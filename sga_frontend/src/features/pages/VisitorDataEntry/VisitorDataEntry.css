@@ -1,0 +1,22 @@
+.page {
+  display: flex;
+  justify-content: center;
+  flex-grow: 1;
+}
+.division {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+.page,
+.division {
+  gap: 25px;
+}
+
+.division input {
+  width: 500px;
+}
+
+.division button {
+  margin: 25px auto;
+}

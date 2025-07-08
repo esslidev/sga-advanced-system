@@ -1,0 +1,6 @@
+.footer {
+  display: flex;
+  justify-content: center;
+  padding: 12px 0px;
+  margin-top: auto;
+}

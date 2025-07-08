@@ -1,0 +1,58 @@
+.header {
+  display: flex;
+  flex-direction: column;
+  background-color: white;
+  padding: 24px 120px;
+  gap: 14px;
+  box-shadow: 2px 2px 11px rgba(0, 0, 0, 0.1);
+}
+
+.topBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.profile {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.profileImage {
+  width: 50px;
+  height: 50px;
+  background-color: #e7e7e7;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+}
+#fullName {
+  font-size: 16px;
+  font-weight: 500;
+}
+
+#logout {
+  padding: 4px 24px;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 50px;
+  background-color: #e74b4b;
+  color: white;
+}
+
+#logout:hover {
+  background-color: #d0393a;
+  color: white;
+}
+
+.navBar {
+  display: flex;
+  gap: 20px;
+}
+
+.navButton {
+  padding: 10px 40px;
+}
