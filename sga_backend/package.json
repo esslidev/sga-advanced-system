@@ -1,0 +1,21 @@
+{
+  "dependencies": {
+    "@prisma/client": "^6.10.1",
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "nodemon": "^3.1.10"
+  },
+ 
+  "scripts": {
+    "custom-command": "echo 'This is my custom command'",
+    "start": "nodemon app.js",
+    "compile": "tsc",
+    "migrate": "prisma migrate dev",
+    "generate": "prisma generate",
+    "push": "prisma db push",
+    "studio": "prisma studio"
+  },
+  "devDependencies": {
+    "prisma": "^6.10.1"
+  }
+}

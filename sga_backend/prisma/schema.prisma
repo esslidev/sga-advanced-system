@@ -1,0 +1,36 @@
+datasource db {
+    provider = "mysql"
+    url      = "mysql://root:@localhost:3306/SGA"
+}
+
+generator client {
+    provider = "prisma-client-js"
+}
+
+model Visitor {
+    id        String    @id @default(uuid())
+    CIN       String    @unique
+    firstName String
+    lastName  String
+    visits    Visit[]
+    createdAt DateTime  @default(now())
+    updatedAt DateTime  @updatedAt
+    deletedAt DateTime?
+}
+
+model Visit {
+    id          String    @id @default(uuid())
+    visitorCIN  String
+    division    Division
+    visitDate   DateTime
+    visitReason String    @db.LongText
+    visitor     Visitor   @relation(fields: [visitorCIN], references: [CIN] ,onUpdate: Cascade)
+    createdAt   DateTime  @default(now())
+    updatedAt   DateTime  @updatedAt
+    deletedAt   DateTime?
+}
+
+enum Division {
+    example1
+    example2
+}
