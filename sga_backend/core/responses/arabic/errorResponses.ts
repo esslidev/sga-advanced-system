@@ -4,7 +4,6 @@ const ErrorHttpStatusCode = {
   FORBIDDEN: 403,
   NOT_FOUND: 404,
   INTERNAL_SERVER_ERROR: 500,
-  //HttpStatusCode
   CONFLICT: 409, // مضاف لحالات مثل "already exists"
 };
 
@@ -21,12 +20,13 @@ const ErrorTitle = {
   USER_ALREADY_EXISTS: "User Already Exists",
   INVALID_EMAIL: "Invalid Email",
   INVALID_PASSWORD: "Invalid Password",
+
   //ErrorTitle Visitor
   VISITOR_ALREADY_EXISTS: "Visitor Already Exists",
   VISITOR_DELETED: "Visitor Deleted Successfully",
   VISITOR_DELETED_PREVIOUSLY: "Visitor Previously Deleted",
-  //ErrorTitle Visit
 
+  //ErrorTitle Visit
   VISIT_NOT_FOUND: "Visit Not Found",
   INVALID_VISIT_DATA: "Invalid Visit Data",
 };

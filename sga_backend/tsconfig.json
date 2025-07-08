@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "target": "es2020",
+    "module": "commonjs",
+    "outDir": "./build", // matches your nodemon path
+    "rootDir": "./", // your source folder (if server.ts is root)
+    "strict": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true
+  },
+  "include": ["**/*.ts"], // compile all ts files
+  "exclude": ["node_modules"]
+}
