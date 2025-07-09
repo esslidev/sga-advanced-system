@@ -1,20 +1,13 @@
-.page {
+.divisions {
   display: flex;
-  justify-content: center;
-  flex-grow: 1;
-}
-.division {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-}
-.page,
-.division {
+  flex-direction: column;
   gap: 25px;
 }
 
-.division input {
-  width: 500px;
+.division {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 25px;
 }
 
 .division button {

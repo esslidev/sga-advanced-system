@@ -21,11 +21,22 @@ body,
   line-height: 1.6;
 }
 
+/* Globalizing colors */
+:root {
+  --primary-color: #3498db;
+  --secondary-color: #2ecc71;
+  --danger-color: #e74c3c;
+  --text-color: #333;
+  --background-color: #f8f9fa;
+}
+
 /* ===== Layout Helpers ===== */
 .page {
   display: flex;
   flex-direction: column;
-  padding: 24px 120px;
+  padding: 24px 180px;
+  flex-grow: 1;
+  justify-content: center;
 }
 
 /* ===== Utility Classes ===== */

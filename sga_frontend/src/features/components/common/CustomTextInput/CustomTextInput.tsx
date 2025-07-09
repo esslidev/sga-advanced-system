@@ -1,4 +1,5 @@
 import React from "react";
+import "./CustomTextInput.css";
 
 interface CustomTextInputProps {
   name: string;
@@ -11,12 +12,8 @@ const CustomTextInput: React.FC<CustomTextInputProps> = ({
   type,
   isCentered,
 }) => {
-  const inputStyle: React.CSSProperties = isCentered
-    ? { textAlign: "center" }
-    : {};
-
   return (
-    <div>
+    <div className="customTextInput">
       <p>{name + " :"}</p>
       <input
         type={type}
@@ -24,7 +21,7 @@ const CustomTextInput: React.FC<CustomTextInputProps> = ({
         name={name}
         required
         placeholder={name}
-        style={inputStyle}
+        style={isCentered ? { textAlign: "center" } : {}}
       />
     </div>
   );
