@@ -1,13 +1,13 @@
-const ErrorHttpStatusCode = {
+export const ErrorHttpStatusCode = {
   BAD_REQUEST: 400,
   UNAUTHORIZED: 401,
   FORBIDDEN: 403,
   NOT_FOUND: 404,
   INTERNAL_SERVER_ERROR: 500,
   CONFLICT: 409, // مضاف لحالات مثل "already exists"
-};
+} as const;
 
-const ErrorTitle = {
+export const ErrorTitle = {
   AUTHENTICATION_ERROR: "Authentication-related issue",
   INVALID_CREDENTIALS: "Invalid Credentials",
   LACK_OF_CREDENTIALS: "Lack of Credentials",
@@ -21,17 +21,17 @@ const ErrorTitle = {
   INVALID_EMAIL: "Invalid Email",
   INVALID_PASSWORD: "Invalid Password",
 
-  //ErrorTitle Visitor
+  // Visitor-related
   VISITOR_ALREADY_EXISTS: "Visitor Already Exists",
   VISITOR_DELETED: "Visitor Deleted Successfully",
   VISITOR_DELETED_PREVIOUSLY: "Visitor Previously Deleted",
 
-  //ErrorTitle Visit
+  // Visit-related
   VISIT_NOT_FOUND: "Visit Not Found",
   INVALID_VISIT_DATA: "Invalid Visit Data",
-};
+} as const;
 
-const ErrorMessage = {
+export const ErrorMessage = {
   AUTHENTICATION_ERROR:
     "Authentication error. Please provide valid credentials.",
   INVALID_CREDENTIALS: "Invalid credentials provided. Please try again.",
@@ -49,21 +49,24 @@ const ErrorMessage = {
   USER_ALREADY_EXISTS: "User with this email or third-party ID already exists.",
   INVALID_EMAIL:
     "Invalid email provided. Please provide a valid email address.",
+  INTERNAL_ERROR:
+    "An internal error occurred. Please try again later or contact support.",
+
   INVALID_PASSWORD:
     "Invalid password provided. Password must be at least 8 characters long and contain both letters and numbers.",
   INTERNAL_SERVER_ERROR:
     "An unexpected error occurred on the server. Please try again later or contact support for assistance.",
-  //ErrorMessage Visitor
+
+  // Visitor-related
   VISITOR_ALREADY_EXISTS:
     "Visitor with the provided information already exists in the system.",
   VISITOR_DELETED: "The visitor has been successfully deleted from the system.",
   VISITOR_DELETED_PREVIOUSLY:
     "This visitor was previously deleted. Please contact support for further assistance.",
-  //ErrorMessage Visit
+
+  // Visit-related
   VISIT_NOT_FOUND:
     "The requested visit could not be found. Please verify the visit ID.",
   INVALID_VISIT_DATA:
     "Invalid visit data provided. Please check the input and try again.",
-};
-
-module.exports = { ErrorHttpStatusCode, ErrorTitle, ErrorMessage };
+} as const;

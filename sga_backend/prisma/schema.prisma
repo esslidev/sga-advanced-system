@@ -22,7 +22,7 @@ model Visit {
     id          String    @id @default(uuid())
     visitorCIN  String
     division    Division
-    visitDate   DateTime
+    visitDate   DateTime  @default(now())
     visitReason String    @db.LongText
     visitor     Visitor   @relation(fields: [visitorCIN], references: [CIN] ,onUpdate: Cascade)
     createdAt   DateTime  @default(now())

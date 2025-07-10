@@ -103,6 +103,7 @@ export const getVisitors = async (
       .send({ data: responseVisitors });
   } catch (error) {
     request.log.error(error);
+
     return reply.status(ErrorHttpStatusCode.INTERNAL_SERVER_ERROR).send({
       statusCode: ErrorHttpStatusCode.INTERNAL_SERVER_ERROR,
       title: ErrorTitle.INTERNAL_SERVER_ERROR,
