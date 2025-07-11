@@ -7,7 +7,7 @@ import visitRouter from "./router/visitRouter";
 import prisma from "./prisma/client";
 
 const fastify = Fastify({
-  logger: true,
+  logger: false,
 });
 
 // Inject Prisma into Fastify instance

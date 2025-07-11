@@ -1,6 +1,6 @@
 datasource db {
     provider = "mysql"
-    url      = "mysql://root:@localhost:3306/SGA"
+    url      = env("DATABASE_URL")
 }
 
 generator client {
@@ -24,10 +24,31 @@ model Visit {
     division    Division
     visitDate   DateTime  @default(now())
     visitReason String    @db.LongText
-    visitor     Visitor   @relation(fields: [visitorCIN], references: [CIN] ,onUpdate: Cascade)
+    visitor     Visitor   @relation(fields: [visitorCIN], references: [CIN], onUpdate: Cascade)
     createdAt   DateTime  @default(now())
     updatedAt   DateTime  @updatedAt
     deletedAt   DateTime?
+}
+
+model User {
+    id        String    @id @default(uuid())
+    CIN       String    @unique
+    password  String
+    firstName String
+    lastName  String
+    imageUrl  String
+    sessions  Session[]
+    createdAt DateTime  @default(now())
+    updatedAt DateTime  @updatedAt
+    deletedAt DateTime?
+}
+
+model Session {
+    id        String   @id @default(uuid())
+    userId    String?
+    User      User?    @relation(fields: [userId], references: [id])
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
 }
 
 enum Division {

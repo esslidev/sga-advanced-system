@@ -18,8 +18,7 @@ const prisma = new PrismaClient();
 export const getVisits = async (
   request: FastifyRequest<{
     Querystring: {
-      orderByName?: string;
-      id?: string;
+      id: string;
       limit?: string;
       page?: string;
     };
@@ -129,8 +128,8 @@ export const updateVisit = async (
     Body: {
       id: string;
       visitorCIN?: string;
-      division: string;
-      visitReason: string;
+      division?: string;
+      visitReason?: string;
     };
   }>,
   reply: FastifyReply
