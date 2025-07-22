@@ -23,9 +23,8 @@ body,
 
 /* Globalizing colors */
 :root {
-  --primary-color: #3498db;
-  --secondary-color: #2ecc71;
-  --danger-color: #e74c3c;
+  --primary-color: #33b168;
+  --danger-color: #ca4d3f;
   --text-color: #333;
   --background-color: #f8f9fa;
 }
@@ -72,6 +71,75 @@ textarea {
   border-radius: 4px;
   border: 1px solid #ccc;
   outline: none;
+}
+
+select {
+  font-family: inherit;
+  font-size: 1rem;
+  padding: 0.5rem;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  color: #222;
+  width: 100%;
+  appearance: auto;
+  -webkit-appearance: menulist;
+  -moz-appearance: menulist;
+}
+select:focus {
+  border-color: var(--primary-color);
+  outline: none;
+}
+
+.custom-multiselect .multiselectContainer {
+  background-color: white;
+  width: 500px;
+  border: 1px solid #ccc;
+}
+
+.chip .closeIcon {
+  margin: 0 !important;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.custom-multiselect .search-wrapper {
+  text-align: right;
+  border: none;
+  outline: none;
+  padding: 0;
+}
+
+.custom-multiselect .searchBox {
+  background-color: white !important;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 100%;
+  text-align: right;
+  padding: 10px 16px;
+}
+
+.custom-multiselect .optionContainer {
+  background-color: white !important;
+  text-align: right;
+}
+
+.custom-multiselect .optionContainer {
+  background-color: white;
+}
+
+.custom-multiselect .option {
+  background-color: white;
+  color: black;
+}
+
+.custom-multiselect .option:hover {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.custom-multiselect .option.selected {
+  background-color: var(--primary-color);
+  color: white;
 }
 
 button {

@@ -22,7 +22,7 @@ const CustomSelector: React.FC<CustomSelectorProps> = ({
 }) => {
   return (
     <div className="customSelector">
-      <label htmlFor={name}>{name + " :"}</label>
+      <p>{name + " :"}</p>
       <select
         id={name}
         name={name}

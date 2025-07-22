@@ -1,13 +1,17 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useVisitor } from "../../hooks/useVisitor";
 import "./Visitors.css";
 import CustomTable from "../../components/common/CustomDataGrid/CustomTable";
 
 const VisitorsPage = () => {
-  const { createVisitor, selectedVisitor, visitors, loading, response } =
-    useVisitor();
+  const { fetchVisitors, visitors, loading } = useVisitor();
 
   const header = ["رقم البطاقة الوطنية", "الإسم الشخصي", "الإسم العائلي"];
+
+  // Fetch visitors when component mounts
+  useEffect(() => {
+    fetchVisitors();
+  }, [fetchVisitors]);
 
   //fake data
   const data = [

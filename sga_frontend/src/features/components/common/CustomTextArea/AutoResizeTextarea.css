@@ -1,0 +1,21 @@
+.auto-resize-textarea {
+  min-height: auto;
+  overflow: hidden;
+  resize: none;
+  transition: all 0.2s ease-in-out;
+  padding: 14px 16px;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  outline: none;
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.5;
+  background-color: #ffffff;
+  color: var(--text-color);
+  box-sizing: border-box;
+}
+
+.auto-resize-textarea:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}

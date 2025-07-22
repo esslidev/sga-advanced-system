@@ -10,5 +10,5 @@
 
 .customButtonOnInsert:hover {
   color: white;
-  background-color: #9cc57a;
+  background-color: var(--primary-color);
 }

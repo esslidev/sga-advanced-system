@@ -10,7 +10,7 @@ import {
   SuccessTitle,
   SuccessMessage,
 } from "../core/responses/arabic/responses";
-import { promises } from "dns";
+import { error } from "console";
 
 const prisma = new PrismaClient();
 
@@ -43,7 +43,7 @@ export const getVisits = async (
       orderBy: order,
       skip,
       take,
-      include: { visitor: true },
+      include: { visitor: true, divisions: true },
     });
 
     if (visits.length === 0) {
@@ -57,7 +57,7 @@ export const getVisits = async (
     const responseVisits = visits.map((visit) => ({
       id: visit.id,
       visitorCIN: visit.visitorCIN,
-      division: visit.division,
+      divisions: visit.divisions.map((vd) => vd.division),
       visitReason: visit.visitReason,
       visitor: {
         id: visit.visitor.id,
@@ -90,8 +90,7 @@ export const addVisit = async (
     Body: {
       visitorCIN: string;
       visitDate: Date;
-      visitTime: Date;
-      division: Division;
+      divisions: Division[];
       visitReason: string;
       visitor: {
         firstName: string;
@@ -101,7 +100,7 @@ export const addVisit = async (
   }>,
   reply: FastifyReply
 ) => {
-  const { visitorCIN, visitDate, visitTime, division, visitReason, visitor } =
+  const { visitorCIN, visitDate, divisions, visitReason, visitor } =
     request.body;
 
   try {
@@ -143,14 +142,19 @@ export const addVisit = async (
       });
     }
 
+    request.log.info("divisions:", divisions);
+
     // Register the visit
     await request.server.prisma.visit.create({
       data: {
         visitorCIN,
         visitDate,
-        visitTime,
-        division,
         visitReason,
+        divisions: {
+          create: divisions.map((division) => ({
+            division,
+          })),
+        },
       },
     });
 
@@ -177,13 +181,13 @@ export const updateVisit = async (
       visitorCIN?: string;
       visitDate?: Date;
       visitTime?: Date;
-      division?: string;
+      divisions?: string[];
       visitReason?: string;
     };
   }>,
   reply: FastifyReply
 ) => {
-  const { id, visitorCIN, division, visitReason } = request.body;
+  const { id, visitorCIN, divisions, visitReason } = request.body;
 
   try {
     const existingVisit = await request.server.prisma.visit.findFirst({
@@ -199,9 +203,13 @@ export const updateVisit = async (
     }
 
     const updatedVisitData = {
-      ...(division && { division: division as Division }),
-      ...(visitReason && { visitReason }),
       ...(visitorCIN && { visitor: { connect: { CIN: visitorCIN } } }),
+      ...(divisions && {
+        divisions: {
+          set: divisions.map((divisionId) => ({ id: divisionId })),
+        },
+      }),
+      ...(visitReason && { visitReason }),
     };
 
     const updatedVisit = await request.server.prisma.visit.update({

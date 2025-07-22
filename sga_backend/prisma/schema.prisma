@@ -35,9 +35,8 @@ model Visitor {
 model Visit {
     id          String    @id @default(uuid())
     visitorCIN  String
-    division    Division
+    divisions   VisitDivision[]
     visitDate   DateTime  @default(now())
-    visitTime   DateTime  @default(now())
     visitReason String    @db.LongText
     visitor     Visitor   @relation(fields: [visitorCIN], references: [CIN], onUpdate: Cascade)
     createdAt   DateTime  @default(now())
@@ -45,16 +44,26 @@ model Visit {
     deletedAt   DateTime?
 }
 
+model VisitDivision {
+    id        String   @id @default(uuid())
+    visitId   String
+    division  Division
+    visit     Visit    @relation(fields: [visitId], references: [id],onDelete: Cascade)
+}
+
 
 model Session {
     id        String   @id @default(uuid())
-    userId    String?
-    User      User?    @relation(fields: [userId], references: [id])
+    userId    String
+    User      User    @relation(fields: [userId], references: [id])
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 }
 
 enum Division {
-    example1
-    example2
+    division1
+    division2
+    division3
+    division4
+    division5
 }

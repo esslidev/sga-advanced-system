@@ -21,7 +21,7 @@ const getVisits = async (request, reply) => {
             orderBy: order,
             skip,
             take,
-            include: { visitor: true },
+            include: { visitor: true, divisions: true },
         });
         if (visits.length === 0) {
             return reply.status(errorResponses_1.ErrorHttpStatusCode.NOT_FOUND).send({
@@ -33,7 +33,7 @@ const getVisits = async (request, reply) => {
         const responseVisits = visits.map((visit) => ({
             id: visit.id,
             visitorCIN: visit.visitorCIN,
-            division: visit.division,
+            divisions: visit.divisions.map((vd) => vd.division),
             visitReason: visit.visitReason,
             visitor: {
                 id: visit.visitor.id,
@@ -62,7 +62,7 @@ const getVisits = async (request, reply) => {
 exports.getVisits = getVisits;
 //ADD Visit
 const addVisit = async (request, reply) => {
-    const { visitorCIN, visitDate, visitTime, division, visitReason, visitor } = request.body;
+    const { visitorCIN, visitDate, divisions, visitReason, visitor } = request.body;
     try {
         const existingVisitor = await request.server.prisma.visitor.findUnique({
             where: { CIN: visitorCIN },
@@ -98,14 +98,18 @@ const addVisit = async (request, reply) => {
                 },
             });
         }
+        request.log.info("divisions:", divisions);
         // Register the visit
         await request.server.prisma.visit.create({
             data: {
                 visitorCIN,
                 visitDate,
-                visitTime,
-                division,
                 visitReason,
+                divisions: {
+                    create: divisions.map((division) => ({
+                        division,
+                    })),
+                },
             },
         });
         return reply.status(responses_1.SuccessHttpStatusCode.CREATED).send({
@@ -126,7 +130,7 @@ const addVisit = async (request, reply) => {
 exports.addVisit = addVisit;
 // UPDATE Visit
 const updateVisit = async (request, reply) => {
-    const { id, visitorCIN, division, visitReason } = request.body;
+    const { id, visitorCIN, divisions, visitReason } = request.body;
     try {
         const existingVisit = await request.server.prisma.visit.findFirst({
             where: { id, deletedAt: { equals: null } },
@@ -139,9 +143,13 @@ const updateVisit = async (request, reply) => {
             });
         }
         const updatedVisitData = {
-            ...(division && { division: division }),
-            ...(visitReason && { visitReason }),
             ...(visitorCIN && { visitor: { connect: { CIN: visitorCIN } } }),
+            ...(divisions && {
+                divisions: {
+                    set: divisions.map((divisionId) => ({ id: divisionId })),
+                },
+            }),
+            ...(visitReason && { visitReason }),
         };
         const updatedVisit = await request.server.prisma.visit.update({
             where: { id },

@@ -1,36 +1,39 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import CustomTextInput from "../../components/common/CustomTextInput/CustomTextInput";
 import CustomButton from "../../components/common/CustomButton/CustomButton";
 import { useVisit } from "../../hooks/useVisit";
 import { HttpStatusCode } from "axios";
-import { Division, Visit } from "../../models/visit";
+import {
+  Division,
+  DivisionOption,
+  divisionOptions,
+  Visit,
+} from "../../models/visit";
 
 import "./VisitDataEntry.css";
-import CustomSelector from "../../components/common/CustomSelector/CustomSelector";
+import Multiselect from "multiselect-react-dropdown";
+import AutoResizeTextarea from "../../components/common/CustomTextArea/AutoResizeTextarea";
 
 interface VisitFormData {
   CIN: string;
   firstName: string;
   lastName: string;
   visitDate: Date;
-  division: Division;
+  divisions: Division[];
   visitReason: string;
 }
 
 const VisitDataEntryPage = () => {
+  const multiselectRef = useRef<Multiselect>(null);
+
   const [formData, setFormData] = useState<VisitFormData>({
     CIN: "",
     firstName: "",
     lastName: "",
     visitDate: new Date(),
-    division: Division.example1,
+    divisions: [],
     visitReason: "",
   });
-
-  const divisionOptions = Object.entries(Division).map(([key, value]) => ({
-    value,
-    label: value,
-  }));
 
   const { createVisit } = useVisit();
 
@@ -40,7 +43,9 @@ const VisitDataEntryPage = () => {
       !formData.CIN?.trim() ||
       !formData.firstName?.trim() ||
       !formData.lastName?.trim() ||
-      !formData.visitReason?.trim()
+      !formData.visitReason?.trim() ||
+      formData.divisions.length === 0 ||
+      formData.visitDate.toString() === "Invalid Date"
     ) {
       alert("الرجاء ملء جميع الحقول المطلوبة.");
       return;
@@ -57,9 +62,11 @@ const VisitDataEntryPage = () => {
         },
         visitorCIN: formData.CIN.trim(),
         visitDate: formData.visitDate,
-        division: formData.division,
+        divisions: formData.divisions,
         visitReason: formData.visitReason.trim(),
       };
+
+      console.log("Submitting visit data:", visitPayload);
 
       const visitActionResult = await createVisit(visitPayload);
       const visitResult = visitActionResult.payload;
@@ -81,9 +88,14 @@ const VisitDataEntryPage = () => {
         firstName: "",
         lastName: "",
         visitDate: new Date(),
-        division: Division.example1,
+        divisions: [],
         visitReason: "",
       });
+
+      // reset multiselect UI
+      if (multiselectRef.current) {
+        multiselectRef.current.resetSelectedValues();
+      }
     } catch (error: any) {
       alert("حدث خطأ: " + (error.message || error));
     }
@@ -122,11 +134,10 @@ const VisitDataEntryPage = () => {
             name="تاريخ الزيارة"
             type="date"
             isCentered
-            value={formData.visitDate.toISOString().split("T")[0]} // YYYY-MM-DD
+            value={formData.visitDate.toISOString().split("T")[0]}
             onChange={(e) => {
               const newDate = new Date(formData.visitDate);
               const [year, month, day] = e.target.value.split("-").map(Number);
-              // Update year, month (zero-based), day, keep time as is
               newDate.setFullYear(year, month - 1, day);
               setFormData({ ...formData, visitDate: newDate });
             }}
@@ -144,31 +155,80 @@ const VisitDataEntryPage = () => {
             }}
           />
           {
-            <CustomSelector
-              name="القسم"
-              value={formData.division}
-              options={divisionOptions}
-              placeholder="اختر القسم"
-              onChange={(e) =>
-                setFormData({
-                  ...formData,
-                  division: e.target.value as Division,
-                })
-              }
-            />
+            <div>
+              <p>الأقسام:</p>
+              <Multiselect
+                ref={multiselectRef}
+                className="custom-multiselect"
+                options={divisionOptions.map((option) => ({
+                  name: option.label,
+                  value: option.value,
+                }))}
+                displayValue="name"
+                placeholder="اختر القسم"
+                emptyRecordMsg="لا توجد خيارات متاحة"
+                onSelect={(selected: DivisionOption[]) => {
+                  setFormData({
+                    ...formData,
+                    divisions: selected.map((s) => s.value as Division), // if you use enum Division
+                  });
+                }}
+                onRemove={(selected: DivisionOption[]) => {
+                  setFormData({
+                    ...formData,
+                    divisions: selected.map((s) => s.value as Division),
+                  });
+                }}
+                isObject={true}
+                style={{
+                  chips: {
+                    gap: "4px",
+                    borderRadius: "4px",
+                    background: "var(--primary-color)",
+                  },
+                  multiselectContainer: {
+                    width: "500px",
+                  },
+                }}
+              />
+            </div>
           }
-          <CustomTextInput
-            name="سبب الزيارة"
-            type="text"
-            value={formData.visitReason}
-            onChange={(e) =>
-              setFormData({ ...formData, visitReason: e.target.value })
-            }
-          />
+          <div>
+            <p className="font-semibold mb-2">سبب الزيارة :</p>
+            <AutoResizeTextarea
+              name="سبب الزيارة"
+              placeholder="أدخل سبب الزيارة هنا"
+              style={{ width: "500px" }}
+              value={formData.visitReason}
+              onChange={(e) =>
+                setFormData({ ...formData, visitReason: e.target.value })
+              }
+              minRows={4}
+              maxRows={8}
+            />
+          </div>
         </div>
         <div className="division buttonDivision">
           <CustomButton name="التسجيل" isInsert={true} onClick={handleSubmit} />
-          <CustomButton name="الإلغاء" />
+          <CustomButton
+            name="الإلغاء"
+            onClick={() => {
+              // Reset form
+              setFormData({
+                CIN: "",
+                firstName: "",
+                lastName: "",
+                visitDate: new Date(),
+                divisions: [],
+                visitReason: "",
+              });
+
+              // reset multiselect UI
+              if (multiselectRef.current) {
+                multiselectRef.current.resetSelectedValues();
+              }
+            }}
+          />
         </div>
       </div>
     </div>

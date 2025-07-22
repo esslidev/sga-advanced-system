@@ -20,7 +20,7 @@ const start = async () => {
     try {
         // Register CORS
         await fastify.register(cors_1.default, {
-            origin: ["http://localhost:3000"],
+            origin: ["http://localhost:3000", "http://192.168.0.108:3000"],
         });
         // Register form-body for urlencoded parsing
         await fastify.register(formbody_1.default);

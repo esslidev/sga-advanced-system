@@ -35,7 +35,7 @@ const Header = () => {
         <button
           className="navButton"
           title="تحصيل الزيارة"
-          onClick={() => navigate(PagesRoutes.visitorDataEntryPage)}
+          onClick={() => navigate(PagesRoutes.visitDataEntryPage)}
         >
           تحصيل الزيارة
         </button>

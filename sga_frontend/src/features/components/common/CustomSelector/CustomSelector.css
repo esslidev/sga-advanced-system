@@ -1,33 +1,3 @@
 .customSelector {
-  display: flex;
-  flex-direction: column;
-  font-family: Arial, sans-serif;
   width: 500px;
-  padding: 10px 16px;
-}
-
-.customSelector label {
-  margin-bottom: 0.5rem;
-  font-size: 0.95rem;
-  color: #333;
-}
-
-.customSelector select {
-  padding: 0.5rem 0.75rem;
-  font-size: 1rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  outline: none;
-  background-color: white;
-  transition: border-color 0.3s ease;
-}
-
-.customSelector select:focus {
-  border-color: #007bff;
-  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.1);
-}
-
-.customSelector select:disabled {
-  background-color: #f8f9fa;
-  cursor: not-allowed;
 }
