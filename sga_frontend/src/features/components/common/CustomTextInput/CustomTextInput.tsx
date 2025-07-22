@@ -5,12 +5,20 @@ interface CustomTextInputProps {
   name: string;
   type: React.HTMLInputTypeAttribute;
   isCentered?: boolean;
+  value?: string;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  required?: boolean;
+  placeholder?: string;
 }
 
 const CustomTextInput: React.FC<CustomTextInputProps> = ({
   name,
   type,
   isCentered,
+  value,
+  onChange,
+  required = true,
+  placeholder,
 }) => {
   return (
     <div className="customTextInput">
@@ -19,8 +27,10 @@ const CustomTextInput: React.FC<CustomTextInputProps> = ({
         type={type}
         id={name}
         name={name}
-        required
-        placeholder={name}
+        value={value}
+        onChange={onChange}
+        required={required}
+        placeholder={placeholder || name}
         style={isCentered ? { textAlign: "center" } : {}}
       />
     </div>

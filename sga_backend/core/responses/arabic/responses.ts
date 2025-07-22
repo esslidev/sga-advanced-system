@@ -3,18 +3,22 @@ export const SuccessHttpStatusCode = {
   CREATED: 201,
   NO_CONTENT: 204,
   ACCEPTED: 202,
-} as const;
+};
 
 export const SuccessTitle = {
-  VISITOR_CREATED: "Visitor Created Successfully",
-  VISITOR_UPDATED: "Visitor Updated Successfully",
-  VISITOR_DELETED: "Visitor Deleted Successfully",
-  OPERATION_SUCCESSFUL: "Operation Successful",
-} as const;
+  // Visitor-related
+  VISITOR_CREATED: "تم إنشاء الزائر بنجاح",
+  VISITOR_UPDATED: "تم تحديث بيانات الزائر بنجاح",
+  VISITOR_DELETED: "تم حذف الزائر بنجاح",
+  // Visit-related
+  VISIT_REGISTERED: "تم تسجيل الزيارة بنجاح",
+};
 
 export const SuccessMessage = {
-  VISITOR_CREATED: "The visitor has been successfully created in the system.",
-  VISITOR_UPDATED: "The visitor details have been successfully updated.",
-  VISITOR_DELETED: "The visitor has been successfully deleted from the system.",
-  OPERATION_SUCCESSFUL: "The operation was completed successfully.",
-} as const;
+  // Visitor-related
+  VISITOR_CREATED: "تم إنشاء الزائر في النظام بنجاح.",
+  VISITOR_UPDATED: "تم تحديث بيانات الزائر بنجاح.",
+  VISITOR_DELETED: "تم حذف الزائر من النظام بنجاح.",
+  // Visit-related
+  VISIT_REGISTERED: "تم تسجيل الزيارة بنجاح.",
+};

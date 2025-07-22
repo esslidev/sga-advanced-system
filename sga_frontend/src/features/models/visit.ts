@@ -1,6 +1,6 @@
 export enum Division {
-    example1,
-    example2,
+  example1 = "example1",
+  example2 = "example2",
 }
 
 export type Visit = {

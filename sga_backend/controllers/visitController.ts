@@ -84,33 +84,80 @@ export const getVisits = async (
   }
 };
 
-// ADD Visit
+//ADD Visit
 export const addVisit = async (
   request: FastifyRequest<{
     Body: {
       visitorCIN: string;
-      division: string;
+      visitDate: Date;
+      visitTime: Date;
+      division: Division;
       visitReason: string;
-      visitor: object;
+      visitor: {
+        firstName: string;
+        lastName: string;
+      };
     };
   }>,
   reply: FastifyReply
 ) => {
-  const { visitorCIN, division, visitReason } = request.body;
+  const { visitorCIN, visitDate, visitTime, division, visitReason, visitor } =
+    request.body;
+
   try {
-    const dataInsert: any = {
-      visitorCIN: visitorCIN,
-      division: division,
-      visitReason: visitReason,
-    };
-    await request.server.prisma.visit.create({
-      data: dataInsert,
+    const existingVisitor = await request.server.prisma.visitor.findUnique({
+      where: { CIN: visitorCIN },
     });
 
-    return reply.status(SuccessHttpStatusCode.OK).send({
-      statusCode: SuccessHttpStatusCode.OK,
-      title: SuccessTitle.VISITOR_CREATED,
-      message: SuccessMessage.VISITOR_CREATED,
+    // If visitor exists
+    if (existingVisitor) {
+      // Soft delete check
+      if (existingVisitor.deletedAt) {
+        return reply.status(ErrorHttpStatusCode.GONE).send({
+          statusCode: ErrorHttpStatusCode.GONE,
+          title: ErrorTitle.VISITOR_DELETED_PREVIOUSLY,
+          message: ErrorMessage.VISITOR_DELETED_PREVIOUSLY,
+        });
+      }
+
+      // Name mismatch check
+      const nameMismatch =
+        existingVisitor.firstName.trim() !== visitor.firstName.trim() ||
+        existingVisitor.lastName.trim() !== visitor.lastName.trim();
+
+      if (nameMismatch) {
+        return reply.status(ErrorHttpStatusCode.CONFLICT).send({
+          statusCode: ErrorHttpStatusCode.CONFLICT,
+          title: ErrorTitle.VISITOR_NAME_MISMATCH,
+          message: ErrorMessage.VISITOR_NAME_MISMATCH,
+        });
+      }
+    } else {
+      // Create visitor if not found
+      await request.server.prisma.visitor.create({
+        data: {
+          CIN: visitorCIN,
+          firstName: visitor.firstName,
+          lastName: visitor.lastName,
+        },
+      });
+    }
+
+    // Register the visit
+    await request.server.prisma.visit.create({
+      data: {
+        visitorCIN,
+        visitDate,
+        visitTime,
+        division,
+        visitReason,
+      },
+    });
+
+    return reply.status(SuccessHttpStatusCode.CREATED).send({
+      statusCode: SuccessHttpStatusCode.CREATED,
+      title: SuccessTitle.VISIT_REGISTERED,
+      message: SuccessMessage.VISIT_REGISTERED,
     });
   } catch (error) {
     request.log.error(error);
@@ -128,6 +175,8 @@ export const updateVisit = async (
     Body: {
       id: string;
       visitorCIN?: string;
+      visitDate?: Date;
+      visitTime?: Date;
       division?: string;
       visitReason?: string;
     };

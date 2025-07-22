@@ -6,7 +6,7 @@ import NotFound from "./features/pages/NotFound/NotFound";
 import Footer from "./features/components/features/Footer/Footer";
 import Header from "./features/components/features/Header/Header";
 import StatsPage from "./features/pages/Stats/Stats";
-import VisitorDataEntryPage from "./features/pages/VisitorDataEntry/VisitorDataEntry";
+import VisitorDataEntryPage from "./features/pages/VisitorDataEntry/VisitDataEntry";
 
 export enum PagesRoutes {
   basePage = "/accueil",

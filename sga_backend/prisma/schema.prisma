@@ -7,6 +7,20 @@ generator client {
     provider = "prisma-client-js"
 }
 
+model User {
+    id        String    @id @default(uuid())
+    CIN       String    @unique
+    password  String
+    firstName String
+    lastName  String
+    imageUrl  String
+    sessions  Session[]
+    createdAt DateTime  @default(now())
+    updatedAt DateTime  @updatedAt
+    deletedAt DateTime?
+}
+
+
 model Visitor {
     id        String    @id @default(uuid())
     CIN       String    @unique
@@ -23,6 +37,7 @@ model Visit {
     visitorCIN  String
     division    Division
     visitDate   DateTime  @default(now())
+    visitTime   DateTime  @default(now())
     visitReason String    @db.LongText
     visitor     Visitor   @relation(fields: [visitorCIN], references: [CIN], onUpdate: Cascade)
     createdAt   DateTime  @default(now())
@@ -30,18 +45,6 @@ model Visit {
     deletedAt   DateTime?
 }
 
-model User {
-    id        String    @id @default(uuid())
-    CIN       String    @unique
-    password  String
-    firstName String
-    lastName  String
-    imageUrl  String
-    sessions  Session[]
-    createdAt DateTime  @default(now())
-    updatedAt DateTime  @updatedAt
-    deletedAt DateTime?
-}
 
 model Session {
     id        String   @id @default(uuid())

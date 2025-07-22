@@ -130,8 +130,8 @@ export const addVisitor = async (
     });
 
     if (existingVisitor) {
-      return reply.status(ErrorHttpStatusCode.BAD_REQUEST).send({
-        statusCode: ErrorHttpStatusCode.BAD_REQUEST,
+      return reply.status(ErrorHttpStatusCode.CONFLICT).send({
+        statusCode: ErrorHttpStatusCode.CONFLICT,
         title: ErrorTitle.VISITOR_ALREADY_EXISTS,
         message: ErrorMessage.VISITOR_ALREADY_EXISTS,
       });
@@ -145,8 +145,8 @@ export const addVisitor = async (
     });
 
     if (deletedVisitor) {
-      return reply.status(ErrorHttpStatusCode.BAD_REQUEST).send({
-        statusCode: ErrorHttpStatusCode.BAD_REQUEST,
+      return reply.status(ErrorHttpStatusCode.GONE).send({
+        statusCode: ErrorHttpStatusCode.GONE,
         title: ErrorTitle.VISITOR_DELETED_PREVIOUSLY,
         message: ErrorMessage.VISITOR_DELETED_PREVIOUSLY,
       });
@@ -156,8 +156,8 @@ export const addVisitor = async (
       data: { CIN, firstName, lastName },
     });
 
-    return reply.status(SuccessHttpStatusCode.OK).send({
-      statusCode: SuccessHttpStatusCode.OK,
+    return reply.status(SuccessHttpStatusCode.CREATED).send({
+      statusCode: SuccessHttpStatusCode.CREATED,
       title: SuccessTitle.VISITOR_CREATED,
       message: SuccessMessage.VISITOR_CREATED,
     });
