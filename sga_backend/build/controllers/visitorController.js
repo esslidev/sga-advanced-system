@@ -54,6 +54,10 @@ const getVisitors = async (request, reply) => {
         const order = orderByName
             ? { firstName: "asc" }
             : { createdAt: "desc" };
+        // Fetch total count of users matching the filters
+        const total = await request.server.prisma.visitor.count({
+            where: filters,
+        });
         const visitors = await request.server.prisma.visitor.findMany({
             where: filters,
             orderBy: order,
@@ -68,9 +72,14 @@ const getVisitors = async (request, reply) => {
             createdAt: visitor.createdAt.toISOString(),
             updatedAt: visitor.updatedAt.toISOString(),
         }));
-        return reply
-            .status(responses_1.SuccessHttpStatusCode.OK)
-            .send({ data: responseVisitors });
+        return reply.status(responses_1.SuccessHttpStatusCode.OK).send({
+            data: responseVisitors,
+            pagination: {
+                total,
+                page: Number(page),
+                pages: Math.ceil(total / take),
+            },
+        });
     }
     catch (error) {
         request.log.error(error);

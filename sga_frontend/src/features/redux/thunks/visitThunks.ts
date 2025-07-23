@@ -1,7 +1,7 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import api from "../../../core/services/api";
-import { Visit } from "../../models/visit";
-import { ApiResponse } from "../../models/apiResponse";
+import type { Visit } from "../../models/visit";
+import type { ApiResponse } from "../../models/apiResponse";
 
 // GET many visits
 export const getVisits = createAsyncThunk<

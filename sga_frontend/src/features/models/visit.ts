@@ -1,10 +1,17 @@
-export enum Division {
-  division1 = "division1",
-  division2 = "division2",
-  division3 = "division3",
-  division4 = "division4",
-  division5 = "division5",
-}
+export type Division =
+  | "division1"
+  | "division2"
+  | "division3"
+  | "division4"
+  | "division5";
+
+export const Division = {
+  division1: "division1" as Division,
+  division2: "division2" as Division,
+  division3: "division3" as Division,
+  division4: "division4" as Division,
+  division5: "division5" as Division,
+};
 
 export interface DivisionOption {
   value: Division;
@@ -24,7 +31,7 @@ export type Visit = {
   visitorCIN: string;
   divisions: Division[];
   visitDate: Date;
-  visitReason: String;
+  visitReason: string;
   createdAt: Date;
   updatedAt: Date;
 };

@@ -11,7 +11,7 @@ import {
   clearResponse,
 } from "../redux/slices/visitSlice";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
-import { Visit } from "../models/visit";
+import type { Visit } from "../models/visit";
 
 export const useVisit = () => {
   const dispatch = useAppDispatch();

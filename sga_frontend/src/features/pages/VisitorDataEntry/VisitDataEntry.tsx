@@ -5,9 +5,9 @@ import { useVisit } from "../../hooks/useVisit";
 import { HttpStatusCode } from "axios";
 import {
   Division,
-  DivisionOption,
   divisionOptions,
-  Visit,
+  type DivisionOption,
+  type Visit,
 } from "../../models/visit";
 
 import "./VisitDataEntry.css";
@@ -24,8 +24,9 @@ interface VisitFormData {
 }
 
 const VisitDataEntryPage = () => {
-  const multiselectRef = useRef<Multiselect>(null);
+  const { createVisit } = useVisit();
 
+  const multiselectRef = useRef<Multiselect>(null);
   const [formData, setFormData] = useState<VisitFormData>({
     CIN: "",
     firstName: "",
@@ -34,8 +35,6 @@ const VisitDataEntryPage = () => {
     divisions: [],
     visitReason: "",
   });
-
-  const { createVisit } = useVisit();
 
   const handleSubmit = async () => {
     // Basic validation

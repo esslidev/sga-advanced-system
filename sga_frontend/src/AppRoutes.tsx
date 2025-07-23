@@ -1,4 +1,3 @@
-import React from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import LoginPage from "./features/pages/Login/Login";
 import VisitorsPage from "./features/pages/Visitors/Visitors";
@@ -8,13 +7,13 @@ import Header from "./features/components/features/Header/Header";
 import StatsPage from "./features/pages/Stats/Stats";
 import VisitDataEntryPage from "./features/pages/VisitorDataEntry/VisitDataEntry";
 
-export enum PagesRoutes {
-  basePage = "/accueil",
-  loginPage = "/connexion",
-  visitorsPage = "/visiteurs",
-  visitDataEntryPage = "/saisie-donnees-visites",
-  statsPage = "/statistiques-visiteurs",
-}
+export const PagesRoutes = {
+  basePage: "/accueil",
+  loginPage: "/connexion",
+  visitorsPage: "/visiteurs",
+  visitDataEntryPage: "/saisie-donnees-visites",
+  statsPage: "/statistiques-visiteurs",
+};
 
 const LoggedInLayout = () => {
   return (

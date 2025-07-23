@@ -1,12 +1,12 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { Visit } from "../../models/visit";
+import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import {
   getVisits,
   addVisit,
   updateVisit,
   deleteVisit,
 } from "../thunks/visitThunks";
-import { ApiResponse } from "../../models/apiResponse";
+import type { Visit } from "../../models/visit";
+import type { ApiResponse } from "../../models/apiResponse";
 
 interface VisitState {
   visits: Visit[];

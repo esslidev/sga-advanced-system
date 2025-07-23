@@ -11,7 +11,7 @@ import {
   clearResponse,
 } from "../redux/slices/visitorSlice";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
-import { Visitor } from "../models/visitor";
+import type { Visitor } from "../models/visitor";
 
 export const useVisitor = () => {
   const dispatch = useAppDispatch();
@@ -22,13 +22,19 @@ export const useVisitor = () => {
   );
   const loading = useAppSelector((state) => state.visitor.loading);
   const response = useAppSelector((state) => state.visitor.response);
+  const pagination = useAppSelector((state) => state.visitor.pagination);
 
-  const fetchVisitors = (search?: string) => dispatch(getVisitors(search));
+  const fetchVisitors = (params: {
+    search?: string;
+    orderByName?: boolean;
+    limit?: number;
+    page?: number;
+  }) => dispatch(getVisitors(params));
   const fetchVisitor = (id: string) => dispatch(getVisitor(id));
   const createVisitor = (data: Partial<Visitor>) => dispatch(addVisitor(data));
   const modifyVisitor = (data: Partial<Visitor>) =>
     dispatch(updateVisitor(data));
-  const removeVisitor = (id: string) => dispatch(deleteVisitor(id));
+  const removeVisitor = ({ id }: { id: string }) => dispatch(deleteVisitor(id));
 
   const resetVisitors = () => dispatch(clearVisitors());
   const resetVisitor = () => dispatch(clearVisitor());
@@ -39,6 +45,7 @@ export const useVisitor = () => {
     selectedVisitor,
     loading,
     response,
+    pagination,
     fetchVisitors,
     fetchVisitor,
     createVisitor,

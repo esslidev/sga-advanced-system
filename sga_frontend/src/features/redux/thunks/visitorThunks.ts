@@ -1,7 +1,8 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import api from "../../../core/services/api";
-import { Visitor } from "../../models/visitor";
-import { ApiResponse } from "../../models/apiResponse";
+import type { Visitor } from "../../models/visitor";
+import type { ApiResponse } from "../../models/apiResponse";
+import type { Pagination } from "../../models/pagination";
 
 // GET visitor
 export const getVisitor = createAsyncThunk<
@@ -11,7 +12,7 @@ export const getVisitor = createAsyncThunk<
 >("visitor/getVisitor", async (id, thunkAPI) => {
   try {
     const res = await api.get(`/visitor/get-visitor/${id}`);
-    return res.data;
+    return res.data.data;
   } catch (err: any) {
     const errorResponse: ApiResponse = err.response?.data || {
       statusCode: 500,
@@ -22,15 +23,35 @@ export const getVisitor = createAsyncThunk<
   }
 });
 
+type GetVisitorsQuery = {
+  search?: string;
+  orderByName?: boolean;
+  limit?: number;
+  page?: number;
+};
+
 // GET many visitors
 export const getVisitors = createAsyncThunk<
-  Visitor[],
-  string | undefined,
+  { data: Visitor[]; pagination: Pagination },
+  GetVisitorsQuery | undefined,
   { rejectValue: ApiResponse }
->("/visitor/getVisitors", async (search, thunkAPI) => {
+>("/visitor/getVisitors", async (params, thunkAPI) => {
   try {
-    const query = search ? `?search=${encodeURIComponent(search)}` : "";
-    const res = await api.get(`/visitor/get-visitors${query}`);
+    const queryParams = new URLSearchParams();
+
+    if (params?.search) queryParams.append("search", params.search);
+    if (params?.orderByName !== undefined)
+      queryParams.append("orderByName", String(params.orderByName));
+    if (params?.limit !== undefined)
+      queryParams.append("limit", String(params.limit));
+    if (params?.page !== undefined)
+      queryParams.append("page", String(params.page));
+
+    const query = queryParams.toString();
+    const res = await api.get(
+      `/visitor/get-visitors${query ? "?" + query : ""}`
+    );
+
     return res.data;
   } catch (err: any) {
     const errorResponse: ApiResponse = err.response?.data || {
@@ -87,7 +108,7 @@ export const deleteVisitor = createAsyncThunk<
   { rejectValue: ApiResponse }
 >("visitor/deleteVisitor", async (id, thunkAPI) => {
   try {
-    const res = await api.delete(`/visitor/delete-visitor/${id}`);
+    const res = await api.delete(`/visitor/delete-visitor?id=${id}`);
     return res.data;
   } catch (err: any) {
     const errorResponse: ApiResponse = err.response?.data || {

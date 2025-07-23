@@ -1,5 +1,4 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { Visitor } from "../../models/visitor";
+import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import {
   getVisitor,
   getVisitors,
@@ -7,13 +6,16 @@ import {
   updateVisitor,
   deleteVisitor,
 } from "../thunks/visitorThunks";
-import { ApiResponse } from "../../models/apiResponse";
+import type { Visitor } from "../../models/visitor";
+import type { ApiResponse } from "../../models/apiResponse";
+import type { Pagination } from "../../models/pagination";
 
 interface VisitorState {
   visitors: Visitor[];
   selectedVisitor: Visitor | null;
   loading: boolean;
   response: ApiResponse | null;
+  pagination: Pagination | null;
 }
 
 const initialState: VisitorState = {
@@ -21,6 +23,7 @@ const initialState: VisitorState = {
   selectedVisitor: null,
   loading: false,
   response: null,
+  pagination: null,
 };
 
 const visitorSlice = createSlice({
@@ -29,6 +32,7 @@ const visitorSlice = createSlice({
   reducers: {
     clearVisitors: (state) => {
       state.visitors = [];
+      state.pagination = null;
     },
     clearVisitor: (state) => {
       state.selectedVisitor = null;
@@ -60,9 +64,13 @@ const visitorSlice = createSlice({
     });
     builder.addCase(
       getVisitors.fulfilled,
-      (state, action: PayloadAction<Visitor[]>) => {
+      (
+        state,
+        action: PayloadAction<{ data: Visitor[]; pagination: Pagination }>
+      ) => {
         state.loading = false;
-        state.visitors = action.payload;
+        state.visitors = action.payload.data;
+        state.pagination = action.payload.pagination;
       }
     );
     builder.addCase(getVisitors.rejected, (state, action) => {

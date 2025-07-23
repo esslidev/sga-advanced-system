@@ -1,4 +1,4 @@
-import { combineReducers, configureStore } from "@reduxjs/toolkit";
+import { combineReducers } from "redux";
 import visitorReducer from "./slices/visitorSlice";
 import visitReducer from "./slices/visitSlice";
 
@@ -13,6 +13,7 @@ import {
   REGISTER,
 } from "redux-persist";
 import storage from "redux-persist/lib/storage";
+import { configureStore } from "@reduxjs/toolkit";
 
 const persistConfig = {
   key: "root",

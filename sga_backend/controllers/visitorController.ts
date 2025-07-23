@@ -54,7 +54,7 @@ export const getVisitor = async (
 export const getVisitors = async (
   request: FastifyRequest<{
     Querystring: {
-      orderByName?: string;
+      orderByName?: boolean;
       search?: string;
       limit?: string;
       page?: string;
@@ -82,6 +82,11 @@ export const getVisitors = async (
       ? { firstName: "asc" as Prisma.SortOrder }
       : { createdAt: "desc" as Prisma.SortOrder };
 
+    // Fetch total count of users matching the filters
+    const total = await request.server.prisma.visitor.count({
+      where: filters,
+    });
+
     const visitors = await request.server.prisma.visitor.findMany({
       where: filters,
       orderBy: order,
@@ -98,9 +103,14 @@ export const getVisitors = async (
       updatedAt: visitor.updatedAt.toISOString(),
     }));
 
-    return reply
-      .status(SuccessHttpStatusCode.OK)
-      .send({ data: responseVisitors });
+    return reply.status(SuccessHttpStatusCode.OK).send({
+      data: responseVisitors,
+      pagination: {
+        total,
+        page: Number(page),
+        pages: Math.ceil(total / take),
+      },
+    });
   } catch (error) {
     request.log.error(error);
 

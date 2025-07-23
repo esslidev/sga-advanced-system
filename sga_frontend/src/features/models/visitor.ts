@@ -1,4 +1,4 @@
-import { Visit } from "./visit";
+import type { Visit } from "./visit";
 
 export type Visitor = {
   id: string;

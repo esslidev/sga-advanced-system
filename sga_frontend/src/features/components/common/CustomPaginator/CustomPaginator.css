@@ -1,0 +1,111 @@
+.custom-paginator {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+  color: #444;
+}
+
+.custom-paginator .info {
+  flex: 1 1 200px;
+}
+
+.pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  flex: 2 1 auto;
+}
+
+.page-btn {
+  padding: 0.3rem 0.5rem;
+  border: 1px solid #ccc;
+  background: #fafafa;
+  color: #666;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.page-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.page-btn:hover:not(:disabled) {
+  background: #e6f0ff;
+  border-color: #7a9aff;
+  color: #204ecf;
+}
+
+.page-numbers {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.page-number {
+  padding: 0.3rem 0.6rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background: #fafafa;
+  color: #555;
+  cursor: pointer;
+  user-select: none;
+}
+
+.page-number.active {
+  background: #204ecf;
+  border-color: #204ecf;
+  color: white;
+  font-weight: bold;
+  cursor: default;
+}
+
+.page-number:hover:not(.active) {
+  background: #e6f0ff;
+  border-color: #7a9aff;
+  color: #204ecf;
+}
+
+.ellipsis {
+  padding: 0 0.5rem;
+  color: #999;
+}
+
+.page-size-selector {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #555;
+}
+
+.page-size-selector label {
+  user-select: none;
+}
+
+.page-size-selector select {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 0.25rem 0.5rem;
+  font-size: 14px;
+  background: white;
+  color: #444;
+  cursor: pointer;
+}
+
+.page-size-selector select:focus {
+  outline: none;
+  border-color: #204ecf;
+  box-shadow: 0 0 3px #a0bfff;
+}
