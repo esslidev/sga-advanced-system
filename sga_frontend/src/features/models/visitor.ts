@@ -5,6 +5,7 @@ export type Visitor = {
   CIN: string;
   firstName: string;
   lastName: string;
+  visitsCount: number;
   visits: Visit[];
   createdAt: Date;
   updatedAt: Date;

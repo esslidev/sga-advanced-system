@@ -63,12 +63,18 @@ const getVisitors = async (request, reply) => {
             orderBy: order,
             skip,
             take,
+            include: {
+                _count: {
+                    select: { visits: true },
+                },
+            },
         });
         const responseVisitors = visitors.map((visitor) => ({
             id: visitor.id,
             CIN: visitor.CIN,
             firstName: visitor.firstName,
             lastName: visitor.lastName,
+            visitsCount: visitor._count.visits,
             createdAt: visitor.createdAt.toISOString(),
             updatedAt: visitor.updatedAt.toISOString(),
         }));

@@ -28,7 +28,6 @@ export const divisionOptions: DivisionOption[] = [
 
 export type Visit = {
   id: string;
-  visitorCIN: string;
   divisions: Division[];
   visitDate: Date;
   visitReason: string;

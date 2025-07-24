@@ -73,7 +73,7 @@ const CustomPaginator: React.FC<CustomPaginatorProps> = ({
   return (
     <div className={`custom-paginator ${className}`}>
       <div className="info">
-        Showing {startItem} to {endItem} of {totalItems} results
+        عرض {startItem} إلى {endItem} من {totalItems} وحدة
       </div>
 
       <div className="pagination-controls">
@@ -83,7 +83,7 @@ const CustomPaginator: React.FC<CustomPaginatorProps> = ({
           title="First page"
           className="page-btn"
         >
-          <ChevronsLeft size={16} />
+          <ChevronsRight size={16} />
         </button>
 
         <button
@@ -92,7 +92,7 @@ const CustomPaginator: React.FC<CustomPaginatorProps> = ({
           title="Previous page"
           className="page-btn"
         >
-          <ChevronLeft size={16} />
+          <ChevronRight size={16} />
         </button>
 
         <div className="page-numbers">
@@ -139,7 +139,7 @@ const CustomPaginator: React.FC<CustomPaginatorProps> = ({
           title="Next page"
           className="page-btn"
         >
-          <ChevronRight size={16} />
+          <ChevronLeft size={16} />
         </button>
 
         <button
@@ -148,13 +148,13 @@ const CustomPaginator: React.FC<CustomPaginatorProps> = ({
           title="Last page"
           className="page-btn"
         >
-          <ChevronsRight size={16} />
+          <ChevronsLeft size={16} />
         </button>
       </div>
 
       {showPageSizeSelector && (
         <div className="page-size-selector">
-          <label htmlFor="pageSize">Show:</label>
+          <label htmlFor="pageSize">عرض:</label>
           <select
             id="pageSize"
             value={limit}
@@ -166,7 +166,7 @@ const CustomPaginator: React.FC<CustomPaginatorProps> = ({
               </option>
             ))}
           </select>
-          <span>per page</span>
+          <span>لكل صفحة</span>
         </div>
       )}
     </div>

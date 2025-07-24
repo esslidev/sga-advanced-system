@@ -10,22 +10,19 @@ import {
   SuccessTitle,
   SuccessMessage,
 } from "../core/responses/arabic/responses";
-import { error } from "console";
-
-const prisma = new PrismaClient();
 
 // GET Visits
 export const getVisits = async (
   request: FastifyRequest<{
     Querystring: {
-      id: string;
+      visitorId: string;
       limit?: string;
       page?: string;
     };
   }>,
   reply: FastifyReply
 ) => {
-  const { id, limit = "10", page = "1" } = request.query;
+  const { visitorId, limit = "10", page = "1" } = request.query;
 
   try {
     const take = Number(limit);
@@ -33,12 +30,17 @@ export const getVisits = async (
 
     const filters: Prisma.VisitWhereInput = {
       deletedAt: { equals: null },
-      ...(id && { id }),
+      ...(visitorId && { visitorId }),
     };
 
     const order = { createdAt: "desc" as Prisma.SortOrder };
 
-    const visits = await prisma.visit.findMany({
+    // Fetch total count of users matching the filters
+    const total = await request.server.prisma.visit.count({
+      where: filters,
+    });
+
+    const visits = await request.server.prisma.visit.findMany({
       where: filters,
       orderBy: order,
       skip,
@@ -56,23 +58,20 @@ export const getVisits = async (
 
     const responseVisits = visits.map((visit) => ({
       id: visit.id,
-      visitorCIN: visit.visitorCIN,
       divisions: visit.divisions.map((vd) => vd.division),
+      visitDate: visit.visitDate.toISOString(),
       visitReason: visit.visitReason,
-      visitor: {
-        id: visit.visitor.id,
-        CIN: visit.visitor.CIN,
-        firstName: visit.visitor.firstName,
-        lastName: visit.visitor.lastName,
-        createdAt: visit.visitor.createdAt,
-        updatedAt: visit.visitor.updatedAt,
-      },
       createdAt: visit.createdAt.toISOString(),
       updatedAt: visit.updatedAt.toISOString(),
     }));
 
     return reply.status(SuccessHttpStatusCode.OK).send({
       data: responseVisits,
+      pagination: {
+        total,
+        page: Number(page),
+        pages: Math.ceil(total / take),
+      },
     });
   } catch (error) {
     request.log.error(error);
@@ -88,11 +87,11 @@ export const getVisits = async (
 export const addVisit = async (
   request: FastifyRequest<{
     Body: {
-      visitorCIN: string;
       visitDate: Date;
       divisions: Division[];
       visitReason: string;
       visitor: {
+        CIN: string;
         firstName: string;
         lastName: string;
       };
@@ -100,12 +99,11 @@ export const addVisit = async (
   }>,
   reply: FastifyReply
 ) => {
-  const { visitorCIN, visitDate, divisions, visitReason, visitor } =
-    request.body;
+  const { visitDate, divisions, visitReason, visitor } = request.body;
 
   try {
     const existingVisitor = await request.server.prisma.visitor.findUnique({
-      where: { CIN: visitorCIN },
+      where: { CIN: visitor.CIN },
     });
 
     // If visitor exists
@@ -135,7 +133,7 @@ export const addVisit = async (
       // Create visitor if not found
       await request.server.prisma.visitor.create({
         data: {
-          CIN: visitorCIN,
+          CIN: visitor.CIN,
           firstName: visitor.firstName,
           lastName: visitor.lastName,
         },
@@ -147,7 +145,7 @@ export const addVisit = async (
     // Register the visit
     await request.server.prisma.visit.create({
       data: {
-        visitorCIN,
+        visitor: { connect: { CIN: visitor.CIN } },
         visitDate,
         visitReason,
         divisions: {

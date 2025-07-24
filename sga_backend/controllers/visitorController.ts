@@ -92,6 +92,11 @@ export const getVisitors = async (
       orderBy: order,
       skip,
       take,
+      include: {
+        _count: {
+          select: { visits: true },
+        },
+      },
     });
 
     const responseVisitors = visitors.map((visitor) => ({
@@ -99,6 +104,7 @@ export const getVisitors = async (
       CIN: visitor.CIN,
       firstName: visitor.firstName,
       lastName: visitor.lastName,
+      visitsCount: visitor._count.visits,
       createdAt: visitor.createdAt.toISOString(),
       updatedAt: visitor.updatedAt.toISOString(),
     }));

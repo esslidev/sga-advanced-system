@@ -59,7 +59,6 @@ const VisitDataEntryPage = () => {
           firstName: formData.firstName.trim(),
           lastName: formData.lastName.trim(),
         },
-        visitorCIN: formData.CIN.trim(),
         visitDate: formData.visitDate,
         divisions: formData.divisions,
         visitReason: formData.visitReason.trim(),

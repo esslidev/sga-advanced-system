@@ -7,12 +7,14 @@ import {
 } from "../thunks/visitThunks";
 import type { Visit } from "../../models/visit";
 import type { ApiResponse } from "../../models/apiResponse";
+import type { Pagination } from "../../models/pagination";
 
 interface VisitState {
   visits: Visit[];
   selectedVisit: Visit | null;
   loading: boolean;
   response: ApiResponse | null;
+  pagination: Pagination | null;
 }
 
 const initialState: VisitState = {
@@ -20,6 +22,7 @@ const initialState: VisitState = {
   selectedVisit: null,
   loading: false,
   response: null,
+  pagination: null,
 };
 
 const visitSlice = createSlice({
@@ -28,6 +31,7 @@ const visitSlice = createSlice({
   reducers: {
     clearVisits: (state) => {
       state.visits = [];
+      state.pagination = null;
     },
     clearVisit: (state) => {
       state.selectedVisit = null;
@@ -43,9 +47,13 @@ const visitSlice = createSlice({
     });
     builder.addCase(
       getVisits.fulfilled,
-      (state, action: PayloadAction<Visit[]>) => {
+      (
+        state,
+        action: PayloadAction<{ data: Visit[]; pagination: Pagination }>
+      ) => {
         state.loading = false;
-        state.visits = action.payload;
+        state.visits = action.payload.data;
+        state.pagination = action.payload.pagination;
       }
     );
     builder.addCase(getVisits.rejected, (state, action) => {

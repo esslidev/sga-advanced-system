@@ -34,11 +34,11 @@ model Visitor {
 
 model Visit {
     id          String    @id @default(uuid())
-    visitorCIN  String
+    visitorId  String
     divisions   VisitDivision[]
     visitDate   DateTime  @default(now())
-    visitReason String    @db.LongText
-    visitor     Visitor   @relation(fields: [visitorCIN], references: [CIN], onUpdate: Cascade)
+    visitReason String    @db.LongText 
+    visitor     Visitor   @relation(fields: [visitorId], references: [id], onUpdate: Cascade)
     createdAt   DateTime  @default(now())
     updatedAt   DateTime  @updatedAt
     deletedAt   DateTime?
@@ -55,7 +55,7 @@ model VisitDivision {
 model Session {
     id        String   @id @default(uuid())
     userId    String
-    User      User    @relation(fields: [userId], references: [id])
+    User      User    @relation(fields: [userId], references: [id],onDelete: Cascade)
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 }
