@@ -1,0 +1,58 @@
+services:
+  ## MYSQL DB DATABASE
+  db_sga:
+    container_name: db_sga
+    image: mysql:latest
+    restart: always
+    environment:
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ALLOW_EMPTY_PASSWORD: "no"
+    ports:
+      - 3307:${DB_PORT}
+    expose:
+      - ${DB_PORT}
+    networks:
+      - sga_networks
+
+  ## PHPMYADMIN
+  php-my-admin:
+    container_name: php-my-admin
+    image: phpmyadmin:latest
+    restart: always
+    environment:
+      PMA_HOST: ${DB_HOST}
+      PMA_ARBITRARY: 1
+      PHP_UPLOAD_MAX_FILESIZE: 10M
+      PHP_POST_MAX_SIZE: 10M
+      UPLOAD_LIMIT: 64M
+    ports:
+      - 8081:80
+    depends_on:
+      - db_sga
+    networks:
+      - sga_networks
+
+  ## PROJECT BACKEND
+  sga-backend:
+    container_name: sga-backend
+    stdin_open: true
+    tty: true
+    command: sh -c "yarn start & yarn run studio"
+    restart: always
+    build:
+      context: ./sga_backend
+      dockerfile: Dockerfile
+    ports:
+      - "${HTTP_PORT}:${HTTP_PORT}" # Port for Express.js server
+      - "${STUDIO_PORT}:${STUDIO_PORT}" # Port for Prisma Studio
+    depends_on:
+      - db_sga
+    env_file:
+      - .env
+    networks:
+      - sga_networks
+
+networks:
+  sga_networks:
+    driver: bridge
