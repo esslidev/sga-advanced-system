@@ -65,7 +65,7 @@ const getVisitors = async (request, reply) => {
             take,
             include: {
                 _count: {
-                    select: { visits: true },
+                    select: { visits: { where: { deletedAt: { equals: null } } } },
                 },
             },
         });

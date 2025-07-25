@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useVisit } from "../../hooks/useVisit"; // your hook
+import { useVisit } from "../../hooks/useVisit";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import "./Visits.css";
 
@@ -9,16 +9,24 @@ import CustomTable, {
 } from "../../components/common/CustomDataGrid/CustomTable";
 
 import CustomPaginator from "../../components/common/CustomPaginator/CustomPaginator";
-import { AppUtil } from "../../../core/utils/appUtil";
 import { PagesRoutes } from "../../../AppRoutes";
-import { divisionOptions } from "../../models/visit";
+import VisitRowEditable from "./components/VisitRowEditable";
+import VisitRow from "./components/VisitRow";
 
 const VisitsPage = () => {
-  const { visits, fetchVisits, removeVisit, loading, response, pagination } =
-    useVisit();
+  const {
+    visits,
+    fetchVisits,
+    removeVisit,
+    modifyVisit, // Make sure this function exists in your hook
+    loading,
+    response,
+    pagination,
+  } = useVisit();
 
   const [limit, setLimit] = useState<number>(5);
   const [page, setPage] = useState<number>(1);
+  const [editingId, setEditingId] = useState<string | null>(null);
 
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -26,7 +34,6 @@ const VisitsPage = () => {
   const visitorId = searchParams.get("visitorId");
   const fullName = searchParams.get("fullName");
 
-  // Redirect back if no visitorId found to prevent errors
   useEffect(() => {
     if (!visitorId) {
       alert("لم يتم تحديد الزائر، سيتم إعادة التوجيه إلى صفحة الزوار");
@@ -41,7 +48,7 @@ const VisitsPage = () => {
   }, [visitorId, limit, page]);
 
   const header = [
-    "رقم التتبع",
+    "رمز التتبع",
     "تاريخ الزيارة",
     "سبب الزيارة",
     "عدد الأقسام",
@@ -58,28 +65,37 @@ const VisitsPage = () => {
     }
   };
 
-  const tableRows = visits.map((visit) => [
-    <p dir="ltr" key={`${visit.id}-id`}>
-      {"#" + visit.id.slice(-8).toUpperCase()}
-    </p>,
-    <p key={`${visit.visitDate}-visitDate`}>
-      {AppUtil.formatDateTimeToArabic(new Date(visit.visitDate))}
-    </p>,
-    <p key={`${visit.visitReason}-visitReason`}>{visit.visitReason}</p>,
-    <div key={`${visit.id}-divisions`}>
-      {visit.divisions.map((division) => (
-        <p key={division}>
-          {divisionOptions.find((d) => d.value === division)?.label}
-        </p>
-      ))}
-    </div>,
-    <div key={`${visit.id}-actions`} className="actions">
-      <button className="btn btn-primary">تعديل الزيارة</button>
-      <button className="btn btn-danger" onClick={() => handleDelete(visit.id)}>
-        حذف
-      </button>
-    </div>,
-  ]);
+  const handleEdit = (id: string) => setEditingId(id);
+
+  const handleCancelEdit = () => setEditingId(null);
+
+  const handleSaveEdit = async (updatedVisit: any) => {
+    try {
+      await modifyVisit(updatedVisit);
+      alert("تم تحديث الزيارة بنجاح");
+      setEditingId(null);
+      fetchVisits({ visitorId: visitorId!, limit, page });
+    } catch {
+      alert("حدث خطأ أثناء التحديث");
+    }
+  };
+
+  // Fixed: Get the cell arrays from row components
+  const tableRows = visits.map((visit) => {
+    if (visit.id === editingId) {
+      return VisitRowEditable({
+        visit,
+        onCancel: handleCancelEdit,
+        onSave: handleSaveEdit,
+      });
+    } else {
+      return VisitRow({
+        visit,
+        onDelete: handleDelete,
+        onEdit: handleEdit,
+      });
+    }
+  });
 
   return (
     <div className="page">

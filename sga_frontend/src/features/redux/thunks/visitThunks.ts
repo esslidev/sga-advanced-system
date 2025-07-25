@@ -81,7 +81,7 @@ export const deleteVisit = createAsyncThunk<
   { rejectValue: ApiResponse }
 >("visit/deleteVisit", async (id, thunkAPI) => {
   try {
-    const res = await api.delete(`/visit/delete-visit/${id}`);
+    const res = await api.delete(`/visit/delete-visit?id=${id}`);
     return res.data;
   } catch (err: any) {
     const errorResponse: ApiResponse = err.response?.data || {

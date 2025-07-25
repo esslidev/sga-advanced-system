@@ -30,7 +30,7 @@ const VisitorsPage = () => {
   const [page, setPage] = useState<number>(1);
 
   const header = [
-    "رقم التتبع",
+    "رمز التتبع",
     "رقم البطاقة الوطنية",
     "الإسم الشخصي",
     "الإسم العائلي",

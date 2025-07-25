@@ -94,7 +94,7 @@ export const getVisitors = async (
       take,
       include: {
         _count: {
-          select: { visits: true },
+          select: { visits: { where: { deletedAt: { equals: null } } } },
         },
       },
     });
