@@ -1,4 +1,21 @@
 services:
+  local-dns:
+    container_name: sga-dns
+    image: ubuntu/bind9:latest
+    environment:
+      - BIND9_USER=root
+      - TZ=Africa/Casablanca
+    ports:
+      - "53:53/udp"
+      - "53:53/tcp"
+      - "953:953/tcp"
+    volumes:
+      - ./dns-config:/etc/bind
+      - ./dns-zones:/var/lib/bind
+    restart: unless-stopped
+    networks:
+      - sga_networks
+
   ## MYSQL DB DATABASE
   db_sga:
     container_name: db_sga
