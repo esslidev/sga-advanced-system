@@ -7,19 +7,32 @@ import visitRouter from "./router/visitRouter";
 import prisma from "./prisma/client";
 
 const fastify = Fastify({
-  logger: true,
+  logger: {
+    transport: {
+      target: "pino-pretty",
+      options: {
+        colorize: true,
+        translateTime: "SYS:standard",
+        ignore: "pid,hostname",
+      },
+    },
+  },
 });
 
 // Inject Prisma into Fastify instance
 fastify.decorate("prisma", prisma);
 
-const port = Number(process.env.HTTP_PORT) || 4000;
+const apiPort = Number(process.env.API_PORT) || 4000;
+const frontendPort = Number(process.env.FRONTEND_PORT) || 3000;
 
 const start = async () => {
   try {
     // Register CORS
     await fastify.register(cors, {
-      origin: ["http://localhost:3000", "http://192.168.0.108:3000"],
+      origin: [
+        `http://localhost:${frontendPort}`,
+        `http://192.168.0.108:${frontendPort}`,
+      ],
       methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     });
 
@@ -35,8 +48,8 @@ const start = async () => {
       return { message: "🚀 API ready to serve! 🚀" };
     });
 
-    await fastify.listen({ port, host: "0.0.0.0" });
-    fastify.log.info(`🚀 API listening at http://localhost:${port} 🚀`);
+    await fastify.listen({ port: apiPort, host: "0.0.0.0" });
+    fastify.log.info(`🚀 API listening at http://localhost:${apiPort} 🚀`);
   } catch (err) {
     fastify.log.error(err);
     process.exit(1);

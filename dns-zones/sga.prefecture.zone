@@ -1,6 +1,6 @@
 $TTL    604800
 @       IN      SOA     ns1.sga.prefecture. admin.sga.prefecture. (
-                              2024072501 ; Serial (YYYYMMDDNN)
+                              2024072501 ; Serial
                          604800         ; Refresh
                           86400         ; Retry
                         2419200         ; Expire
@@ -8,13 +8,15 @@ $TTL    604800
 
 ; Name servers
 @               IN      NS      ns1.sga.prefecture.
-ns1             IN      A       192.168.0.108
+ns1             IN      A       192.168.100.98
 
 ; Service records - All pointing to your PC
-api             IN      A       192.168.0.108
-admin           IN      A       192.168.0.108
-db              IN      A       192.168.0.108
-studio          IN      A       192.168.0.108
+api             IN      A       192.168.100.98
+admin           IN      A       192.168.100.98
+db              IN      A       192.168.100.98
+studio          IN      A       192.168.100.98
+www             IN      A       192.168.100.98
+@               IN      A       192.168.100.98
 
 ; Wildcard for any subdomain
-*               IN      A       192.168.0.108
+*               IN      A       192.168.100.98

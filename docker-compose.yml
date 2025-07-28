@@ -1,22 +1,36 @@
 services:
-  local-dns:
-    container_name: sga-dns
-    image: ubuntu/bind9:latest
-    environment:
-      - BIND9_USER=root
-      - TZ=Africa/Casablanca
-    ports:
-      - "53:53/udp"
-      - "53:53/tcp"
-      - "953:953/tcp"
-    volumes:
-      - ./dns-config:/etc/bind
-      - ./dns-zones:/var/lib/bind
-    restart: unless-stopped
-    networks:
-      - sga_networks
+  #sga-dns:
+  #  container_name: sga-dns
+  #  image: ubuntu/bind9:latest
+  #  environment:
+  #    - BIND9_USER=root
+  #    - TZ=Africa/Casablanca
+  #  ports:
+  #    - "53:53/udp"
+  #    - "53:53/tcp"
+  #    - "953:953/tcp"
+  #  volumes:
+  #    - ./dns-config:/etc/bind
+  #    - ./dns-zones:/var/lib/bind
+  #  restart: unless-stopped
+  #  networks:
+  #    - sga_networks
 
-  ## MYSQL DB DATABASE
+  # Reverse proxy to handle domain routing
+  #nginx-proxy:
+  #  container_name: nginx-proxy
+  #  image: nginx:alpine
+  #  ports:
+  #    - "80:80"
+  #    - "443:443"
+  #  volumes:
+  #    - ./nginx.conf:/etc/nginx/nginx.conf
+  #  depends_on:
+  #    - sga-backend
+  #    - php-my-admin
+  #  networks:
+  #    - sga_networks
+
   db_sga:
     container_name: db_sga
     image: mysql:latest
@@ -27,12 +41,9 @@ services:
       MYSQL_ALLOW_EMPTY_PASSWORD: "no"
     ports:
       - 3307:${DB_PORT}
-    expose:
-      - ${DB_PORT}
     networks:
       - sga_networks
 
-  ## PHPMYADMIN
   php-my-admin:
     container_name: php-my-admin
     image: phpmyadmin:latest
@@ -40,17 +51,11 @@ services:
     environment:
       PMA_HOST: ${DB_HOST}
       PMA_ARBITRARY: 1
-      PHP_UPLOAD_MAX_FILESIZE: 10M
-      PHP_POST_MAX_SIZE: 10M
-      UPLOAD_LIMIT: 64M
     ports:
       - 8081:80
-    depends_on:
-      - db_sga
     networks:
       - sga_networks
 
-  ## PROJECT BACKEND
   sga-backend:
     container_name: sga-backend
     stdin_open: true
@@ -61,12 +66,28 @@ services:
       context: ./sga_backend
       dockerfile: Dockerfile
     ports:
-      - "${HTTP_PORT}:${HTTP_PORT}" # Port for Express.js server
-      - "${STUDIO_PORT}:${STUDIO_PORT}" # Port for Prisma Studio
+      - "${API_PORT}:${API_PORT}"
+      - "${STUDIO_PORT}:${STUDIO_PORT}"
+    #expose:
+    #  - "4003"
+    #  - "5555"
     depends_on:
       - db_sga
     env_file:
       - .env
+    networks:
+      - sga_networks
+
+  sga-frontend:
+    container_name: sga-frontend
+    build:
+      context: ./sga_frontend
+      dockerfile: Dockerfile
+    ports:
+      - "${FRONTEND_PORT}:${FRONTEND_PORT}"
+    restart: always
+    depends_on:
+      - sga-backend
     networks:
       - sga_networks
 

@@ -5,7 +5,8 @@
     "@prisma/client": "^6.11.1",
     "cors": "^2.8.5",
     "fastify": "^5.4.0",
-    "nodemon": "^3.1.10"
+    "nodemon": "^3.1.10",
+    "pino-pretty": "^13.0.0"
   },
   "devDependencies": {
     "@types/node": "^24.0.10",
