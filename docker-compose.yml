@@ -78,18 +78,18 @@ services:
     networks:
       - sga_networks
 
-  sga-frontend:
-    container_name: sga-frontend
-    build:
-      context: ./sga_frontend
-      dockerfile: Dockerfile
-    ports:
-      - "${FRONTEND_PORT}:${FRONTEND_PORT}"
-    restart: always
-    depends_on:
-      - sga-backend
-    networks:
-      - sga_networks
+  #sga-frontend:
+  #  container_name: sga-frontend
+  #  build:
+  #    context: ./sga_frontend
+  #    dockerfile: Dockerfile
+  #  ports:
+  #    - "${FRONTEND_PORT}:${FRONTEND_PORT}"
+  #  restart: always
+  #  depends_on:
+  #    - sga-backend
+  #  networks:
+  #    - sga_networks
 
 networks:
   sga_networks:

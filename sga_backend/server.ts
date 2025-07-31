@@ -13,7 +13,7 @@ const fastify = Fastify({
       options: {
         colorize: true,
         translateTime: "SYS:standard",
-        ignore: "pid,hostname",
+        ignore: "pid",
       },
     },
   },
@@ -30,6 +30,7 @@ const start = async () => {
     // Register CORS
     await fastify.register(cors, {
       origin: [
+        `http://localhost:5173`,
         `http://localhost:${frontendPort}`,
         `http://192.168.0.108:${frontendPort}`,
       ],

@@ -10,7 +10,6 @@ import CustomTable, {
 
 import CustomPaginator from "../../components/common/CustomPaginator/CustomPaginator";
 import { PagesRoutes } from "../../../AppRoutes";
-import VisitRowEditable from "./components/VisitRowEditable";
 import VisitRow from "./components/VisitRow";
 
 const VisitsPage = () => {
@@ -18,7 +17,7 @@ const VisitsPage = () => {
     visits,
     fetchVisits,
     removeVisit,
-    modifyVisit, // Make sure this function exists in your hook
+    modifyVisit,
     loading,
     response,
     pagination,
@@ -26,7 +25,6 @@ const VisitsPage = () => {
 
   const [limit, setLimit] = useState<number>(5);
   const [page, setPage] = useState<number>(1);
-  const [editingId, setEditingId] = useState<string | null>(null);
 
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -55,6 +53,8 @@ const VisitsPage = () => {
     "العمليات",
   ];
 
+  const handleUpdate = async () => {};
+
   const handleDelete = async (id: string) => {
     try {
       await removeVisit({ id });
@@ -65,38 +65,23 @@ const VisitsPage = () => {
     }
   };
 
-  const handleEdit = (id: string) => setEditingId(id);
-
-  const handleCancelEdit = () => setEditingId(null);
-
   const handleSaveEdit = async (updatedVisit: any) => {
     try {
       await modifyVisit(updatedVisit);
       alert("تم تحديث الزيارة بنجاح");
-      setEditingId(null);
       fetchVisits({ visitorId: visitorId!, limit, page });
     } catch {
       alert("حدث خطأ أثناء التحديث");
     }
   };
 
-  // Fixed: Get the cell arrays from row components
   const tableRows = visits.map((visit) => {
-    if (visit.id === editingId) {
-      return VisitRowEditable({
-        visit,
-        onCancel: handleCancelEdit,
-        onSave: handleSaveEdit,
-      });
-    } else {
-      return VisitRow({
-        visit,
-        onDelete: handleDelete,
-        onEdit: handleEdit,
-      });
-    }
+    return VisitRow({
+      visit,
+      onDelete: handleDelete,
+      onUpdate: handleSaveEdit,
+    });
   });
-
   return (
     <div className="page">
       <h1 className="title">تتبع الزيارات : {fullName || "اسم غير معروف"}</h1>

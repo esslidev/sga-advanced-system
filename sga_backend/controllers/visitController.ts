@@ -48,14 +48,6 @@ export const getVisits = async (
       include: { visitor: true, divisions: true },
     });
 
-    if (visits.length === 0) {
-      return reply.status(ErrorHttpStatusCode.NOT_FOUND).send({
-        statusCode: ErrorHttpStatusCode.NOT_FOUND,
-        title: ErrorTitle.VISIT_NOT_FOUND,
-        message: ErrorMessage.VISIT_NOT_FOUND,
-      });
-    }
-
     const responseVisits = visits.map((visit) => ({
       id: visit.id,
       divisions: visit.divisions.map((vd) => vd.division),
