@@ -8,18 +8,18 @@ generator client {
 }
 
 model User {
-    id        String    @id @default(uuid())
-    CIN       String    @unique
-    password  String
-    firstName String
-    lastName  String
-    imageUrl  String
-    sessions  Session[]
-    createdAt DateTime  @default(now())
-    updatedAt DateTime  @updatedAt
-    deletedAt DateTime?
+    id         String         @id @default(uuid())
+    CIN        String         @unique
+    password   String
+    firstName  String
+    lastName   String
+    imageUrl   String
+    credential UserCredential
+    sessions   Session[]
+    createdAt  DateTime       @default(now())
+    updatedAt  DateTime       @updatedAt
+    deletedAt  DateTime?
 }
-
 
 model Visitor {
     id        String    @id @default(uuid())
@@ -33,31 +33,29 @@ model Visitor {
 }
 
 model Visit {
-    id          String    @id @default(uuid())
-    visitorId  String
+    id          String          @id @default(uuid())
+    visitorId   String
     divisions   VisitDivision[]
-    visitDate   DateTime  @default(now())
-    visitReason String    @db.LongText 
-    visitor     Visitor   @relation(fields: [visitorId], references: [id], onUpdate: Cascade)
-    createdAt   DateTime  @default(now())
-    updatedAt   DateTime  @updatedAt
+    visitDate   DateTime        @default(now())
+    visitReason String          @db.LongText
+    visitor     Visitor         @relation(fields: [visitorId], references: [id], onUpdate: Cascade)
+    createdAt   DateTime        @default(now())
+    updatedAt   DateTime        @updatedAt
     deletedAt   DateTime?
 }
 
 model VisitDivision {
-    id        String   @id @default(uuid())
-    visitId   String
-    division  Division
-    visit     Visit    @relation(fields: [visitId], references: [id],onDelete: Cascade)
+    id       String   @id @default(uuid())
+    visitId  String
+    division Division
+    visit    Visit    @relation(fields: [visitId], references: [id], onDelete: Cascade)
 }
-
 
 model Session {
     id        String   @id @default(uuid())
     userId    String
-    User      User    @relation(fields: [userId], references: [id],onDelete: Cascade)
+    User      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
     createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
 }
 
 enum Division {
@@ -66,4 +64,9 @@ enum Division {
     division3
     division4
     division5
+}
+
+enum UserCredential {
+    standard
+    admin
 }
