@@ -171,7 +171,7 @@ export const updateVisit = async (
       visitorCIN?: string;
       visitDate?: Date;
       visitTime?: Date;
-      divisions?: string[];
+      divisions?: Division[]; // Array of enum values like 'division1', 'division2'
       visitReason?: string;
     };
   }>,
@@ -180,8 +180,10 @@ export const updateVisit = async (
   const { id, visitorCIN, divisions, visitReason } = request.body;
 
   try {
-    const existingVisit = await request.server.prisma.visit.findFirst({
-      where: { id, deletedAt: { equals: null } },
+    // Check existing Visit
+    const existingVisit = await request.server.prisma.visit.findUnique({
+      where: { id },
+      include: { divisions: true },
     });
 
     if (!existingVisit) {
@@ -192,26 +194,40 @@ export const updateVisit = async (
       });
     }
 
-    const updatedVisitData = {
+    // Start building update data for Visit itself (excluding divisions)
+    const updateData: any = {
       ...(visitorCIN && { visitor: { connect: { CIN: visitorCIN } } }),
-      ...(divisions && {
-        divisions: {
-          set: divisions.map((divisionId) => ({ id: divisionId })),
-        },
-      }),
       ...(visitReason && { visitReason }),
     };
 
-    const updatedVisit = await request.server.prisma.visit.update({
-      where: { id },
-      data: updatedVisitData,
+    // Use transaction to update Visit and VisitDivision join table
+    await request.server.prisma.$transaction(async (tx) => {
+      // Update Visit (non-relations)
+      await tx.visit.update({
+        where: { id },
+        data: updateData,
+      });
+
+      // If divisions provided, update VisitDivision rows
+      if (divisions) {
+        // Delete existing VisitDivisions for this Visit
+        await tx.visitDivision.deleteMany({
+          where: { visitId: id },
+        });
+
+        // Create new VisitDivision rows for each division enum value
+        const newVisitDivisions = divisions.map((division) => ({
+          visitId: id,
+          division,
+        }));
+
+        await tx.visitDivision.createMany({
+          data: newVisitDivisions,
+        });
+      }
     });
 
-    const responseVisit = {
-      id: updatedVisit.id,
-    };
-
-    return reply.status(SuccessHttpStatusCode.OK).send({ data: responseVisit });
+    return reply.status(SuccessHttpStatusCode.OK).send({ data: { id } });
   } catch (error) {
     request.log.error(error);
     return reply.status(ErrorHttpStatusCode.INTERNAL_SERVER_ERROR).send({

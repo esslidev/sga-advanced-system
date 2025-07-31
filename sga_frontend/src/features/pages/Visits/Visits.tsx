@@ -10,14 +10,15 @@ import CustomTable, {
 
 import CustomPaginator from "../../components/common/CustomPaginator/CustomPaginator";
 import { PagesRoutes } from "../../../AppRoutes";
-import VisitRow from "./components/VisitRow";
+import { AppUtil } from "../../../core/utils/appUtil";
+import { divisionOptions, type Visit } from "../../models/visit";
 
 const VisitsPage = () => {
   const {
     visits,
     fetchVisits,
     removeVisit,
-    modifyVisit,
+    modifyVisit, // Make sure this function exists in your hook
     loading,
     response,
     pagination,
@@ -25,6 +26,7 @@ const VisitsPage = () => {
 
   const [limit, setLimit] = useState<number>(5);
   const [page, setPage] = useState<number>(1);
+  const [editingId, setEditingId] = useState<string | null>(null);
 
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -53,8 +55,6 @@ const VisitsPage = () => {
     "العمليات",
   ];
 
-  const handleUpdate = async () => {};
-
   const handleDelete = async (id: string) => {
     try {
       await removeVisit({ id });
@@ -65,23 +65,75 @@ const VisitsPage = () => {
     }
   };
 
-  const handleSaveEdit = async (updatedVisit: any) => {
+  const handleEdit = (id: string) => setEditingId(id);
+
+  const handleCancelEdit = () => setEditingId(null);
+
+  const handleSaveEdit = async (updatedVisit: Partial<Visit>) => {
     try {
-      await modifyVisit(updatedVisit);
-      alert("تم تحديث الزيارة بنجاح");
+      await modifyVisit({ id: updatedVisit.id, visitReason: "hello world" });
+      console.log(JSON.stringify(updatedVisit, null, 2));
+      alert(response?.message || "تم تحديث الزيارة بنجاح");
+      setEditingId(null);
       fetchVisits({ visitorId: visitorId!, limit, page });
     } catch {
-      alert("حدث خطأ أثناء التحديث");
+      alert(response?.message || "حدث خطأ أثناء التحديث");
     }
   };
 
-  const tableRows = visits.map((visit) => {
-    return VisitRow({
-      visit,
-      onDelete: handleDelete,
-      onUpdate: handleSaveEdit,
-    });
+  const tableCells = visits.map((visit: Visit) => {
+    if (visit.id === editingId) {
+      // Render editable row cells as React nodes or strings
+      return [
+        "#" + visit.id.slice(-8).toUpperCase(),
+        <input
+          key="date-edit"
+          type="date"
+          defaultValue={new Date(visit.visitDate).toISOString().slice(0, 10)}
+          // Add onChange handlers as needed
+        />,
+        <input
+          key="reason-edit"
+          type="text"
+          defaultValue={visit.visitReason}
+          // Add onChange handlers as needed
+        />,
+        visit.divisions.join(", "), // or a better editable component
+        <div key="actions" className="actions">
+          <button onClick={handleCancelEdit}>إلغاء</button>
+          <button onClick={() => handleSaveEdit(visit)}>حفظ</button>
+        </div>,
+      ];
+    } else {
+      // Normal read-only row cells
+      return [
+        "#" + visit.id.slice(-8).toUpperCase(),
+        AppUtil.formatDateTimeToArabic(new Date(visit.visitDate)),
+        visit.visitReason,
+        visit.divisions
+          .map(
+            (division) =>
+              divisionOptions.find((d) => d.value === division)?.label
+          )
+          .join(", "),
+        <div key="actions" className="actions">
+          <button
+            className="btn btn-primary"
+            onClick={() => handleEdit(visit.id)}
+          >
+            تعديل الزيارة
+          </button>
+          <button
+            className="btn btn-danger"
+            onClick={() => handleDelete(visit.id)}
+          >
+            حذف
+          </button>
+        </div>,
+      ];
+    }
   });
+
   return (
     <div className="page">
       <h1 className="title">تتبع الزيارات : {fullName || "اسم غير معروف"}</h1>
@@ -92,7 +144,7 @@ const VisitsPage = () => {
         <>
           <CustomTable
             headerCells={header}
-            cells={tableRows}
+            cells={tableCells}
             theme={CustomTableTheme.MINIMAL}
             alignment={CustomTableAlignment.LEFT}
             hoverable
