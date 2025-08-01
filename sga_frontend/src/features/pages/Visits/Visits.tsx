@@ -32,7 +32,7 @@ const VisitsPage = () => {
     visits,
     fetchVisits,
     removeVisit,
-    modifyVisit,
+    modifyVisit, // Make sure this function exists in your hook
     loading,
     response,
     pagination,
