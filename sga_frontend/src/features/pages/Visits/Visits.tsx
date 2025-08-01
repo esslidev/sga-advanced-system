@@ -11,18 +11,38 @@ import CustomTable, {
 import CustomPaginator from "../../components/common/CustomPaginator/CustomPaginator";
 import { PagesRoutes } from "../../../AppRoutes";
 import { AppUtil } from "../../../core/utils/appUtil";
-import { divisionOptions, type Visit } from "../../models/visit";
+import {
+  Division,
+  divisionOptions,
+  type DivisionOption,
+  type Visit,
+} from "../../models/visit";
+import CustomTextInput from "../../components/common/CustomTextInput/CustomTextInput";
+import AutoResizeTextarea from "../../components/common/CustomTextArea/AutoResizeTextarea";
+import Multiselect from "multiselect-react-dropdown";
+
+interface VisitFormData {
+  visitDate: Date;
+  visitReason: string;
+  divisions: Division[];
+}
 
 const VisitsPage = () => {
   const {
     visits,
     fetchVisits,
     removeVisit,
-    modifyVisit, // Make sure this function exists in your hook
+    modifyVisit,
     loading,
     response,
     pagination,
   } = useVisit();
+
+  const [formData, setFormData] = useState<VisitFormData>({
+    divisions: [],
+    visitDate: new Date(),
+    visitReason: "",
+  });
 
   const [limit, setLimit] = useState<number>(5);
   const [page, setPage] = useState<number>(1);
@@ -86,19 +106,76 @@ const VisitsPage = () => {
       // Render editable row cells as React nodes or strings
       return [
         "#" + visit.id.slice(-8).toUpperCase(),
-        <input
-          key="date-edit"
-          type="date"
-          defaultValue={new Date(visit.visitDate).toISOString().slice(0, 10)}
-          // Add onChange handlers as needed
+        <div>
+          <CustomTextInput
+            name="تاريخ الزيارة"
+            type="date"
+            isCentered
+            value={formData.visitDate.toISOString().split("T")[0]}
+            onChange={(e) => {
+              const newDate = new Date(formData.visitDate);
+              const [year, month, day] = e.target.value.split("-").map(Number);
+              newDate.setFullYear(year, month - 1, day);
+              setFormData({ ...formData, visitDate: newDate });
+            }}
+          />
+          <CustomTextInput
+            name="ساعة الزيارة"
+            type="time"
+            isCentered
+            value={formData.visitDate.toTimeString().substring(0, 5)} // HH:mm
+            onChange={(e) => {
+              const newDate = new Date(formData.visitDate);
+              const [hours, minutes] = e.target.value.split(":").map(Number);
+              newDate.setHours(hours, minutes);
+              setFormData({ ...formData, visitDate: newDate });
+            }}
+          />
+        </div>,
+        <AutoResizeTextarea
+          name="سبب الزيارة"
+          placeholder="أدخل سبب الزيارة هنا"
+          style={{ width: "500px" }}
+          value={formData.visitReason}
+          onChange={(e) =>
+            setFormData({ ...formData, visitReason: e.target.value })
+          }
+          minRows={4}
+          maxRows={8}
         />,
-        <input
-          key="reason-edit"
-          type="text"
-          defaultValue={visit.visitReason}
-          // Add onChange handlers as needed
-        />,
-        visit.divisions.join(", "), // or a better editable component
+        <Multiselect
+          className="custom-multiselect"
+          options={divisionOptions.map((option) => ({
+            name: option.label,
+            value: option.value,
+          }))}
+          displayValue="name"
+          placeholder="اختر القسم"
+          emptyRecordMsg="لا توجد خيارات متاحة"
+          onSelect={(selected: DivisionOption[]) => {
+            setFormData({
+              ...formData,
+              divisions: selected.map((s) => s.value as Division), // if you use enum Division
+            });
+          }}
+          onRemove={(selected: DivisionOption[]) => {
+            setFormData({
+              ...formData,
+              divisions: selected.map((s) => s.value as Division),
+            });
+          }}
+          isObject={true}
+          style={{
+            chips: {
+              gap: "4px",
+              borderRadius: "4px",
+              background: "var(--primary-color)",
+            },
+            multiselectContainer: {
+              width: "100%",
+            },
+          }}
+        />, // or a better editable component
         <div key="actions" className="actions">
           <button onClick={handleCancelEdit}>إلغاء</button>
           <button onClick={() => handleSaveEdit(visit)}>حفظ</button>
