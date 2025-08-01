@@ -1,4 +1,4 @@
-import { FastifyRequest, FastifyReply } from "fastify";
+import { FastifyRequest, FastifyReply, HookHandlerDoneFunction } from "fastify";
 import { HttpError } from "../core/resources/response/httpError";
 import * as jwt from "jsonwebtoken";
 import { handleError } from "../core/utils/errorHandler";
@@ -39,11 +39,14 @@ export async function integrationAuthHook(
       isAdmin: null,
     };
   } catch (error) {
-    handleError(error, reply, language);
+    return handleError(error, reply, language);
   }
 }
 
-export async function authHook(request: FastifyRequest, reply: FastifyReply) {
+export async function authHook(
+  request: FastifyRequest,
+  reply: FastifyReply
+) {
   const language = request.headers["language"] as string;
   const accessToken = request.headers["authorization"];
 
@@ -88,19 +91,22 @@ export async function authHook(request: FastifyRequest, reply: FastifyReply) {
       isAdmin: decoded.isAdmin,
     };
   } catch (error) {
-    handleError(error, reply, language);
+    return handleError(error, reply, language);
   }
 }
 
-export async function isAdminHook(request: any, reply: FastifyReply) {
+export async function isAdminHook(
+  request: FastifyRequest,
+  reply: FastifyReply
+) {
   const language = request.headers["language"] as string;
-  const userId = request.body.userId;
+  const userId = (request.body as any).userId;
 
   try {
     const user = await request.server.prisma.user.findUnique({
       where: {
         id: userId,
-        isAdmin: true,
+        credential: "standard",
         deletedAt: null,
       },
     });
@@ -113,10 +119,8 @@ export async function isAdminHook(request: any, reply: FastifyReply) {
         { accessUnauthorized: true }
       );
     }
-
-    // Proceed (optional return)
   } catch (error) {
-    handleError(error, reply, language);
+    return handleError(error, reply, language);
   }
 }
 
@@ -125,11 +129,11 @@ export async function isVerifiedHook(
   reply: FastifyReply
 ) {
   const language = request.headers["language"] as string;
-  const userId = (request.body as { userId: string }).userId;
+  const userId = (request.body as any).userId;
 
   try {
     const user = await request.server.prisma.user.findUnique({
-      where: { id: userId, isVerified: true, deletedAt: null },
+      where: { id: userId,  deletedAt: null },
     });
 
     if (!user) {
@@ -140,6 +144,6 @@ export async function isVerifiedHook(
       );
     }
   } catch (error) {
-    handleError(error, reply, language);
+    return handleError(error, reply, language);
   }
 }

@@ -6,7 +6,8 @@ import {
   getJwtExpiryTime,
   isPasswordValid,
   saltAndHashData,
-  isCINValid,
+  verifyHashedData,
+  isCINValid
 } from "../core/utils/utils";
 import { HttpStatusCode } from "../core/enums/response/httpStatusCode";
 import { errorResponse } from "../core/resources/response/localizedErrorResponse";
@@ -47,7 +48,7 @@ export const signUp = async (request: FastifyRequest, reply: FastifyReply) => {
       !CIN ||
       !password ||
       !firstName ||
-      !lastName ||
+      !lastName
     ) {
       throw new HttpError(
         HttpStatusCode.BAD_REQUEST,
@@ -56,9 +57,9 @@ export const signUp = async (request: FastifyRequest, reply: FastifyReply) => {
       );
     }
 
-   
-    const hashedPassword = await saltAndHashData(password);
-   
+
+    const hashPassword: any = await saltAndHashData(password);
+
 
     const existingUser = await request.server.prisma.user.findUnique({
       where: { CIN },
@@ -75,20 +76,16 @@ export const signUp = async (request: FastifyRequest, reply: FastifyReply) => {
     const user = await request.server.prisma.user.create({
       data: {
         CIN,
-        encryptedFirstName,
-        encryptedLastName,
-        encryptedAddressMain,
-        encryptedAddressSecond,
-        userPreferences: {
-          create: { emailNotifications: true },
-        },
+        hashPassword,
+        firstName,
+        lastName,
+        imageUrl: "",
       },
     });
 
     const tokenPayload = {
       userId: user.id,
-      isAdmin: user.isAdmin,
-      isVerified: user.isVerified,
+      credential: user.credential,
     };
 
     const accessToken = jwt.sign(tokenPayload, jwtSecretToken, {
@@ -99,47 +96,19 @@ export const signUp = async (request: FastifyRequest, reply: FastifyReply) => {
       expiresIn: getJwtExpiryTime(renewTokenLifeSpan),
     });
 
-    await prisma.sessions.create({
+    await request.server.prisma.session.create({
       data: {
         userId: user.id,
-        accessToken,
-        renewToken,
-        accessTokenExpiryTime: addSecondsToDate(
-          new Date(),
-          getJwtExpiryTime(accessTokenLifeSpan)!
-        ),
-        renewTokenExpiryTime: addSecondsToDate(
-          new Date(),
-          getJwtExpiryTime(renewTokenLifeSpan)!
-        ),
       },
     });
 
-    mailSender(
-      email,
-      `${storeName} Account Created`,
-      undefined,
-      accountCreatedTemplatePath,
-      {
-        username: decryptData(user.encryptedFirstName ?? ""),
-        storeName,
-        frontendUrl,
-      },
-      [
-        {
-          filename: "logo.png",
-          path: logoPath,
-          cid: "logo",
-        },
-      ]
-    );
 
     return reply.status(HttpStatusCode.OK).send({
       data: { accessToken, renewToken },
       status: "Success",
     });
   } catch (error) {
-    return handleError(error, reply, language);
+    return handleError(error, reply, ResponseLanguage.ARABIC);
   }
 };
 
@@ -163,24 +132,10 @@ export const signIn = async (request: FastifyRequest, reply: FastifyReply) => {
       );
     }
 
-    // const encryptedCIN = encryptData(CIN.toLowerCase());
-    // const user = await request.server.prisma.user.findUnique({
-    //   where: { encryptedCIN },
-    // });
-    // if (!user || !(await verifyHashedData(password, user.hashedPassword))) {
-    //   throw new HttpError(
-    //     HttpStatusCode.UNAUTHORIZED,
-    //     errorResponse(ResponseLanguage.ARABIC).errorTitle.INVALID_CREDENTIALS,
-    //     errorResponse(ResponseLanguage.ARABIC).errorMessage.INVALID_CREDENTIALS,
-    //     { accessUnauthorized: true }
-    //   );
-    // }
-    const cin = CIN;
-    const user = await request.server.prisma.user.findUnique({
-      where: { CIN: cin },
+    const user: any = await request.server.prisma.user.findUnique({
+      where: { CIN },
     });
-
-    if (!user || !(password === user.password)) {
+    if (!user || !(await verifyHashedData(password, user.hashPassword))) {
       throw new HttpError(
         HttpStatusCode.UNAUTHORIZED,
         errorResponse(ResponseLanguage.ARABIC).errorTitle.INVALID_CREDENTIALS,
@@ -188,6 +143,7 @@ export const signIn = async (request: FastifyRequest, reply: FastifyReply) => {
         { accessUnauthorized: true }
       );
     }
+
     const tokenPayload = {
       userId: user.id,
       rule: user.credential,
@@ -203,25 +159,13 @@ export const signIn = async (request: FastifyRequest, reply: FastifyReply) => {
 
     await request.server.prisma.session.upsert({
       where: {
-        userId: user.id,
+        userId: user.id
       },
       update: {
-        userId: user.id,
-        createdAt: new Date().toISOString(),
-        User: {
-          connect: {
-            id: user.id,
-          },
-        },
+        userId: user.id
       },
       create: {
         userId: user.id,
-        createdAt: new Date().toISOString(),
-        User: {
-          connect: {
-            id: user.id,
-          },
-        },
       },
     });
 
@@ -235,7 +179,7 @@ export const signIn = async (request: FastifyRequest, reply: FastifyReply) => {
 };
 
 export const signOut = async (request: FastifyRequest, reply: FastifyReply) => {
-  const { language, userId }: any = request.body;
+  const { userId }: any = request.body;
 
   try {
     const existingSession = await request.server.prisma.session.findUnique({
@@ -250,8 +194,8 @@ export const signOut = async (request: FastifyRequest, reply: FastifyReply) => {
       );
     }
 
-    await prisma.sessions.delete({
-      where: { userId: Number(userId) },
+    await request.server.prisma.session.delete({
+      where: { userId: userId },
     });
 
     return reply.status(HttpStatusCode.OK).send({
@@ -262,3 +206,66 @@ export const signOut = async (request: FastifyRequest, reply: FastifyReply) => {
     return handleError(error, reply, ResponseLanguage.ARABIC);
   }
 };
+
+export const renewAccess = async (request: FastifyRequest, reply: FastifyReply) => {
+  const { renewToken }: any = request.body;
+
+  try {
+    if (!renewToken) {
+      throw new HttpError(
+        HttpStatusCode.BAD_REQUEST,
+        errorResponse(ResponseLanguage.ARABIC).errorTitle.LACK_OF_CREDENTIALS,
+        errorResponse(ResponseLanguage.ARABIC).errorMessage.LACK_OF_CREDENTIALS
+      );
+    }
+
+    if (!jwtSecretRenewToken) {
+      console.error("JWT secret renew token is not configured properly in the environment variables.");
+      throw new HttpError(
+        HttpStatusCode.INTERNAL_SERVER_ERROR,
+        errorResponse(ResponseLanguage.ARABIC).errorTitle.INTERNAL_SERVER_ERROR,
+        errorResponse(ResponseLanguage.ARABIC).errorMessage.INTERNAL_SERVER_ERROR
+      );
+    }
+
+    let decodedResult: jwt.JwtPayload;
+    try {
+      decodedResult = jwt.verify(renewToken, jwtSecretRenewToken) as jwt.JwtPayload;
+    } catch (err) {
+      if (err instanceof jwt.TokenExpiredError) {
+        throw new HttpError(
+          HttpStatusCode.UNAUTHORIZED,
+          errorResponse(ResponseLanguage.ARABIC).errorTitle.RENEW_TOKEN_EXPIRED,
+          errorResponse(ResponseLanguage.ARABIC).errorMessage.EXPIRED_TOKEN,
+          { expiredRenewToken: true }
+        );
+      }
+      throw err;
+    }
+
+    const userId = decodedResult.userId;
+    const userRole = decodedResult.userRole;
+
+    if (!jwtSecretToken) {
+      console.error("JWT secret tokens are not configured properly in the environment variables.");
+      throw new HttpError(
+        HttpStatusCode.INTERNAL_SERVER_ERROR,
+        errorResponse(ResponseLanguage.ARABIC).errorTitle.INTERNAL_SERVER_ERROR,
+        errorResponse(ResponseLanguage.ARABIC).errorMessage.INTERNAL_SERVER_ERROR
+      );
+    }
+
+    const tokenPayload = { userId: userId, userRole: userRole };
+    const finalAccessToken = jwt.sign(tokenPayload, jwtSecretToken, {
+      expiresIn: getJwtExpiryTime(accessTokenLifeSpan),
+    });
+
+    return reply.status(HttpStatusCode.OK).send({
+      data: { accessToken: finalAccessToken },
+      status: "Success",
+    });
+  } catch (error) {
+    return handleError(error, reply, ResponseLanguage.ARABIC);
+  }
+};
+

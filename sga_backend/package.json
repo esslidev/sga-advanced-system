@@ -23,7 +23,7 @@
     "custom-command": "echo 'This is my custom command'",
     "start": "tsc && nodemon build/server.js",
     "compile": "tsc",
-    "migrate": "prisma migrate dev",
+    "migrate": "prisma migrate dev --name init",
     "generate": "prisma generate",
     "push": "prisma db push",
     "studio": "prisma studio"

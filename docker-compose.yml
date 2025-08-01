@@ -1,5 +1,5 @@
 services:
-  #sga-dns:
+  # sga-dns:
   #  container_name: sga-dns
   #  image: ubuntu/bind9:latest
   #  environment:
@@ -43,6 +43,11 @@ services:
       - 3307:${DB_PORT}
     networks:
       - sga_networks
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-p${DB_PASSWORD}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
 
   php-my-admin:
     container_name: php-my-admin
@@ -60,7 +65,7 @@ services:
     container_name: sga-backend
     stdin_open: true
     tty: true
-    command: sh -c "yarn start & yarn run studio"
+    command: sh -c "yarn start & yarn migrate & yarn run studio"
     restart: always
     build:
       context: ./sga_backend
@@ -72,7 +77,9 @@ services:
     #  - "4003"
     #  - "5555"
     depends_on:
-      - db_sga
+      db_sga:
+        condition: service_healthy
+
     env_file:
       - .env
     networks:

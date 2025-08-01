@@ -1,24 +1,28 @@
 import { FastifyInstance } from "fastify";
 import {
-  authMiddleware,
-  integrationAuthMiddleware,
-} from "../middlewares/authMidleware";
+  authHook,
+  integrationAuthHook,
+} from "../hooks/authHook";
 import * as authController from "../controllers/authController";
 
 async function authRoutes(fastify: FastifyInstance) {
   fastify.post(
-    "/sign_in",
-    { preHandler: integrationAuthMiddleware },
+    "/sign-up",
+    authController.signUp
+  );
+  fastify.post(
+    "/sign-in",
+    // { preHandler: integrationAuthHook },
     authController.signIn
   );
   fastify.post(
-    "/sign_out",
-    { preHandler: authMiddleware },
+    "/sign-out",
+    { preHandler: authHook },
     authController.signOut
   );
   fastify.post(
     "/access/renew",
-    { preHandler: integrationAuthMiddleware },
+    { preHandler: integrationAuthHook },
     authController.renewAccess
   );
 }
