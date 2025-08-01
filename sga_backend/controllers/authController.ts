@@ -3,14 +3,9 @@ import * as jwt from "jsonwebtoken";
 import { HttpError } from "../core/resources/response/httpError";
 import { handleError } from "../core/utils/errorHandler";
 import {
-  addSecondsToDate,
-  decryptData,
-  encryptData,
   getJwtExpiryTime,
-  isEmailValid,
   isPasswordValid,
   saltAndHashData,
-  verifyHashedData,
   isCINValid,
 } from "../core/utils/utils";
 import { HttpStatusCode } from "../core/enums/response/httpStatusCode";
@@ -25,84 +20,65 @@ const renewTokenLifeSpan = process.env.RENEW_TOKEN_LIFESPAN!;
 
 export const signUp = async (request: FastifyRequest, reply: FastifyReply) => {
   const {
-    language,
-    email,
-    phone,
+    CIN,
     password,
     firstName,
     lastName,
-    addressMain,
-    addressSecond,
-    city,
-    zip,
   }: any = request.body;
 
   try {
-    if (!email || !isEmailValid(email)) {
+    if (!CIN || !isCINValid(CIN)) {
       throw new HttpError(
         HttpStatusCode.BAD_REQUEST,
-        errorResponse(language).errorTitle.INVALID_EMAIL,
-        errorResponse(language).errorMessage.INVALID_EMAIL
+        errorResponse(ResponseLanguage.ARABIC).errorTitle.INVALID_EMAIL,
+        errorResponse(ResponseLanguage.ARABIC).errorMessage.INVALID_EMAIL
       );
     }
 
     if (!password || !isPasswordValid(password)) {
       throw new HttpError(
         HttpStatusCode.BAD_REQUEST,
-        errorResponse(language).errorTitle.INVALID_PASSWORD,
-        errorResponse(language).errorMessage.INVALID_PASSWORD
+        errorResponse(ResponseLanguage.ARABIC).errorTitle.INVALID_PASSWORD,
+        errorResponse(ResponseLanguage.ARABIC).errorMessage.INVALID_PASSWORD
       );
     }
 
     if (
-      !phone ||
+      !CIN ||
       !password ||
       !firstName ||
       !lastName ||
-      !addressMain ||
-      !city ||
-      !zip
     ) {
       throw new HttpError(
         HttpStatusCode.BAD_REQUEST,
-        errorResponse(language).errorTitle.MISSING_PARAMETERS,
-        errorResponse(language).errorMessage.MISSING_PARAMETERS
+        errorResponse(ResponseLanguage.ARABIC).errorTitle.MISSING_PARAMETERS,
+        errorResponse(ResponseLanguage.ARABIC).errorMessage.MISSING_PARAMETERS
       );
     }
 
-    const encryptedEmail = await encryptData(email.toLowerCase());
-    const encryptedPhone = await encryptData(phone.toLowerCase());
+   
     const hashedPassword = await saltAndHashData(password);
-    const encryptedFirstName = await encryptData(firstName.toLowerCase());
-    const encryptedLastName = await encryptData(lastName.toLowerCase());
-    const encryptedAddressMain = await encryptData(addressMain.toLowerCase());
-    const encryptedAddressSecond = await encryptData(
-      addressSecond?.toLowerCase() || ""
-    );
+   
 
-    const existingUser = await prisma.user.findUnique({
-      where: { encryptedEmail },
+    const existingUser = await request.server.prisma.user.findUnique({
+      where: { CIN },
     });
 
     if (existingUser) {
       throw new HttpError(
         HttpStatusCode.BAD_REQUEST,
-        errorResponse(language).errorTitle.USER_ALREADY_EXISTS,
-        errorResponse(language).errorMessage.USER_ALREADY_EXISTS
+        errorResponse(ResponseLanguage.ARABIC).errorTitle.USER_ALREADY_EXISTS,
+        errorResponse(ResponseLanguage.ARABIC).errorMessage.USER_ALREADY_EXISTS
       );
     }
 
-    const user = await prisma.user.create({
+    const user = await request.server.prisma.user.create({
       data: {
-        encryptedEmail,
-        encryptedPhone,
-        hashedPassword,
+        CIN,
         encryptedFirstName,
         encryptedLastName,
         encryptedAddressMain,
         encryptedAddressSecond,
-        city,
-        zip,
         userPreferences: {
           create: { emailNotifications: true },
         },
@@ -226,23 +202,26 @@ export const signIn = async (request: FastifyRequest, reply: FastifyReply) => {
     });
 
     await request.server.prisma.session.upsert({
+      where: {
+        userId: user.id,
+      },
       update: {
         userId: user.id,
-        User: {},
-        createdAt: Date(),
+        createdAt: new Date().toISOString(),
+        User: {
+          connect: {
+            id: user.id,
+          },
+        },
       },
       create: {
         userId: user.id,
-        User: {},
-        renewToken,
-        accessTokenExpiryTime: addSecondsToDate(
-          new Date(),
-          getJwtExpiryTime(accessTokenLifeSpan)!
-        ),
-        renewTokenExpiryTime: addSecondsToDate(
-          new Date(),
-          getJwtExpiryTime(renewTokenLifeSpan)!
-        ),
+        createdAt: new Date().toISOString(),
+        User: {
+          connect: {
+            id: user.id,
+          },
+        },
       },
     });
 
@@ -251,7 +230,7 @@ export const signIn = async (request: FastifyRequest, reply: FastifyReply) => {
       status: "Success",
     });
   } catch (error) {
-    return handleError(error, reply, language);
+    return handleError(error, reply, ResponseLanguage.ARABIC);
   }
 };
 
@@ -259,15 +238,15 @@ export const signOut = async (request: FastifyRequest, reply: FastifyReply) => {
   const { language, userId }: any = request.body;
 
   try {
-    const existingSession = await prisma.sessions.findUnique({
-      where: { userId: Number(userId) },
+    const existingSession = await request.server.prisma.session.findUnique({
+      where: { userId: userId },
     });
 
     if (!existingSession) {
       throw new HttpError(
         HttpStatusCode.NOT_FOUND,
-        errorResponse(language).errorTitle.NOT_FOUND,
-        errorResponse(language).errorMessage.NOT_FOUND
+        errorResponse(ResponseLanguage.ARABIC).errorTitle.NOT_FOUND,
+        errorResponse(ResponseLanguage.ARABIC).errorMessage.NOT_FOUND
       );
     }
 
@@ -280,6 +259,6 @@ export const signOut = async (request: FastifyRequest, reply: FastifyReply) => {
       status: "Success",
     });
   } catch (error) {
-    return handleError(error, reply, language);
+    return handleError(error, reply, ResponseLanguage.ARABIC);
   }
 };
