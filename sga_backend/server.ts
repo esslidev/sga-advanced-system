@@ -4,7 +4,7 @@ import cors from "@fastify/cors";
 import formbody from "@fastify/formbody";
 import visitorRouter from "./router/visitorRouter";
 import visitRouter from "./router/visitRouter";
-import authRoutes from "./router/authRoutes"
+import authRoutes from "./router/authRoutes";
 import prisma from "./prisma/client";
 
 const fastify = Fastify({
@@ -24,19 +24,19 @@ const fastify = Fastify({
 fastify.decorate("prisma", prisma);
 
 const apiPort = Number(process.env.API_PORT) || 4000;
-// const frontendPort = Number(process.env.FRONTEND_PORT) || 3000;
+const frontendPort = Number(process.env.FRONTEND_PORT) || 3000;
 
 const start = async () => {
   try {
     // Register CORS
-    /* await fastify.register(cors, {
+    await fastify.register(cors, {
       origin: [
         `http://localhost:5173`,
         `http://localhost:${frontendPort}`,
         `http://192.168.0.108:${frontendPort}`,
       ],
       methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    }); */
+    });
 
     // Register form-body for urlencoded parsing
     await fastify.register(formbody);

@@ -170,14 +170,13 @@ export const updateVisit = async (
       id: string;
       visitorCIN?: string;
       visitDate?: Date;
-      visitTime?: Date;
-      divisions?: Division[]; // Array of enum values like 'division1', 'division2'
+      divisions?: Division[];
       visitReason?: string;
     };
   }>,
   reply: FastifyReply
 ) => {
-  const { id, visitorCIN, divisions, visitReason } = request.body;
+  const { id, visitorCIN, divisions, visitDate, visitReason } = request.body;
 
   try {
     // Check existing Visit
@@ -198,6 +197,7 @@ export const updateVisit = async (
     const updateData: any = {
       ...(visitorCIN && { visitor: { connect: { CIN: visitorCIN } } }),
       ...(visitReason && { visitReason }),
+      ...(visitDate && { visitDate }),
     };
 
     // Use transaction to update Visit and VisitDivision join table

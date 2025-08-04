@@ -32,7 +32,7 @@ const VisitsPage = () => {
     visits,
     fetchVisits,
     removeVisit,
-    modifyVisit, // Make sure this function exists in your hook
+    modifyVisit,
     loading,
     response,
     pagination,
@@ -76,6 +76,10 @@ const VisitsPage = () => {
   ];
 
   const handleDelete = async (id: string) => {
+    if (!window.confirm("هل أنت متأكد من حذف هذه الزيارة؟")) {
+      return;
+    }
+
     try {
       await removeVisit({ id });
       alert(response?.message || "تم حذف الزيارة بنجاح");
@@ -85,28 +89,59 @@ const VisitsPage = () => {
     }
   };
 
-  const handleEdit = (id: string) => setEditingId(id);
+  const handleEdit = (visit: Visit) => {
+    setEditingId(visit.id);
+    // Initialize form data with current visit values
+    setFormData({
+      visitDate: new Date(visit.visitDate),
+      visitReason: visit.visitReason,
+      divisions: visit.divisions,
+    });
+  };
 
-  const handleCancelEdit = () => setEditingId(null);
+  const handleCancelEdit = () => {
+    setEditingId(null);
+    // Reset form data
+    setFormData({
+      divisions: [],
+      visitDate: new Date(),
+      visitReason: "",
+    });
+  };
 
-  const handleSaveEdit = async (updatedVisit: Partial<Visit>) => {
+  const handleSaveEdit = async (visitId: string) => {
     try {
-      await modifyVisit({ id: updatedVisit.id, visitReason: "hello world" });
-      console.log(JSON.stringify(updatedVisit, null, 2));
+      const updateData = {
+        id: visitId,
+        visitDate: formData.visitDate,
+        visitReason: formData.visitReason,
+        divisions: formData.divisions,
+      };
+
+      await modifyVisit(updateData);
       alert(response?.message || "تم تحديث الزيارة بنجاح");
       setEditingId(null);
+      setFormData({
+        divisions: [],
+        visitDate: new Date(),
+        visitReason: "",
+      });
       fetchVisits({ visitorId: visitorId!, limit, page });
-    } catch {
+    } catch (error) {
+      console.error("Error updating visit:", error);
       alert(response?.message || "حدث خطأ أثناء التحديث");
     }
   };
 
   const tableCells = visits.map((visit: Visit) => {
     if (visit.id === editingId) {
-      // Render editable row cells as React nodes or strings
+      // Render editable row cells
       return [
         "#" + visit.id.slice(-8).toUpperCase(),
-        <div>
+        <div
+          key="date-time-inputs"
+          style={{ display: "flex", flexDirection: "column", gap: "8px" }}
+        >
           <CustomTextInput
             name="تاريخ الزيارة"
             type="date"
@@ -123,7 +158,7 @@ const VisitsPage = () => {
             name="ساعة الزيارة"
             type="time"
             isCentered
-            value={formData.visitDate.toTimeString().substring(0, 5)} // HH:mm
+            value={formData.visitDate.toTimeString().substring(0, 5)}
             onChange={(e) => {
               const newDate = new Date(formData.visitDate);
               const [hours, minutes] = e.target.value.split(":").map(Number);
@@ -133,35 +168,43 @@ const VisitsPage = () => {
           />
         </div>,
         <AutoResizeTextarea
+          key="visit-reason"
           name="سبب الزيارة"
           placeholder="أدخل سبب الزيارة هنا"
-          style={{ width: "500px" }}
+          style={{ width: "100%", minWidth: "300px" }}
           value={formData.visitReason}
           onChange={(e) =>
             setFormData({ ...formData, visitReason: e.target.value })
           }
-          minRows={4}
-          maxRows={8}
+          minRows={2}
+          maxRows={6}
         />,
         <Multiselect
+          key="divisions-select"
           className="custom-multiselect"
           options={divisionOptions.map((option) => ({
             name: option.label,
             value: option.value,
           }))}
+          selectedValues={divisionOptions
+            .filter((option) => formData.divisions.includes(option.value))
+            .map((option) => ({
+              name: option.label,
+              value: option.value,
+            }))}
           displayValue="name"
-          placeholder="اختر القسم"
+          placeholder="اختر الأقسام"
           emptyRecordMsg="لا توجد خيارات متاحة"
-          onSelect={(selected: DivisionOption[]) => {
+          onSelect={(selectedList: DivisionOption[]) => {
             setFormData({
               ...formData,
-              divisions: selected.map((s) => s.value as Division), // if you use enum Division
+              divisions: selectedList.map((s) => s.value as Division),
             });
           }}
-          onRemove={(selected: DivisionOption[]) => {
+          onRemove={(selectedList: DivisionOption[]) => {
             setFormData({
               ...formData,
-              divisions: selected.map((s) => s.value as Division),
+              divisions: selectedList.map((s) => s.value as Division),
             });
           }}
           isObject={true}
@@ -170,15 +213,37 @@ const VisitsPage = () => {
               gap: "4px",
               borderRadius: "4px",
               background: "var(--primary-color)",
+              color: "white",
             },
             multiselectContainer: {
               width: "100%",
+              minWidth: "200px",
+            },
+            searchBox: {
+              border: "1px solid #ccc",
+              borderRadius: "4px",
             },
           }}
-        />, // or a better editable component
-        <div key="actions" className="actions">
-          <button onClick={handleCancelEdit}>إلغاء</button>
-          <button onClick={() => handleSaveEdit(visit)}>حفظ</button>
+        />,
+        <div
+          key="actions"
+          className="actions"
+          style={{ display: "flex", gap: "8px" }}
+        >
+          <button
+            className="btn btn-secondary"
+            onClick={handleCancelEdit}
+            style={{ padding: "8px 16px" }}
+          >
+            إلغاء
+          </button>
+          <button
+            className="btn btn-success"
+            onClick={() => handleSaveEdit(visit.id)}
+            style={{ padding: "8px 16px" }}
+          >
+            حفظ
+          </button>
         </div>,
       ];
     } else {
@@ -186,23 +251,37 @@ const VisitsPage = () => {
       return [
         "#" + visit.id.slice(-8).toUpperCase(),
         AppUtil.formatDateTimeToArabic(new Date(visit.visitDate)),
-        visit.visitReason,
-        visit.divisions
-          .map(
-            (division) =>
-              divisionOptions.find((d) => d.value === division)?.label
-          )
-          .join(", "),
-        <div key="actions" className="actions">
+        <div
+          key="visit-reason"
+          style={{ maxWidth: "300px", wordWrap: "break-word" }}
+        >
+          {visit.visitReason}
+        </div>,
+        <div key="divisions" style={{ maxWidth: "200px" }}>
+          {visit.divisions
+            .map(
+              (division) =>
+                divisionOptions.find((d) => d.value === division)?.label
+            )
+            .filter(Boolean)
+            .join(", ") || "لا توجد أقسام"}
+        </div>,
+        <div
+          key="actions"
+          className="actions"
+          style={{ display: "flex", gap: "8px" }}
+        >
           <button
             className="btn btn-primary"
-            onClick={() => handleEdit(visit.id)}
+            onClick={() => handleEdit(visit)}
+            style={{ padding: "8px 16px" }}
           >
-            تعديل الزيارة
+            تعديل
           </button>
           <button
             className="btn btn-danger"
             onClick={() => handleDelete(visit.id)}
+            style={{ padding: "8px 16px" }}
           >
             حذف
           </button>
@@ -216,6 +295,15 @@ const VisitsPage = () => {
       <h1 className="title">تتبع الزيارات : {fullName || "اسم غير معروف"}</h1>
 
       {loading && <p>جاري تحميل البيانات...</p>}
+
+      {!loading && visits.length === 0 && (
+        <div
+          className="no-data"
+          style={{ textAlign: "center", padding: "40px" }}
+        >
+          <p>لا توجد زيارات مسجلة لهذا الزائر</p>
+        </div>
+      )}
 
       {!loading && visits.length > 0 && (
         <>

@@ -1,4 +1,4 @@
-import { FastifyRequest, FastifyReply, HookHandlerDoneFunction } from "fastify";
+import { FastifyRequest, FastifyReply } from "fastify";
 import { HttpError } from "../core/resources/response/httpError";
 import * as jwt from "jsonwebtoken";
 import { handleError } from "../core/utils/errorHandler";

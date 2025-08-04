@@ -1,4 +1,3 @@
-import React from "react";
 import "./Login.css";
 import CustomTextInput from "../../components/common/CustomTextInput/CustomTextInput";
 import CustomButton from "../../components/common/CustomButton/CustomButton";

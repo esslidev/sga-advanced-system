@@ -70,7 +70,21 @@ const VisitorsPage = () => {
     );
   };
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = async ({
+    id,
+    visitorName,
+  }: {
+    id: string;
+    visitorName: string;
+  }) => {
+    if (
+      !window.confirm(
+        `هل أنت متأكد من حذف الزائر "${visitorName}"؟\nسيتم حذف جميع الزيارات المرتبطة به أيضاً.`
+      )
+    ) {
+      return;
+    }
+
     try {
       await removeVisitor({ id });
       alert(response?.message || "تم حذف الزائر بنجاح");
@@ -99,7 +113,12 @@ const VisitorsPage = () => {
       </button>
       <button
         className="btn btn-danger"
-        onClick={() => handleDelete(visitor.id)}
+        onClick={() =>
+          handleDelete({
+            id: visitor.id,
+            visitorName: visitor.firstName + " " + visitor.lastName,
+          })
+        }
       >
         حذف
       </button>

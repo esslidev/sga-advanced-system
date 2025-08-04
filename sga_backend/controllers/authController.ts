@@ -7,7 +7,7 @@ import {
   isPasswordValid,
   saltAndHashData,
   verifyHashedData,
-  isCINValid
+  isCINValid,
 } from "../core/utils/utils";
 import { HttpStatusCode } from "../core/enums/response/httpStatusCode";
 import { errorResponse } from "../core/resources/response/localizedErrorResponse";
@@ -20,12 +20,7 @@ const accessTokenLifeSpan = process.env.ACCESS_TOKEN_LIFESPAN!;
 const renewTokenLifeSpan = process.env.RENEW_TOKEN_LIFESPAN!;
 
 export const signUp = async (request: FastifyRequest, reply: FastifyReply) => {
-  const {
-    CIN,
-    password,
-    firstName,
-    lastName,
-  }: any = request.body;
+  const { CIN, password, firstName, lastName }: any = request.body;
 
   try {
     if (!CIN || !isCINValid(CIN)) {
@@ -44,12 +39,7 @@ export const signUp = async (request: FastifyRequest, reply: FastifyReply) => {
       );
     }
 
-    if (
-      !CIN ||
-      !password ||
-      !firstName ||
-      !lastName
-    ) {
+    if (!CIN || !password || !firstName || !lastName) {
       throw new HttpError(
         HttpStatusCode.BAD_REQUEST,
         errorResponse(ResponseLanguage.ARABIC).errorTitle.MISSING_PARAMETERS,
@@ -57,9 +47,7 @@ export const signUp = async (request: FastifyRequest, reply: FastifyReply) => {
       );
     }
 
-
     const hashPassword: any = await saltAndHashData(password);
-
 
     const existingUser = await request.server.prisma.user.findUnique({
       where: { CIN },
@@ -102,9 +90,8 @@ export const signUp = async (request: FastifyRequest, reply: FastifyReply) => {
       },
     });
 
-
     return reply.status(HttpStatusCode.OK).send({
-      data: { accessToken, renewToken },
+      auth: { accessToken, renewToken },
       status: "Success",
     });
   } catch (error) {
@@ -119,8 +106,8 @@ export const signIn = async (request: FastifyRequest, reply: FastifyReply) => {
     if (!CIN || !isCINValid(CIN)) {
       throw new HttpError(
         HttpStatusCode.BAD_REQUEST,
-        errorResponse(ResponseLanguage.ARABIC).errorTitle.INVALID_EMAIL,
-        errorResponse(ResponseLanguage.ARABIC).errorMessage.INVALID_EMAIL
+        errorResponse(ResponseLanguage.ARABIC).errorTitle.INVALID_CIN,
+        errorResponse(ResponseLanguage.ARABIC).errorMessage.INVALID_CIN
       );
     }
 
@@ -159,10 +146,10 @@ export const signIn = async (request: FastifyRequest, reply: FastifyReply) => {
 
     await request.server.prisma.session.upsert({
       where: {
-        userId: user.id
+        userId: user.id,
       },
       update: {
-        userId: user.id
+        userId: user.id,
       },
       create: {
         userId: user.id,
@@ -170,7 +157,7 @@ export const signIn = async (request: FastifyRequest, reply: FastifyReply) => {
     });
 
     return reply.status(HttpStatusCode.OK).send({
-      data: { accessToken, renewToken },
+      auth: { accessToken, renewToken },
       status: "Success",
     });
   } catch (error) {
@@ -207,7 +194,10 @@ export const signOut = async (request: FastifyRequest, reply: FastifyReply) => {
   }
 };
 
-export const renewAccess = async (request: FastifyRequest, reply: FastifyReply) => {
+export const renewAccess = async (
+  request: FastifyRequest,
+  reply: FastifyReply
+) => {
   const { renewToken }: any = request.body;
 
   try {
@@ -220,17 +210,24 @@ export const renewAccess = async (request: FastifyRequest, reply: FastifyReply) 
     }
 
     if (!jwtSecretRenewToken) {
-      console.error("JWT secret renew token is not configured properly in the environment variables.");
+      console.error(
+        "JWT secret renew token is not configured properly in the environment variables."
+      );
       throw new HttpError(
         HttpStatusCode.INTERNAL_SERVER_ERROR,
         errorResponse(ResponseLanguage.ARABIC).errorTitle.INTERNAL_SERVER_ERROR,
-        errorResponse(ResponseLanguage.ARABIC).errorMessage.INTERNAL_SERVER_ERROR
+        errorResponse(
+          ResponseLanguage.ARABIC
+        ).errorMessage.INTERNAL_SERVER_ERROR
       );
     }
 
     let decodedResult: jwt.JwtPayload;
     try {
-      decodedResult = jwt.verify(renewToken, jwtSecretRenewToken) as jwt.JwtPayload;
+      decodedResult = jwt.verify(
+        renewToken,
+        jwtSecretRenewToken
+      ) as jwt.JwtPayload;
     } catch (err) {
       if (err instanceof jwt.TokenExpiredError) {
         throw new HttpError(
@@ -247,11 +244,15 @@ export const renewAccess = async (request: FastifyRequest, reply: FastifyReply) 
     const userRole = decodedResult.userRole;
 
     if (!jwtSecretToken) {
-      console.error("JWT secret tokens are not configured properly in the environment variables.");
+      console.error(
+        "JWT secret tokens are not configured properly in the environment variables."
+      );
       throw new HttpError(
         HttpStatusCode.INTERNAL_SERVER_ERROR,
         errorResponse(ResponseLanguage.ARABIC).errorTitle.INTERNAL_SERVER_ERROR,
-        errorResponse(ResponseLanguage.ARABIC).errorMessage.INTERNAL_SERVER_ERROR
+        errorResponse(
+          ResponseLanguage.ARABIC
+        ).errorMessage.INTERNAL_SERVER_ERROR
       );
     }
 
@@ -261,11 +262,10 @@ export const renewAccess = async (request: FastifyRequest, reply: FastifyReply) 
     });
 
     return reply.status(HttpStatusCode.OK).send({
-      data: { accessToken: finalAccessToken },
+      auth: { accessToken: finalAccessToken },
       status: "Success",
     });
   } catch (error) {
     return handleError(error, reply, ResponseLanguage.ARABIC);
   }
 };
-
