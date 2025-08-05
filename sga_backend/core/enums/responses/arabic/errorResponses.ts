@@ -23,18 +23,15 @@ export enum ArErrorTitle {
   EMAIL_NOT_VERIFIED = "البريد الإلكتروني غير مُؤكد",
   DATA_ALREADY_EXISTS = "البيانات موجودة بالفعل",
   MISSING_PARAMETERS = "المعطيات المفقودة",
-  // إضافة المزيد من أنواع الأخطاء حسب الحاجة
-  CANNOT_SWITCH_ORDER = "لا يمكن تغيير الترتيب.",
-  PREFERENCES_ALREADY_EXISTS = "التفضيلات موجودة بالفعل",
-  MAGASIN_ALREADY_EXISTS = "المتجر موجود بالفعل",
-  PRODUCT_ALREADY_EXISTS = "المنتج موجود بالفعل",
-  WISHLIST_ALREADY_EXIST = "قائمة الرغبات موجودة بالفعل",
-  ITEM_ALREADY_IN_WISHLIST = "العنصر موجود بالفعل في قائمة الرغبات",
-  ITEM_ALREADY_IN_CART = "العنصر موجود بالفعل في عربة التسوق",
-  CART_ALREADY_EXIST = "عربة التسوق موجودة بالفعل",
-  CATEGORY_ALREADY_EXISTS = "الفئة موجودة بالفعل",
-  ORDER_MUST_INCLUDE_ONE_ITEM = "يجب أن تحتوي الطلبية على عنصر واحد على الأقل",
-  EMAIL_ALREADY_SUBSCRIBED = "البريد الإلكتروني مشترك بالفعل",
+  // Visitor-related
+  VISITOR_ALREADY_EXISTS = "الزائر موجود مسبقًا",
+  VISITOR_DELETED = "تم حذف الزائر بنجاح",
+  VISITOR_DELETED_PREVIOUSLY = "تم حذف هذا الزائر مسبقًا",
+  VISITOR_NAME_MISMATCH = "معلومات اسم الزائر غير متطابقة",
+
+  // Visit-related
+  VISIT_NOT_FOUND = "الزيارة غير موجودة",
+  INVALID_VISIT_DATA = "بيانات زيارة غير صحيحة",
 }
 
 export enum ArErrorMessage {
@@ -60,17 +57,13 @@ export enum ArErrorMessage {
   EMAIL_NOT_VERIFIED = "عنوان البريد الإلكتروني غير مُؤكد. يُرجى تأكيد بريدك الإلكتروني قبل المتابعة.",
   DATA_ALREADY_EXISTS = "البيانات موجودة بالفعل. يرجى تقديم بيانات مختلفة.",
   MISSING_PARAMETERS = "المعطيات المطلوبة مفقودة في الطلب.",
-  // إضافة المزيد من أنواع الأخطاء حسب الحاجة
-  PASSWORDS_DO_NOT_MATCH = "كلمات المرور غير متطابقة.",
-  CANNOT_SWITCH_ORDER = "لا يمكن تغيير الترتيب. لم يتم العثور على عنصر صالح.",
-  PREFERENCES_ALREADY_EXISTS = "التفضيلات موجودة بالفعل. يرجى اختيار تفضيلات مختلفة.",
-  MAGASIN_ALREADY_EXISTS = "المتجر موجود بالفعل. يرجى اختيار متجر مختلف.",
-  PRODUCT_ALREADY_EXISTS = "المنتج موجود بالفعل. يرجى اختيار منتج مختلف.",
-  WISHLIST_ALREADY_EXIST = "قائمة الرغبات موجودة بالفعل. يرجى تحديث قائمة الرغبات الحالية الخاصة بك.",
-  ITEM_ALREADY_IN_WISHLIST = "العنصر موجود بالفعل في قائمة الرغبات الخاصة بك. يرجى اختيار عنصر آخر.",
-  ITEM_ALREADY_IN_CART = "العنصر موجود بالفعل في عربة التسوق الخاصة بك. يرجى تحديث الكمية أو اختيار عنصر آخر.",
-  CART_ALREADY_EXIST = "عربة التسوق موجودة بالفعل. يرجى تحديث عربة التسوق الحالية الخاصة بك.",
-  CATEGORY_ALREADY_EXISTS = "الفئة موجودة بالفعل. يرجى اختيار فئة أخرى.",
-  ORDER_MUST_INCLUDE_ONE_ITEM = "يجب أن تحتوي طلبك على عنصر واحد على الأقل. يرجى إضافة عنصر للمتابعة.",
-  EMAIL_ALREADY_SUBSCRIBED = "البريد الإلكتروني مشترك بالفعل في النشرة الإخبارية. يرجى تقديم بريد إلكتروني آخر.",
+  // Visitor-related
+  VISITOR_ALREADY_EXISTS = "الزائر بمعلومات المقدمة موجود مسبقًا في النظام.",
+  VISITOR_DELETED = "تم حذف الزائر من النظام بنجاح.",
+  VISITOR_DELETED_PREVIOUSLY = "تم حذف هذا الزائر مسبقًا. يرجى التواصل مع الدعم لمزيد من المساعدة.",
+  VISITOR_NAME_MISMATCH = "معلومات الاسم المقدمة للزائر لا تطابق السجل الحالي. يرجى التحقق من البيانات.",
+
+  // Visit-related
+  VISIT_NOT_FOUND = "لم يتم العثور على الزيارة المطلوبة. يرجى التحقق من معرف الزيارة.",
+  INVALID_VISIT_DATA = "تم تقديم بيانات زيارة غير صحيحة. يرجى مراجعة المدخلات والمحاولة مرة أخرى.",
 }

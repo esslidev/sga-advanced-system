@@ -1,0 +1,71 @@
+export enum FrErrorTitle {
+  AUTHENTICATION_ERROR = "Problème d'authentification",
+  INVALID_REQUEST = "Requête invalide",
+  INVALID_CREDENTIALS = "Identifiants incorrects",
+  LACK_OF_CREDENTIALS = "Manque d'identifiants",
+  UNAUTHORIZED_ACCESS = "Accès non autorisé",
+  ACCESS_TOKEN_EXPIRED = "Jeton d'accès expiré",
+  RENEW_TOKEN_EXPIRED = "Jeton de renouvellement expiré",
+  INVALID_SIGNUP_DATA = "Données d'inscription invalides",
+  INVALID_SIGNIN_DATA = "Données de connexion invalides",
+  INTERNAL_SERVER_ERROR = "Erreur interne du serveur",
+  NOT_FOUND = "Ressource non trouvée",
+  FORBIDDEN = "Accès interdit",
+  USER_NOT_FOUND = "Utilisateur non trouvé",
+  USER_ALREADY_EXISTS = "L'utilisateur existe déjà",
+  INVALID_INPUT = "Entrée invalide",
+  INVALID_CIN = "Numéro d'identification nationale invalide",
+  INVALID_EMAIL = "Adresse e-mail invalide",
+  INVALID_PASSWORD = "Mot de passe invalide",
+  EXPIRED_TOKEN = "Jeton expiré",
+  INVALID_TOKEN = "Jeton invalide",
+  ALREADY_VERIFIED = "Déjà vérifié",
+  EMAIL_NOT_VERIFIED = "E-mail non vérifié",
+  DATA_ALREADY_EXISTS = "Les données existent déjà",
+  MISSING_PARAMETERS = "Paramètres manquants",
+
+  // Visitor-related
+  VISITOR_ALREADY_EXISTS = "Le visiteur existe déjà",
+  VISITOR_DELETED = "Visiteur supprimé avec succès",
+  VISITOR_DELETED_PREVIOUSLY = "Ce visiteur a déjà été supprimé",
+  VISITOR_NAME_MISMATCH = "Nom du visiteur ne correspond pas",
+
+  // Visit-related
+  VISIT_NOT_FOUND = "Visite introuvable",
+  INVALID_VISIT_DATA = "Données de visite invalides",
+}
+
+export enum FrErrorMessage {
+  AUTHENTICATION_ERROR = "Erreur d'authentification. Veuillez fournir des identifiants valides.",
+  INVALID_REQUEST = "La requête est invalide. Veuillez vérifier les données et réessayer.",
+  INVALID_CREDENTIALS = "Les identifiants fournis sont incorrects. Veuillez réessayer.",
+  LACK_OF_CREDENTIALS = "La requête ne contient pas les identifiants nécessaires pour accéder à la ressource.",
+  UNAUTHORIZED_ACCESS = "Vous n'avez pas la permission d'accéder à cette ressource.",
+  EXPIRED_TOKEN = "Le jeton fourni a expiré. Veuillez en obtenir un nouveau pour continuer.",
+  INVALID_SIGNUP_DATA = "Les données d'inscription sont invalides. Veuillez fournir des informations correctes.",
+  INVALID_SIGNIN_DATA = "Les données de connexion sont invalides. Veuillez fournir des informations valides.",
+  NOT_FOUND = "La ressource demandée est introuvable sur le serveur.",
+  FORBIDDEN = "Vous n'avez pas les autorisations nécessaires pour accéder à cette ressource.",
+  USER_NOT_FOUND = "L'utilisateur recherché n'existe pas dans le système.",
+  USER_ALREADY_EXISTS = "Un utilisateur avec cet e-mail ou identifiant tiers existe déjà.",
+  INVALID_INPUT = "Les données saisies sont invalides. Veuillez vérifier et réessayer.",
+  INVALID_CIN = "Le numéro d'identification nationale est invalide. Veuillez fournir un numéro correct.",
+  INVALID_EMAIL = "Adresse e-mail invalide. Veuillez fournir une adresse correcte.",
+  INVALID_PASSWORD = "Mot de passe invalide. Il doit comporter au moins 8 caractères, avec des lettres et des chiffres.",
+  INTERNAL_SERVER_ERROR = "Une erreur inattendue est survenue sur le serveur. Veuillez réessayer plus tard ou contacter le support.",
+  INVALID_TOKEN = "Le jeton fourni est invalide. Veuillez en fournir un valide.",
+  ALREADY_VERIFIED = "Ce compte a déjà été vérifié.",
+  EMAIL_NOT_VERIFIED = "L'adresse e-mail n'est pas vérifiée. Veuillez la confirmer avant de continuer.",
+  DATA_ALREADY_EXISTS = "Les données existent déjà. Veuillez fournir des données différentes.",
+  MISSING_PARAMETERS = "Des paramètres requis sont manquants dans la requête.",
+
+  // Visitor-related
+  VISITOR_ALREADY_EXISTS = "Un visiteur avec ces informations existe déjà dans le système.",
+  VISITOR_DELETED = "Le visiteur a été supprimé du système avec succès.",
+  VISITOR_DELETED_PREVIOUSLY = "Ce visiteur a déjà été supprimé. Veuillez contacter le support pour plus d'aide.",
+  VISITOR_NAME_MISMATCH = "Le nom fourni pour le visiteur ne correspond pas à l'enregistrement existant. Veuillez vérifier les données.",
+
+  // Visit-related
+  VISIT_NOT_FOUND = "La visite demandée est introuvable. Veuillez vérifier l'identifiant de la visite.",
+  INVALID_VISIT_DATA = "Les données de la visite sont invalides. Veuillez vérifier les entrées et réessayer.",
+}

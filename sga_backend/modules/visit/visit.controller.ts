@@ -1,18 +1,20 @@
 import { FastifyRequest, FastifyReply } from "fastify";
-import { Prisma, PrismaClient, Division } from "@prisma/client";
+import { Prisma, Division } from "@prisma/client";
 import {
   ErrorHttpStatusCode,
-  ErrorTitle,
-  ErrorMessage,
-} from "../core/responses/arabic/errorResponses";
-import {
   SuccessHttpStatusCode,
-  SuccessTitle,
-  SuccessMessage,
-} from "../core/responses/arabic/responses";
+} from "../../core/enums/responses/responseStatusCode";
+import { handleError } from "../../core/utils/errorHandler";
+import { ResponseLanguage } from "../../core/enums/responses/responseLanguage";
+import { HttpErrorResponse } from "../../core/resources/response/httpErrorResponse";
+import {
+  errorResponse,
+  successResponse,
+} from "../../core/resources/response/localizedResponse";
+import { getHeaderValue } from "../../core/utils/headerValueGetter";
 
 // GET Visits
-export const getVisits = async (
+const getVisits = async (
   request: FastifyRequest<{
     Querystring: {
       visitorId: string;
@@ -22,6 +24,11 @@ export const getVisits = async (
   }>,
   reply: FastifyReply
 ) => {
+  const language = getHeaderValue(
+    request.headers,
+    "language",
+    ResponseLanguage.ARABIC
+  )!;
   const { visitorId, limit = "10", page = "1" } = request.query;
 
   try {
@@ -66,17 +73,12 @@ export const getVisits = async (
       },
     });
   } catch (error) {
-    request.log.error(error);
-    return reply.status(ErrorHttpStatusCode.BAD_REQUEST).send({
-      statusCode: ErrorHttpStatusCode.BAD_REQUEST,
-      title: ErrorTitle.INVALID_VISIT_DATA,
-      message: ErrorMessage.INVALID_VISIT_DATA,
-    });
+    return handleError(error, reply, language);
   }
 };
 
 //ADD Visit
-export const addVisit = async (
+const addVisit = async (
   request: FastifyRequest<{
     Body: {
       visitDate: Date;
@@ -91,6 +93,11 @@ export const addVisit = async (
   }>,
   reply: FastifyReply
 ) => {
+  const language = getHeaderValue(
+    request.headers,
+    "language",
+    ResponseLanguage.ARABIC
+  )!;
   const { visitDate, divisions, visitReason, visitor } = request.body;
 
   try {
@@ -102,11 +109,11 @@ export const addVisit = async (
     if (existingVisitor) {
       // Soft delete check
       if (existingVisitor.deletedAt) {
-        return reply.status(ErrorHttpStatusCode.GONE).send({
-          statusCode: ErrorHttpStatusCode.GONE,
-          title: ErrorTitle.VISITOR_DELETED_PREVIOUSLY,
-          message: ErrorMessage.VISITOR_DELETED_PREVIOUSLY,
-        });
+        throw new HttpErrorResponse(
+          ErrorHttpStatusCode.GONE,
+          errorResponse(language).errorTitle.VISITOR_DELETED_PREVIOUSLY,
+          errorResponse(language).errorMessage.VISITOR_DELETED_PREVIOUSLY
+        );
       }
 
       // Name mismatch check
@@ -115,11 +122,11 @@ export const addVisit = async (
         existingVisitor.lastName.trim() !== visitor.lastName.trim();
 
       if (nameMismatch) {
-        return reply.status(ErrorHttpStatusCode.CONFLICT).send({
-          statusCode: ErrorHttpStatusCode.CONFLICT,
-          title: ErrorTitle.VISITOR_NAME_MISMATCH,
-          message: ErrorMessage.VISITOR_NAME_MISMATCH,
-        });
+        throw new HttpErrorResponse(
+          ErrorHttpStatusCode.CONFLICT,
+          errorResponse(language).errorTitle.VISITOR_NAME_MISMATCH,
+          errorResponse(language).errorMessage.VISITOR_NAME_MISMATCH
+        );
       }
     } else {
       // Create visitor if not found
@@ -149,22 +156,19 @@ export const addVisit = async (
     });
 
     return reply.status(SuccessHttpStatusCode.CREATED).send({
-      statusCode: SuccessHttpStatusCode.CREATED,
-      title: SuccessTitle.VISIT_REGISTERED,
-      message: SuccessMessage.VISIT_REGISTERED,
+      response: {
+        statusCode: SuccessHttpStatusCode.CREATED,
+        title: successResponse(language).successTitle.VISIT_REGISTERED,
+        message: successResponse(language).successTitle.VISIT_REGISTERED,
+      },
     });
   } catch (error) {
-    request.log.error(error);
-    return reply.status(ErrorHttpStatusCode.INTERNAL_SERVER_ERROR).send({
-      statusCode: ErrorHttpStatusCode.INTERNAL_SERVER_ERROR,
-      title: ErrorTitle.INTERNAL_SERVER_ERROR,
-      message: ErrorMessage.INTERNAL_SERVER_ERROR,
-    });
+    return handleError(error, reply, language);
   }
 };
 
 // UPDATE Visit
-export const updateVisit = async (
+const updateVisit = async (
   request: FastifyRequest<{
     Body: {
       id: string;
@@ -176,6 +180,11 @@ export const updateVisit = async (
   }>,
   reply: FastifyReply
 ) => {
+  const language = getHeaderValue(
+    request.headers,
+    "language",
+    ResponseLanguage.ARABIC
+  )!;
   const { id, visitorCIN, divisions, visitDate, visitReason } = request.body;
 
   try {
@@ -186,14 +195,14 @@ export const updateVisit = async (
     });
 
     if (!existingVisit) {
-      return reply.status(ErrorHttpStatusCode.NOT_FOUND).send({
-        statusCode: ErrorHttpStatusCode.NOT_FOUND,
-        title: ErrorTitle.NOT_FOUND,
-        message: ErrorMessage.NOT_FOUND,
-      });
+      throw new HttpErrorResponse(
+        ErrorHttpStatusCode.NOT_FOUND,
+        errorResponse(language).errorTitle.NOT_FOUND,
+        errorResponse(language).errorMessage.NOT_FOUND
+      );
     }
 
-    // Start building update data for Visit itself (excluding divisions)
+    // update data (excluding divisions)
     const updateData: any = {
       ...(visitorCIN && { visitor: { connect: { CIN: visitorCIN } } }),
       ...(visitReason && { visitReason }),
@@ -227,19 +236,20 @@ export const updateVisit = async (
       }
     });
 
-    return reply.status(SuccessHttpStatusCode.OK).send({ data: { id } });
-  } catch (error) {
-    request.log.error(error);
-    return reply.status(ErrorHttpStatusCode.INTERNAL_SERVER_ERROR).send({
-      statusCode: ErrorHttpStatusCode.INTERNAL_SERVER_ERROR,
-      title: ErrorTitle.INTERNAL_SERVER_ERROR,
-      message: ErrorMessage.INTERNAL_SERVER_ERROR,
+    return reply.status(SuccessHttpStatusCode.OK).send({
+      response: {
+        statusCode: SuccessHttpStatusCode.OK,
+        title: successResponse(language).successTitle.VISIT_UPDATED,
+        message: successResponse(language).successTitle.VISIT_UPDATED,
+      },
     });
+  } catch (error) {
+    return handleError(error, reply, language);
   }
 };
 
 // DELETE Visit
-export const deleteVisit = async (
+const deleteVisit = async (
   request: FastifyRequest<{
     Querystring: {
       id: string;
@@ -247,6 +257,11 @@ export const deleteVisit = async (
   }>,
   reply: FastifyReply
 ) => {
+  const language = getHeaderValue(
+    request.headers,
+    "language",
+    ResponseLanguage.ARABIC
+  )!;
   const { id } = request.query;
   try {
     const visit = await request.server.prisma.visit.findUnique({
@@ -254,11 +269,11 @@ export const deleteVisit = async (
     });
 
     if (!visit) {
-      return reply.status(ErrorHttpStatusCode.NOT_FOUND).send({
-        statusCode: ErrorHttpStatusCode.NOT_FOUND,
-        title: ErrorTitle.NOT_FOUND,
-        message: ErrorMessage.NOT_FOUND,
-      });
+      throw new HttpErrorResponse(
+        ErrorHttpStatusCode.NOT_FOUND,
+        errorResponse(language).errorTitle.NOT_FOUND,
+        errorResponse(language).errorMessage.NOT_FOUND
+      );
     }
 
     await request.server.prisma.visit.update({
@@ -266,18 +281,15 @@ export const deleteVisit = async (
       data: { deletedAt: new Date() },
     });
 
-    return reply.status(SuccessHttpStatusCode.ACCEPTED).send({
-      statusCode: SuccessHttpStatusCode.ACCEPTED,
-      title: SuccessTitle.VISITOR_DELETED,
-      message: SuccessMessage.VISITOR_DELETED,
+    return reply.status(SuccessHttpStatusCode.OK).send({
+      response: {
+        statusCode: SuccessHttpStatusCode.OK,
+        title: successResponse(language).successTitle.VISIT_DELETED,
+        message: successResponse(language).successTitle.VISIT_DELETED,
+      },
     });
   } catch (error) {
-    request.log.error(error);
-    return reply.status(ErrorHttpStatusCode.INTERNAL_SERVER_ERROR).send({
-      statusCode: ErrorHttpStatusCode.INTERNAL_SERVER_ERROR,
-      title: ErrorTitle.INTERNAL_SERVER_ERROR,
-      message: ErrorMessage.INTERNAL_ERROR,
-    });
+    return handleError(error, reply, language);
   }
 };
 

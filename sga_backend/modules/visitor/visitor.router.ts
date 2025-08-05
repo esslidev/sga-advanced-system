@@ -1,5 +1,5 @@
 import { FastifyInstance } from "fastify";
-import visitorController from "../controllers/visitorController";
+import visitorController from "./visitor.controller";
 
 export default async function visitorRouter(fastify: FastifyInstance) {
   fastify.get("/get-visitor", visitorController.getVisitor);

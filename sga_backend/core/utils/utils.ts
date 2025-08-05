@@ -58,7 +58,7 @@ export const verifyEncryptedData = (
 // Generate a salted and hashed value (e.g., password, email, etc.)
 export const saltAndHashData = async (data: string): Promise<string> => {
   // Generate a salt with a complexity of 10
-  const salt = await bcrypt.genSalt(10);
+  const salt = await bcrypt.genSalt(12);
 
   // Hash the data with the generated salt
   const hashedData = await bcrypt.hash(data, salt);

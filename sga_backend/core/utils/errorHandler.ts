@@ -1,28 +1,34 @@
 import { FastifyReply } from "fastify";
-import { HttpError } from "../resources/response/httpError";
-import { ResponseLanguage } from "../enums/response/responseLanguage";
-import { HttpStatusCode } from "../enums/response/httpStatusCode";
-import { errorResponse } from "../resources/response/localizedErrorResponse";
+import { errorResponse } from "../resources/response/localizedResponse";
+import { HttpErrorResponse } from "../resources/response/httpErrorResponse";
+import { ResponseLanguage } from "../enums/responses/responseLanguage";
+import { ErrorHttpStatusCode } from "../enums/responses/responseStatusCode";
 
 const handleError = (
   error: any,
   reply: FastifyReply,
-  language: string = ResponseLanguage.ENGLISH
+  language: string = ResponseLanguage.ARABIC
 ) => {
-  const errorLang = errorResponse(language);
+  const errorResponseLang = errorResponse(language);
 
-  if (error instanceof HttpError) {
+  if (error instanceof HttpErrorResponse) {
     return reply.code(error.statusCode).send({
-      error: error.errorTitle,
-      message: error.errorMessage,
-      expiredAccessToken: error.expiredAccessToken,
-      expiredRenewToken: error.expiredRenewToken,
+      response: {
+        statusCode: error.statusCode,
+        title: error.responseTitle,
+        message: error.responseMessage,
+        expiredAccessToken: error.expiredAccessToken,
+        expiredRenewToken: error.expiredRenewToken,
+      },
     });
   } else {
     console.error(error);
-    return reply.code(HttpStatusCode.INTERNAL_SERVER_ERROR).send({
-      error: errorLang.errorTitle.INTERNAL_SERVER_ERROR,
-      message: errorLang.errorMessage.INTERNAL_SERVER_ERROR,
+    return reply.code(ErrorHttpStatusCode.INTERNAL_SERVER_ERROR).send({
+      response: {
+        statusCode: ErrorHttpStatusCode.BAD_REQUEST,
+        title: errorResponseLang.errorTitle.INTERNAL_SERVER_ERROR,
+        message: errorResponseLang.errorMessage.INTERNAL_SERVER_ERROR,
+      },
     });
   }
 };

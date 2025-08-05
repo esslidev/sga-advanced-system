@@ -10,7 +10,7 @@ generator client {
 model User {
   id           String         @id @default(uuid())
   CIN          String         @unique
-  hashPassword String
+  hashedPassword String 
   firstName    String
   lastName     String
   imageUrl     String?

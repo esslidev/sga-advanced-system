@@ -2,10 +2,10 @@
 import Fastify from "fastify";
 import cors from "@fastify/cors";
 import formbody from "@fastify/formbody";
-import visitorRouter from "./router/visitorRouter";
-import visitRouter from "./router/visitRouter";
-import authRoutes from "./router/authRoutes";
 import prisma from "./prisma/client";
+import visitorRouter from "./modules/visitor/visitor.router";
+import visitRouter from "./modules/visit/visit.router";
+import authRoutes from "./modules/auth/auth.routes";
 
 const fastify = Fastify({
   logger: {

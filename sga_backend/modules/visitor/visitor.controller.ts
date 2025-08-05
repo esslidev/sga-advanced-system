@@ -1,21 +1,30 @@
 import { FastifyRequest, FastifyReply } from "fastify";
+import { Prisma } from "@prisma/client";
+import { ResponseLanguage } from "../../core/enums/responses/responseLanguage";
+import { HttpErrorResponse } from "../../core/resources/response/httpErrorResponse";
+import {
+  errorResponse,
+  successResponse,
+} from "../../core/resources/response/localizedResponse";
 import {
   ErrorHttpStatusCode,
-  ErrorTitle,
-  ErrorMessage,
-} from "../core/responses/arabic/errorResponses";
-import {
   SuccessHttpStatusCode,
-  SuccessTitle,
-  SuccessMessage,
-} from "../core/responses/arabic/responses";
-import { Prisma } from "@prisma/client";
+} from "../../core/enums/responses/responseStatusCode";
+import { handleError } from "../../core/utils/errorHandler";
+import { getHeaderValue } from "../../core/utils/headerValueGetter";
 
 // GET Visitor
-export const getVisitor = async (
-  request: FastifyRequest<{ Querystring: { id: string } }>,
+const getVisitor = async (
+  request: FastifyRequest<{
+    Querystring: { id: string };
+  }>,
   reply: FastifyReply
 ) => {
+  const language = getHeaderValue(
+    request.headers,
+    "language",
+    ResponseLanguage.ARABIC
+  )!;
   const { id } = request.query;
   try {
     const visitor = await request.server.prisma.visitor.findFirst({
@@ -23,11 +32,11 @@ export const getVisitor = async (
     });
 
     if (!visitor) {
-      return reply.status(ErrorHttpStatusCode.NOT_FOUND).send({
-        statusCode: ErrorHttpStatusCode.NOT_FOUND,
-        title: ErrorTitle.NOT_FOUND,
-        message: ErrorMessage.NOT_FOUND,
-      });
+      throw new HttpErrorResponse(
+        ErrorHttpStatusCode.NOT_FOUND,
+        errorResponse(language).errorTitle.NOT_FOUND,
+        errorResponse(language).errorMessage.NOT_FOUND
+      );
     }
 
     const responseUser = {
@@ -41,17 +50,12 @@ export const getVisitor = async (
 
     return reply.status(SuccessHttpStatusCode.OK).send({ data: responseUser });
   } catch (error) {
-    request.log.error(error);
-    return reply.status(ErrorHttpStatusCode.INTERNAL_SERVER_ERROR).send({
-      statusCode: ErrorHttpStatusCode.INTERNAL_SERVER_ERROR,
-      title: ErrorTitle.INTERNAL_SERVER_ERROR,
-      message: ErrorMessage.INTERNAL_SERVER_ERROR,
-    });
+    return handleError(error, reply, language);
   }
 };
 
 // GET Visitors
-export const getVisitors = async (
+const getVisitors = async (
   request: FastifyRequest<{
     Querystring: {
       orderByName?: boolean;
@@ -62,6 +66,11 @@ export const getVisitors = async (
   }>,
   reply: FastifyReply
 ) => {
+  const language = getHeaderValue(
+    request.headers,
+    "language",
+    ResponseLanguage.ARABIC
+  )!;
   const { orderByName, search, limit = "10", page = "1" } = request.query;
 
   try {
@@ -118,18 +127,12 @@ export const getVisitors = async (
       },
     });
   } catch (error) {
-    request.log.error(error);
-
-    return reply.status(ErrorHttpStatusCode.INTERNAL_SERVER_ERROR).send({
-      statusCode: ErrorHttpStatusCode.INTERNAL_SERVER_ERROR,
-      title: ErrorTitle.INTERNAL_SERVER_ERROR,
-      message: ErrorMessage.INTERNAL_SERVER_ERROR,
-    });
+    return handleError(error, reply, language);
   }
 };
 
 // ADD Visitor
-export const addVisitor = async (
+const addVisitor = async (
   request: FastifyRequest<{
     Body: {
       CIN: string;
@@ -139,6 +142,11 @@ export const addVisitor = async (
   }>,
   reply: FastifyReply
 ) => {
+  const language = getHeaderValue(
+    request.headers,
+    "language",
+    ResponseLanguage.ARABIC
+  )!;
   const { CIN, firstName, lastName } = request.body;
   try {
     const existingVisitor = await request.server.prisma.visitor.findFirst({
@@ -146,11 +154,11 @@ export const addVisitor = async (
     });
 
     if (existingVisitor) {
-      return reply.status(ErrorHttpStatusCode.CONFLICT).send({
-        statusCode: ErrorHttpStatusCode.CONFLICT,
-        title: ErrorTitle.VISITOR_ALREADY_EXISTS,
-        message: ErrorMessage.VISITOR_ALREADY_EXISTS,
-      });
+      throw new HttpErrorResponse(
+        ErrorHttpStatusCode.CONFLICT,
+        errorResponse(language).errorTitle.VISITOR_ALREADY_EXISTS,
+        errorResponse(language).errorMessage.VISITOR_ALREADY_EXISTS
+      );
     }
 
     const deletedVisitor = await request.server.prisma.visitor.findFirst({
@@ -161,11 +169,11 @@ export const addVisitor = async (
     });
 
     if (deletedVisitor) {
-      return reply.status(ErrorHttpStatusCode.GONE).send({
-        statusCode: ErrorHttpStatusCode.GONE,
-        title: ErrorTitle.VISITOR_DELETED_PREVIOUSLY,
-        message: ErrorMessage.VISITOR_DELETED_PREVIOUSLY,
-      });
+      throw new HttpErrorResponse(
+        ErrorHttpStatusCode.GONE,
+        errorResponse(language).errorTitle.VISITOR_DELETED_PREVIOUSLY,
+        errorResponse(language).errorMessage.VISITOR_DELETED_PREVIOUSLY
+      );
     }
 
     await request.server.prisma.visitor.create({
@@ -173,22 +181,19 @@ export const addVisitor = async (
     });
 
     return reply.status(SuccessHttpStatusCode.CREATED).send({
-      statusCode: SuccessHttpStatusCode.CREATED,
-      title: SuccessTitle.VISITOR_CREATED,
-      message: SuccessMessage.VISITOR_CREATED,
+      response: {
+        statusCode: SuccessHttpStatusCode.CREATED,
+        title: successResponse(language).successTitle.VISITOR_CREATED,
+        message: successResponse(language).successTitle.VISITOR_CREATED,
+      },
     });
   } catch (error) {
-    request.log.error(error);
-    return reply.status(ErrorHttpStatusCode.INTERNAL_SERVER_ERROR).send({
-      statusCode: ErrorHttpStatusCode.INTERNAL_SERVER_ERROR,
-      title: ErrorTitle.INTERNAL_SERVER_ERROR,
-      message: ErrorMessage.INTERNAL_SERVER_ERROR,
-    });
+    return handleError(error, reply, language);
   }
 };
 
 // UPDATE Visitor
-export const updateVisitor = async (
+const updateVisitor = async (
   request: FastifyRequest<{
     Body: {
       id: string;
@@ -199,6 +204,11 @@ export const updateVisitor = async (
   }>,
   reply: FastifyReply
 ) => {
+  const language = getHeaderValue(
+    request.headers,
+    "language",
+    ResponseLanguage.ARABIC
+  )!;
   const { id, CIN, firstName, lastName } = request.body;
 
   try {
@@ -207,11 +217,11 @@ export const updateVisitor = async (
     });
 
     if (!existingVisitor) {
-      return reply.status(ErrorHttpStatusCode.NOT_FOUND).send({
-        statusCode: ErrorHttpStatusCode.NOT_FOUND,
-        title: ErrorTitle.NOT_FOUND,
-        message: ErrorMessage.NOT_FOUND,
-      });
+      throw new HttpErrorResponse(
+        ErrorHttpStatusCode.NOT_FOUND,
+        errorResponse(language).errorTitle.NOT_FOUND,
+        errorResponse(language).errorMessage.NOT_FOUND
+      );
     }
 
     const updatedVisitorData = {
@@ -234,21 +244,20 @@ export const updateVisitor = async (
       updatedAt: updatedVisitor.updatedAt.toISOString(),
     };
 
-    return reply
-      .status(SuccessHttpStatusCode.OK)
-      .send({ data: responseVisitor });
-  } catch (error) {
-    request.log.error(error);
-    return reply.status(ErrorHttpStatusCode.INTERNAL_SERVER_ERROR).send({
-      statusCode: ErrorHttpStatusCode.INTERNAL_SERVER_ERROR,
-      title: ErrorTitle.INTERNAL_SERVER_ERROR,
-      message: ErrorMessage.INTERNAL_SERVER_ERROR,
+    return reply.status(SuccessHttpStatusCode.OK).send({
+      response: {
+        statusCode: SuccessHttpStatusCode.OK,
+        title: successResponse(language).successTitle.VISITOR_UPDATED,
+        message: successResponse(language).successTitle.VISITOR_UPDATED,
+      },
     });
+  } catch (error) {
+    return handleError(error, reply, language);
   }
 };
 
 // DELETE Visitor
-export const deleteVisitor = async (
+const deleteVisitor = async (
   request: FastifyRequest<{
     Querystring: {
       id: string;
@@ -256,6 +265,11 @@ export const deleteVisitor = async (
   }>,
   reply: FastifyReply
 ) => {
+  const language = getHeaderValue(
+    request.headers,
+    "language",
+    ResponseLanguage.ARABIC
+  )!;
   const { id } = request.query;
   try {
     const visitor = await request.server.prisma.visitor.findUnique({
@@ -263,11 +277,11 @@ export const deleteVisitor = async (
     });
 
     if (!visitor) {
-      return reply.status(ErrorHttpStatusCode.NOT_FOUND).send({
-        statusCode: ErrorHttpStatusCode.NOT_FOUND,
-        title: ErrorTitle.NOT_FOUND,
-        message: ErrorMessage.NOT_FOUND,
-      });
+      throw new HttpErrorResponse(
+        ErrorHttpStatusCode.NOT_FOUND,
+        errorResponse(language).errorTitle.NOT_FOUND,
+        errorResponse(language).errorMessage.NOT_FOUND
+      );
     }
 
     await request.server.prisma.visitor.update({
@@ -275,18 +289,15 @@ export const deleteVisitor = async (
       data: { deletedAt: new Date() },
     });
 
-    return reply.status(SuccessHttpStatusCode.ACCEPTED).send({
-      statusCode: SuccessHttpStatusCode.ACCEPTED,
-      title: SuccessTitle.VISITOR_DELETED,
-      message: SuccessMessage.VISITOR_DELETED,
+    return reply.status(SuccessHttpStatusCode.OK).send({
+      response: {
+        statusCode: SuccessHttpStatusCode.OK,
+        title: successResponse(language).successTitle.VISITOR_DELETED,
+        message: successResponse(language).successTitle.VISITOR_DELETED,
+      },
     });
   } catch (error) {
-    request.log.error(error);
-    return reply.status(ErrorHttpStatusCode.INTERNAL_SERVER_ERROR).send({
-      statusCode: ErrorHttpStatusCode.INTERNAL_SERVER_ERROR,
-      title: ErrorTitle.INTERNAL_SERVER_ERROR,
-      message: ErrorMessage.INTERNAL_ERROR,
-    });
+    return handleError(error, reply, language);
   }
 };
 
