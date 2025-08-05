@@ -23,6 +23,9 @@ export enum ArErrorTitle {
   EMAIL_NOT_VERIFIED = "البريد الإلكتروني غير مُؤكد",
   DATA_ALREADY_EXISTS = "البيانات موجودة بالفعل",
   MISSING_PARAMETERS = "المعطيات المفقودة",
+  MISSING_ADMIN_ACCESS_CODE = "رمز الوصول الإداري مفقود",
+  INVALID_ADMIN_ACCESS_CODE = "رمز الوصول الإداري غير صالح",
+
   // Visitor-related
   VISITOR_ALREADY_EXISTS = "الزائر موجود مسبقًا",
   VISITOR_DELETED = "تم حذف الزائر بنجاح",
@@ -57,6 +60,9 @@ export enum ArErrorMessage {
   EMAIL_NOT_VERIFIED = "عنوان البريد الإلكتروني غير مُؤكد. يُرجى تأكيد بريدك الإلكتروني قبل المتابعة.",
   DATA_ALREADY_EXISTS = "البيانات موجودة بالفعل. يرجى تقديم بيانات مختلفة.",
   MISSING_PARAMETERS = "المعطيات المطلوبة مفقودة في الطلب.",
+  MISSING_ADMIN_ACCESS_CODE = "رمز الوصول الإداري مطلوب للتسجيل.",
+  INVALID_ADMIN_ACCESS_CODE = "رمز الوصول الإداري المقدم غير صالح.",
+
   // Visitor-related
   VISITOR_ALREADY_EXISTS = "الزائر بمعلومات المقدمة موجود مسبقًا في النظام.",
   VISITOR_DELETED = "تم حذف الزائر من النظام بنجاح.",

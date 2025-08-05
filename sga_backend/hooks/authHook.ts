@@ -2,11 +2,11 @@ import { FastifyRequest, FastifyReply } from "fastify";
 import * as jwt from "jsonwebtoken";
 import { handleError } from "../core/utils/errorHandler";
 import { errorResponse } from "../core/resources/response/localizedResponse";
-import { UserCredential } from "@prisma/client";
 import { HttpErrorResponse } from "../core/resources/response/httpErrorResponse";
 import { ErrorHttpStatusCode } from "../core/enums/responses/responseStatusCode";
 import { ResponseLanguage } from "../core/enums/responses/responseLanguage";
 import { getHeaderValue } from "../core/utils/headerValueGetter";
+import { UserRole } from "@prisma/client";
 
 const envApiKey = process.env.API_SECRET_KEY;
 const jwtSecretToken = process.env.JWT_SECRET_ACCESS;
@@ -88,7 +88,7 @@ export async function authHook(request: FastifyRequest, reply: FastifyReply) {
     request.body = {
       ...(request.body || {}),
       userId: decoded.userId,
-      isAdmin: decoded.isAdmin,
+      userRole: decoded.userRole,
     };
   } catch (error) {
     return handleError(error, reply, language);
@@ -110,7 +110,7 @@ export async function isAdminHook(
     const user = await request.server.prisma.user.findUnique({
       where: {
         id: userId,
-        credential: UserCredential.admin,
+        role: UserRole.admin,
         deletedAt: null,
       },
     });

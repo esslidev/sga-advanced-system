@@ -8,7 +8,7 @@ import {
 } from "../thunks/visitorThunks";
 import type { Visitor } from "../../models/visitor";
 import type { ApiResponse } from "../../models/apiResponse";
-import type { Pagination } from "../../models/pagination";
+import type { Pagination } from "../../models/apiPagination";
 
 interface VisitorState {
   visitors: Visitor[];

@@ -14,7 +14,7 @@ model User {
   firstName    String
   lastName     String
   imageUrl     String?
-  credential   UserCredential @default(standard)
+  role   UserRole @default(standard)
   sessions     Session[]
   createdAt    DateTime       @default(now())
   updatedAt    DateTime       @updatedAt
@@ -66,7 +66,7 @@ enum Division {
   division5
 }
 
-enum UserCredential {
+enum UserRole {
   standard
   admin
 }

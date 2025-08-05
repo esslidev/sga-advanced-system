@@ -44,9 +44,32 @@ const signUp = async (
     ResponseLanguage.ARABIC
   )!;
 
-  const { CIN, password, firstName, lastName }: any = request.body;
+  const { adminAccessCode, CIN, password, firstName, lastName } = request.body;
 
   try {
+    if (!adminAccessCode) {
+      throw new HttpErrorResponse(
+        ErrorHttpStatusCode.UNAUTHORIZED,
+        errorResponse(language).errorTitle.MISSING_ADMIN_ACCESS_CODE,
+        errorResponse(language).errorMessage.MISSING_ADMIN_ACCESS_CODE
+      );
+    }
+
+    const isCodeValid = await verifyHashedData(
+      adminAccessCode,
+      adminHashedAccessCode
+    );
+
+    console.log("isCodeValid:", isCodeValid);
+
+    if (!isCodeValid) {
+      throw new HttpErrorResponse(
+        ErrorHttpStatusCode.UNAUTHORIZED,
+        errorResponse(language).errorTitle.INVALID_ADMIN_ACCESS_CODE,
+        errorResponse(language).errorMessage.INVALID_ADMIN_ACCESS_CODE
+      );
+    }
+
     if (!CIN || !isCINValid(CIN)) {
       throw new HttpErrorResponse(
         ErrorHttpStatusCode.BAD_REQUEST,
@@ -63,7 +86,7 @@ const signUp = async (
       );
     }
 
-    if (!CIN || !password || !firstName || !lastName) {
+    if (!firstName || !lastName) {
       throw new HttpErrorResponse(
         ErrorHttpStatusCode.BAD_REQUEST,
         errorResponse(language).errorTitle.MISSING_PARAMETERS,
@@ -71,7 +94,7 @@ const signUp = async (
       );
     }
 
-    const hashedPassword: any = await saltAndHashData(password);
+    const hashedPassword = await saltAndHashData(password);
 
     const existingUser = await request.server.prisma.user.findUnique({
       where: { CIN },
@@ -97,7 +120,7 @@ const signUp = async (
 
     const tokenPayload = {
       userId: user.id,
-      credential: user.credential,
+      userRole: user.role,
     };
 
     const accessToken = jwt.sign(tokenPayload, jwtSecretToken, {
@@ -174,7 +197,7 @@ const signIn = async (
 
     const tokenPayload = {
       userId: user.id,
-      rule: user.credential,
+      userRole: user.role,
     };
 
     const accessToken = jwt.sign(tokenPayload, jwtSecretToken, {

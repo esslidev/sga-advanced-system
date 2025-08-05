@@ -2,7 +2,7 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import api from "../../../core/services/api";
 import type { Visitor } from "../../models/visitor";
 import type { ApiResponse } from "../../models/apiResponse";
-import type { Pagination } from "../../models/pagination";
+import type { Pagination } from "../../models/apiPagination";
 
 // GET visitor
 export const getVisitor = createAsyncThunk<

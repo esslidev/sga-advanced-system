@@ -23,6 +23,8 @@ export enum FrErrorTitle {
   EMAIL_NOT_VERIFIED = "E-mail non vérifié",
   DATA_ALREADY_EXISTS = "Les données existent déjà",
   MISSING_PARAMETERS = "Paramètres manquants",
+  MISSING_ADMIN_ACCESS_CODE = "Code d'accès administrateur manquant",
+  INVALID_ADMIN_ACCESS_CODE = "Code d'accès administrateur invalide",
 
   // Visitor-related
   VISITOR_ALREADY_EXISTS = "Le visiteur existe déjà",
@@ -58,6 +60,8 @@ export enum FrErrorMessage {
   EMAIL_NOT_VERIFIED = "L'adresse e-mail n'est pas vérifiée. Veuillez la confirmer avant de continuer.",
   DATA_ALREADY_EXISTS = "Les données existent déjà. Veuillez fournir des données différentes.",
   MISSING_PARAMETERS = "Des paramètres requis sont manquants dans la requête.",
+  MISSING_ADMIN_ACCESS_CODE = "Le code d'accès administrateur est requis pour s'inscrire.",
+  INVALID_ADMIN_ACCESS_CODE = "Le code d'accès administrateur fourni est invalide.",
 
   // Visitor-related
   VISITOR_ALREADY_EXISTS = "Un visiteur avec ces informations existe déjà dans le système.",

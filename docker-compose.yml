@@ -65,7 +65,7 @@ services:
     container_name: sga-backend
     stdin_open: true
     tty: true
-    command: sh -c "yarn start & yarn migrate & yarn run studio"
+    command: sh -c "yarn start & yarn run studio"
     restart: always
     build:
       context: ./sga_backend
