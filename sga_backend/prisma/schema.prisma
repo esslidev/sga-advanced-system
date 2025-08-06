@@ -9,12 +9,13 @@ generator client {
 
 model User {
   id           String         @id @default(uuid())
+  role   UserRole @default(standard)
   CIN          String         @unique
   hashedPassword String 
   firstName    String
   lastName     String
   imageUrl     String?
-  role   UserRole @default(standard)
+  auditLogs    AuditLog[]
   sessions     Session[]
   createdAt    DateTime       @default(now())
   updatedAt    DateTime       @updatedAt
@@ -51,6 +52,17 @@ model VisitDivision {
   visit    Visit    @relation(fields: [visitId], references: [id], onDelete: Cascade)
 }
 
+// Audit Log Table for tracking all user actions
+model AuditLog {
+  id            String      @id @default(uuid())
+  userId        String
+  action        AuditAction
+  metadata      Json?       // Store additional data as JSON
+  user          User       @relation(fields: [userId], references: [id])
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+}
+
 model Session {
   id        String   @id @default(uuid())
   userId    String   @unique
@@ -69,4 +81,24 @@ enum Division {
 enum UserRole {
   standard
   admin
+}
+
+enum AuditAction {
+  // Authentication
+  SIGN_UP
+  SIGN_IN
+  SIGN_OUT
+  
+  // User management
+  USER_DELETED
+  
+  // Visitor management
+  VISITOR_CREATED
+  VISITOR_UPDATED
+  VISITOR_DELETED
+  
+  // Visit management
+  VISIT_CREATED
+  VISIT_UPDATED
+  VISIT_DELETED
 }

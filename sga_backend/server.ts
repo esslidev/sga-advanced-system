@@ -2,10 +2,13 @@
 import Fastify from "fastify";
 import cors from "@fastify/cors";
 import formbody from "@fastify/formbody";
+import rateLimit from "@fastify/rate-limit";
 import prisma from "./prisma/client";
 import visitorRouter from "./modules/visitor/visitor.router";
 import visitRouter from "./modules/visit/visit.router";
 import authRoutes from "./modules/auth/auth.routes";
+import userRouter from "./modules/user/user.router";
+import { integrationAuthHook } from "./hooks/authHook";
 
 const fastify = Fastify({
   logger: {
@@ -38,13 +41,26 @@ const start = async () => {
       methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     });
 
+    // Rate Limiting Middleware (DDoS Protection)
+    await fastify.register(rateLimit, {
+      global: true,
+      max: 100, // max requests
+      timeWindow: "1 minute", // per time window
+      // allowList: ["127.0.0.1"], // optional: allow local dev IP
+      ban: 2, // temporary ban after exceeding limit
+    });
+
     // Register form-body for urlencoded parsing
     await fastify.register(formbody);
 
+    // Global Auth Middleware
+    fastify.addHook("onRequest", integrationAuthHook);
+
     // Register your routers
+    fastify.register(authRoutes, { prefix: "/api/auth" });
+    fastify.register(userRouter, { prefix: "/api/user" });
     fastify.register(visitorRouter, { prefix: "/api/visitor" });
     fastify.register(visitRouter, { prefix: "/api/visit" });
-    fastify.register(authRoutes, { prefix: "/api/auth" });
 
     // Root route
     fastify.get("/", async (request, reply) => {

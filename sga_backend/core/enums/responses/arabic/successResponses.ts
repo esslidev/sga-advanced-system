@@ -2,6 +2,9 @@ export enum ArSuccessTitle {
   SIGNED_IN = "تم تسجيل الدخول بنجاح",
   SIGNED_UP = "تم إنشاء الحساب بنجاح",
   SIGNED_OUT = "تم تسجيل الخروج بنجاح",
+
+  // User-related
+  USER_DELETED = "تم حذف المستخدم بنجاح",
   // Visitor-related
   VISITOR_CREATED = "تم إنشاء الزائر بنجاح",
   VISITOR_UPDATED = "تم تحديث بيانات الزائر بنجاح",
@@ -16,6 +19,9 @@ export enum ArSuccessMessage {
   SIGNED_IN = "تم تسجيل دخول المستخدم إلى النظام بنجاح.",
   SIGNED_UP = "تم إنشاء حساب المستخدم في النظام بنجاح.",
   SIGNED_OUT = "تم تسجيل خروج المستخدم من النظام بنجاح.",
+
+  // User-related
+  USER_DELETED = "تم حذف المستخدم من النظام بنجاح.",
   // Visitor-related
   VISITOR_CREATED = "تم إنشاء الزائر في النظام بنجاح.",
   VISITOR_UPDATED = "تم تحديث بيانات الزائر بنجاح.",

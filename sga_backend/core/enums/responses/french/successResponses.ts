@@ -2,6 +2,9 @@ export enum FrSuccessTitle {
   SIGNED_IN = "Connexion réussie",
   SIGNED_UP = "Inscription réussie",
   SIGNED_OUT = "Déconnexion réussie",
+
+  // User-related
+  USER_DELETED = "L'utilisateur a été supprimé avec succès",
   // Visitor-related
   VISITOR_CREATED = "Le visiteur a été créé avec succès",
   VISITOR_UPDATED = "Les informations du visiteur ont été mises à jour avec succès",
@@ -16,6 +19,9 @@ export enum FrSuccessMessage {
   SIGNED_IN = "L'utilisateur s'est connecté au système avec succès.",
   SIGNED_UP = "Le compte utilisateur a été créé avec succès dans le système.",
   SIGNED_OUT = "L'utilisateur a été déconnecté du système avec succès.",
+
+  // User-related
+  USER_DELETED = "L'utilisateur a été supprimé du système avec succès.",
   // Visitor-related
   VISITOR_CREATED = "Le visiteur a été créé dans le système avec succès.",
   VISITOR_UPDATED = "Les informations du visiteur ont été mises à jour avec succès.",

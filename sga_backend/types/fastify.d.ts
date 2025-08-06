@@ -5,4 +5,11 @@ declare module "fastify" {
   interface FastifyInstance {
     prisma: PrismaClient;
   }
+
+  interface FastifyRequest {
+    user: {
+      userId?: string;
+      userRole?: string;
+    };
+  }
 }

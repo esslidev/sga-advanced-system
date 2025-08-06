@@ -19,6 +19,7 @@ import {
 } from "../../core/enums/responses/responseStatusCode";
 import { ResponseLanguage } from "../../core/enums/responses/responseLanguage";
 import { getHeaderValue } from "../../core/utils/headerValueGetter";
+import { AuditAction } from "@prisma/client";
 
 const adminHashedAccessCode = process.env.ADMIN_HASHED_ACCESS_CODE!;
 const jwtSecretToken = process.env.JWT_SECRET_ACCESS!;
@@ -59,8 +60,6 @@ const signUp = async (
       adminAccessCode,
       adminHashedAccessCode
     );
-
-    console.log("isCodeValid:", isCodeValid);
 
     if (!isCodeValid) {
       throw new HttpErrorResponse(
@@ -129,6 +128,13 @@ const signUp = async (
 
     const renewToken = jwt.sign(tokenPayload, jwtSecretRenewToken, {
       expiresIn: getJwtExpiryTime(renewTokenLifeSpan),
+    });
+
+    await request.server.prisma.auditLog.create({
+      data: {
+        userId: user.id,
+        action: AuditAction.SIGN_UP,
+      },
     });
 
     await request.server.prisma.session.create({
@@ -220,6 +226,13 @@ const signIn = async (
       },
     });
 
+    await request.server.prisma.auditLog.create({
+      data: {
+        userId: user.id,
+        action: AuditAction.SIGN_IN,
+      },
+    });
+
     return reply.status(SuccessHttpStatusCode.OK).send({
       auth: { accessToken, renewToken },
       response: {
@@ -260,6 +273,13 @@ const signOut = async (
         errorResponse(language).errorMessage.NOT_FOUND
       );
     }
+
+    await request.server.prisma.auditLog.create({
+      data: {
+        userId: userId,
+        action: AuditAction.SIGN_OUT,
+      },
+    });
 
     await request.server.prisma.session.delete({
       where: { userId: userId },

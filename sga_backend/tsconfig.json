@@ -9,6 +9,6 @@
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true
   },
-  "include": ["**/*.ts"], // compile all ts files
+  "include": ["**/*.ts", "**/*.d.ts"], // compile all ts files
   "exclude": ["node_modules"]
 }

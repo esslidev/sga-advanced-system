@@ -85,8 +85,7 @@ export async function authHook(request: FastifyRequest, reply: FastifyReply) {
       throw err;
     }
 
-    request.body = {
-      ...(request.body || {}),
+    request.user = {
       userId: decoded.userId,
       userRole: decoded.userRole,
     };
@@ -104,7 +103,7 @@ export async function isAdminHook(
     "language",
     ResponseLanguage.ARABIC
   )!;
-  const userId = (request.body as any).userId;
+  const { userId } = request.user;
 
   try {
     const user = await request.server.prisma.user.findUnique({
