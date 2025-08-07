@@ -9,6 +9,7 @@ import visitRouter from "./modules/visit/visit.router";
 import authRoutes from "./modules/auth/auth.routes";
 import userRouter from "./modules/user/user.router";
 import { integrationAuthHook } from "./hooks/authHook";
+import logsRouter from "./modules/logs/logs.routes";
 
 const fastify = Fastify({
   logger: {
@@ -61,6 +62,7 @@ const start = async () => {
     fastify.register(userRouter, { prefix: "/api/user" });
     fastify.register(visitorRouter, { prefix: "/api/visitor" });
     fastify.register(visitRouter, { prefix: "/api/visit" });
+    fastify.register(logsRouter, { prefix: "/api/logs" });
 
     // Root route
     fastify.get("/", async (request, reply) => {

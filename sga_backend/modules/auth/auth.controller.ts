@@ -133,7 +133,7 @@ const signUp = async (
     await request.server.prisma.auditLog.create({
       data: {
         userId: user.id,
-        action: AuditAction.SIGN_UP,
+        action: AuditAction.signUp,
       },
     });
 
@@ -229,7 +229,7 @@ const signIn = async (
     await request.server.prisma.auditLog.create({
       data: {
         userId: user.id,
-        action: AuditAction.SIGN_IN,
+        action: AuditAction.signIn,
       },
     });
 
@@ -246,22 +246,24 @@ const signIn = async (
   }
 };
 
-const signOut = async (
-  request: FastifyRequest<{
-    Body: {
-      userId: string;
-    };
-  }>,
-  reply: FastifyReply
-) => {
+const signOut = async (request: FastifyRequest, reply: FastifyReply) => {
   const language = getHeaderValue(
     request.headers,
     "language",
     ResponseLanguage.ARABIC
   )!;
-  const { userId }: any = request.body;
+
+  const { userId } = request.user;
 
   try {
+    if (!userId) {
+      throw new HttpErrorResponse(
+        ErrorHttpStatusCode.BAD_REQUEST,
+        errorResponse(language).errorTitle.INVALID_REQUEST,
+        errorResponse(language).errorMessage.INVALID_REQUEST
+      );
+    }
+
     const existingSession = await request.server.prisma.session.findUnique({
       where: { userId: userId },
     });
@@ -277,7 +279,7 @@ const signOut = async (
     await request.server.prisma.auditLog.create({
       data: {
         userId: userId,
-        action: AuditAction.SIGN_OUT,
+        action: AuditAction.signOut,
       },
     });
 

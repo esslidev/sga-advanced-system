@@ -1,4 +1,5 @@
 import { combineReducers } from "redux";
+import authReducer from "./slices/authSlice";
 import visitorReducer from "./slices/visitorSlice";
 import visitReducer from "./slices/visitSlice";
 
@@ -18,10 +19,11 @@ import { configureStore } from "@reduxjs/toolkit";
 const persistConfig = {
   key: "root",
   storage,
-  whitelist: [],
+  whitelist: ["auth"],
 };
 
 const rootReducer = combineReducers({
+  auth: authReducer,
   visitor: visitorReducer,
   visit: visitReducer,
 });
@@ -36,6 +38,7 @@ export const store = configureStore({
         ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
       },
     }),
+  devTools: true,
 });
 
 export const persistor = persistStore(store);

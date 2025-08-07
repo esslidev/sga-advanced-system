@@ -87,7 +87,6 @@ export async function authHook(request: FastifyRequest, reply: FastifyReply) {
 
     request.user = {
       userId: decoded.userId,
-      userRole: decoded.userRole,
     };
   } catch (error) {
     return handleError(error, reply, language);

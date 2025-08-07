@@ -176,7 +176,7 @@ const deleteUser = async (request: FastifyRequest, reply: FastifyReply) => {
     await request.server.prisma.auditLog.create({
       data: {
         userId: userId,
-        action: AuditAction.USER_DELETED,
+        action: AuditAction.userDeleted,
       },
     });
 

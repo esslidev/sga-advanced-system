@@ -4,4 +4,5 @@ export type ApiResponse = {
   message: string;
   expiredAccessToken: boolean;
   expiredRenewToken: boolean;
+  accessUnauthorized: boolean;
 };

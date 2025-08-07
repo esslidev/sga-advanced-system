@@ -14,22 +14,21 @@ import {
 import { getHeaderValue } from "../../core/utils/headerValueGetter";
 
 // GET Visits
-const getVisits = async (
-  request: FastifyRequest<{
-    Querystring: {
-      visitorId: string;
-      limit?: string;
-      page?: string;
-    };
-  }>,
-  reply: FastifyReply
-) => {
+const getVisits = async (request: FastifyRequest, reply: FastifyReply) => {
   const language = getHeaderValue(
     request.headers,
     "language",
     ResponseLanguage.ARABIC
   )!;
-  const { visitorId, limit = "10", page = "1" } = request.query;
+  const {
+    visitorId,
+    limit = "10",
+    page = "1",
+  } = request.query as {
+    visitorId: string;
+    limit?: string;
+    page?: string;
+  };
 
   try {
     const take = Number(limit);

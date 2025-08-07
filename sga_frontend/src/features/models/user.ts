@@ -8,8 +8,10 @@ export const UserRole = {
 export type User = {
   id: string;
   CIN: string;
-  password?: string;
-  firstName?: string;
-  lastName?: string;
-  role?: UserRole;
+  password: string;
+  firstName: string;
+  lastName: string;
+  role: UserRole;
+  createdAt: Date;
+  updatedAt: Date;
 };

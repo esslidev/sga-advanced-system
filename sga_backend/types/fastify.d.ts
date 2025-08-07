@@ -9,7 +9,6 @@ declare module "fastify" {
   interface FastifyRequest {
     user: {
       userId?: string;
-      userRole?: string;
     };
   }
 }

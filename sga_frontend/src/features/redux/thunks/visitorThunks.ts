@@ -2,7 +2,7 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import api from "../../../core/services/api";
 import type { Visitor } from "../../models/visitor";
 import type { ApiResponse } from "../../models/apiResponse";
-import type { Pagination } from "../../models/apiPagination";
+import type { ApiPagination } from "../../models/apiPagination";
 
 // GET visitor
 export const getVisitor = createAsyncThunk<
@@ -32,7 +32,7 @@ type GetVisitorsQuery = {
 
 // GET many visitors
 export const getVisitors = createAsyncThunk<
-  { data: Visitor[]; pagination: Pagination },
+  { data: Visitor[]; pagination: ApiPagination },
   GetVisitorsQuery | undefined,
   { rejectValue: ApiResponse }
 >("/visitor/getVisitors", async (params, thunkAPI) => {

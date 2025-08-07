@@ -85,20 +85,20 @@ enum UserRole {
 
 enum AuditAction {
   // Authentication
-  SIGN_UP
-  SIGN_IN
-  SIGN_OUT
+  signUp
+  signIn
+  signOut
   
   // User management
-  USER_DELETED
+  userDeleted
   
   // Visitor management
-  VISITOR_CREATED
-  VISITOR_UPDATED
-  VISITOR_DELETED
+  visitorCreated
+  visitorUpdated
+  visitorDeleted
   
   // Visit management
-  VISIT_CREATED
-  VISIT_UPDATED
-  VISIT_DELETED
+  visitCreated
+  visitUpdated
+  visitDeleted
 }

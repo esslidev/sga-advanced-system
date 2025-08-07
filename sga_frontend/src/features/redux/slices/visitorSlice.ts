@@ -8,14 +8,14 @@ import {
 } from "../thunks/visitorThunks";
 import type { Visitor } from "../../models/visitor";
 import type { ApiResponse } from "../../models/apiResponse";
-import type { Pagination } from "../../models/apiPagination";
+import type { ApiPagination } from "../../models/apiPagination";
 
 interface VisitorState {
   visitors: Visitor[];
   selectedVisitor: Visitor | null;
   loading: boolean;
   response: ApiResponse | null;
-  pagination: Pagination | null;
+  pagination: ApiPagination | null;
 }
 
 const initialState: VisitorState = {
@@ -66,7 +66,7 @@ const visitorSlice = createSlice({
       getVisitors.fulfilled,
       (
         state,
-        action: PayloadAction<{ data: Visitor[]; pagination: Pagination }>
+        action: PayloadAction<{ data: Visitor[]; pagination: ApiPagination }>
       ) => {
         state.loading = false;
         state.visitors = action.payload.data;
