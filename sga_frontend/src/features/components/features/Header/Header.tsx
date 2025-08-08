@@ -1,36 +1,40 @@
-import React from "react";
 import "./Header.css";
 import ProfileFilledIcon from "../../../../assets/vectors/profile-filled-icon";
 import { useNavigate } from "react-router-dom";
 import { PagesRoutes } from "../../../../AppRoutes";
+import { useAuth } from "../../../hooks/useAuth";
 
 const Header = () => {
   const navigate = useNavigate();
+  const { apiAuth, signOut } = useAuth();
 
-  const isLoggedIn = false;
+  const fullName = "الإسم الكامل";
+  const profileImage = null;
+
+  const handleLogout = () => {
+    signOut(); // Clear auth state
+    navigate(PagesRoutes.loginPage); // Redirect to login
+  };
 
   return (
     <div className="header">
       <div className="topBar">
         <div className="profile">
-          {isLoggedIn ? (
-            <img className="profileImage" src="" alt="profile-image" />
+          {profileImage ? (
+            <img className="profileImage" src={profileImage} alt="profile" />
           ) : (
             <div className="profileImage">
               <ProfileFilledIcon fillColor="#717070" />
             </div>
           )}
-
-          <p id="fullName">الإسم الكامل</p>
+          <p id="fullName">{fullName}</p>
         </div>
-        <button
-          id="logout"
-          title="خروج"
-          onClick={() => navigate(PagesRoutes.loginPage)}
-        >
+
+        <button id="logout" title="خروج" onClick={handleLogout}>
           خروج
         </button>
       </div>
+
       <div className="navBar">
         <button
           className="navButton"

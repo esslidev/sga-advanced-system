@@ -7,6 +7,7 @@ import Header from "./features/components/features/Header/Header";
 import StatsPage from "./features/pages/Stats/Stats";
 import VisitDataEntryPage from "./features/pages/VisitorDataEntry/VisitDataEntry";
 import VisitsPage from "./features/pages/Visits/Visits";
+import { useAuth } from "./features/hooks/useAuth";
 
 export const PagesRoutes = {
   basePage: "/accueil",
@@ -42,11 +43,33 @@ const LoggedInLayout = () => {
 };
 
 const AppRoutes = () => {
+  const { apiAuth } = useAuth();
+
+  // If user is not authenticated, block access to logged-in routes by redirecting to login
+  if (!apiAuth?.accessToken) {
+    return (
+      <Routes>
+        <Route path={PagesRoutes.loginPage} element={<LoginPage />} />
+        <Route
+          path="*"
+          element={<Navigate to={PagesRoutes.loginPage} replace />}
+        />
+      </Routes>
+    );
+  }
+
+  // User is authenticated, render logged-in routes + public fallback
   return (
     <Routes>
-      <Route path="/" element={<Navigate to={PagesRoutes.loginPage} />} />
+      <Route
+        path="/"
+        element={<Navigate to={PagesRoutes.visitDataEntryPage} replace />}
+      />
       <Route path="/*" element={<LoggedInLayout />} />
-      <Route path={PagesRoutes.loginPage} element={<LoginPage />} />
+      <Route
+        path={PagesRoutes.loginPage}
+        element={<Navigate to={PagesRoutes.visitDataEntryPage} replace />}
+      />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );

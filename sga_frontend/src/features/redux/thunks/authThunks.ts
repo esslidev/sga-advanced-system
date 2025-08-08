@@ -1,6 +1,7 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import api from "../../../core/services/api";
 import type { ApiResponse } from "../../models/apiResponse";
+import type { ApiAuth } from "../../models/apiAuth";
 
 // ---------- Types ----------
 interface SignInPayload {
@@ -16,27 +17,25 @@ interface SignUpPayload {
   lastName: string;
 }
 
-interface AuthResponse {
-  accessToken: string;
+interface RenewPayload {
   renewToken: string;
-  response: ApiResponse;
-}
-
-interface RenewResponse {
-  accessToken: string;
 }
 
 // ---------- SIGN IN ----------
 export const signInThunk = createAsyncThunk<
-  AuthResponse,
+  { response: ApiResponse; auth: ApiAuth },
   SignInPayload,
   { rejectValue: ApiResponse }
 >("auth/signIn", async (payload, thunkAPI) => {
   try {
     const res = await api.post("/auth/sign-in", payload);
-    return res.data;
+
+    return {
+      response: res.data.response,
+      auth: res.data.auth,
+    };
   } catch (err: any) {
-    const errorResponse: ApiResponse = err.response?.data || {
+    const errorResponse: ApiResponse = err.response?.data?.response || {
       statusCode: 500,
       title: "Unknown Error",
       message: err.message,
@@ -47,15 +46,19 @@ export const signInThunk = createAsyncThunk<
 
 // ---------- SIGN UP ----------
 export const signUpThunk = createAsyncThunk<
-  AuthResponse,
+  { response: ApiResponse; auth: ApiAuth },
   SignUpPayload,
   { rejectValue: ApiResponse }
 >("auth/signUp", async (payload, thunkAPI) => {
   try {
     const res = await api.post("/auth/sign-up", payload);
-    return res.data;
+
+    return {
+      response: res.data.response,
+      auth: res.data.auth,
+    };
   } catch (err: any) {
-    const errorResponse: ApiResponse = err.response?.data || {
+    const errorResponse: ApiResponse = err.response?.data?.response || {
       statusCode: 500,
       title: "Unknown Error",
       message: err.message,
@@ -66,15 +69,18 @@ export const signUpThunk = createAsyncThunk<
 
 // ---------- SIGN OUT ----------
 export const signOutThunk = createAsyncThunk<
-  ApiResponse,
+  { response: ApiResponse },
   void,
   { rejectValue: ApiResponse }
 >("auth/signOut", async (_, thunkAPI) => {
   try {
     const res = await api.post("/auth/sign-out");
-    return res.data.response;
+
+    return {
+      response: res.data.response,
+    };
   } catch (err: any) {
-    const errorResponse: ApiResponse = err.response?.data || {
+    const errorResponse: ApiResponse = err.response?.data?.response || {
       statusCode: 500,
       title: "Unknown Error",
       message: err.message,
@@ -85,15 +91,19 @@ export const signOutThunk = createAsyncThunk<
 
 // ---------- RENEW ACCESS ----------
 export const renewAccessThunk = createAsyncThunk<
-  RenewResponse,
-  string, // renewToken
+  { newAccessToken: string; response: ApiResponse },
+  RenewPayload,
   { rejectValue: ApiResponse }
 >("auth/renewAccess", async (renewToken, thunkAPI) => {
   try {
     const res = await api.post("/auth/renew", { renewToken });
-    return res.data.auth;
+
+    return {
+      newAccessToken: res.data.auth.accessToken,
+      response: res.data.response,
+    };
   } catch (err: any) {
-    const errorResponse: ApiResponse = err.response?.data || {
+    const errorResponse: ApiResponse = err.response?.data?.response || {
       statusCode: 500,
       title: "Unknown Error",
       message: err.message,

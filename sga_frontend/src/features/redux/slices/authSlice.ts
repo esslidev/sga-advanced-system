@@ -6,19 +6,16 @@ import {
   signOutThunk,
   signUpThunk,
 } from "../thunks/authThunks";
+import type { ApiAuth } from "../../models/apiAuth";
 
 interface AuthState {
-  accessToken: string | null;
-  renewToken: string | null;
-  isAuthenticated: boolean;
+  apiAuth: ApiAuth | null;
   loading: boolean;
   response: ApiResponse | null;
 }
 
 const initialState: AuthState = {
-  accessToken: null,
-  renewToken: null,
-  isAuthenticated: false,
+  apiAuth: null,
   loading: false,
   response: null,
 };
@@ -31,9 +28,7 @@ const authSlice = createSlice({
       state.response = null;
     },
     logoutLocal: (state) => {
-      state.accessToken = null;
-      state.renewToken = null;
-      state.isAuthenticated = false;
+      state.apiAuth = null;
       state.response = null;
     },
   },
@@ -46,16 +41,10 @@ const authSlice = createSlice({
       signInThunk.fulfilled,
       (
         state,
-        action: PayloadAction<{
-          accessToken: string;
-          renewToken: string;
-          response: ApiResponse;
-        }>
+        action: PayloadAction<{ auth: ApiAuth; response: ApiResponse }>
       ) => {
         state.loading = false;
-        state.accessToken = action.payload.accessToken;
-        state.renewToken = action.payload.renewToken;
-        state.isAuthenticated = true;
+        state.apiAuth = action.payload.auth;
         state.response = action.payload.response;
       }
     );
@@ -72,16 +61,10 @@ const authSlice = createSlice({
       signUpThunk.fulfilled,
       (
         state,
-        action: PayloadAction<{
-          accessToken: string;
-          renewToken: string;
-          response: ApiResponse;
-        }>
+        action: PayloadAction<{ auth: ApiAuth; response: ApiResponse }>
       ) => {
         state.loading = false;
-        state.accessToken = action.payload.accessToken;
-        state.renewToken = action.payload.renewToken;
-        state.isAuthenticated = true;
+        state.apiAuth = action.payload.auth;
         state.response = action.payload.response;
       }
     );
@@ -96,12 +79,10 @@ const authSlice = createSlice({
     });
     builder.addCase(
       signOutThunk.fulfilled,
-      (state, action: PayloadAction<ApiResponse>) => {
+      (state, action: PayloadAction<{ response: ApiResponse }>) => {
         state.loading = false;
-        state.accessToken = null;
-        state.renewToken = null;
-        state.isAuthenticated = false;
-        state.response = action.payload;
+        state.apiAuth = null;
+        state.response = action.payload.response;
       }
     );
     builder.addCase(signOutThunk.rejected, (state, action) => {
@@ -115,10 +96,15 @@ const authSlice = createSlice({
     });
     builder.addCase(
       renewAccessThunk.fulfilled,
-      (state, action: PayloadAction<{ accessToken: string }>) => {
+      (
+        state,
+        action: PayloadAction<{ newAccessToken: string; response: ApiResponse }>
+      ) => {
         state.loading = false;
-        state.accessToken = action.payload.accessToken;
-        state.isAuthenticated = true;
+        if (state.apiAuth) {
+          state.apiAuth.accessToken = action.payload.newAccessToken;
+        }
+        state.response = action.payload.response;
       }
     );
     builder.addCase(renewAccessThunk.rejected, (state, action) => {
