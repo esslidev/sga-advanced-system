@@ -1,9 +1,9 @@
 import type { ApiResponse } from "../../features/models/apiResponse";
 import type { AppDispatch, RootState } from "../../features/redux/store";
 import { renewAccessThunk } from "../../features/redux/thunks/authThunks";
+import type { AxiosError } from "axios";
 
-type RequestFn<T> = (accessToken: string) => Promise<T>;
-
+// Helper to create an unauthorized response
 function createUnauthorizedResponse(
   message = "الولوج غير مصرح به لسبب مجهول, المرجو الاتصال بمصلحة المعلوميات."
 ): ApiResponse {
@@ -17,80 +17,77 @@ function createUnauthorizedResponse(
   };
 }
 
+// Helper to handle missing token cases
+function createMissingTokenResponse(type: "access" | "renew"): ApiResponse {
+  const message =
+    type === "access"
+      ? "رمز الوصول مفقود. يرجى تسجيل الدخول مرة أخرى."
+      : "رمز التجديد مفقود. يرجى تسجيل الدخول مرة أخرى.";
+
+  return {
+    statusCode: 401,
+    title: "غير مصرح",
+    message,
+    expiredAccessToken: type === "access",
+    expiredRenewToken: type === "renew",
+    accessUnauthorized: true,
+  };
+}
+
 export async function authRequestHandler<T>(
-  requestFn: RequestFn<T>,
+  requestFn: (accessToken: string) => Promise<T>,
   dispatch: AppDispatch,
-  getState: () => RootState
-): Promise<T | ApiResponse> {
-  let accessToken = getState().auth.apiAuth?.accessToken;
+  state: RootState
+): Promise<T> {
+  let accessToken = state.auth.apiAuth?.accessToken;
 
   if (!accessToken) {
-    return {
-      statusCode: 401,
-      title: "غير مصرح",
-      message: "رمز الوصول مفقود. يرجى تسجيل الدخول مرة أخرى.",
-      expiredAccessToken: false,
-      expiredRenewToken: false,
-      accessUnauthorized: true,
-    };
+    throw createMissingTokenResponse("access");
   }
 
   try {
     return await requestFn(accessToken);
-  } catch (error: any) {
-    const errorResponse: ApiResponse | undefined =
-      error?.response?.data?.response;
+  } catch (error) {
+    const axiosError = error as AxiosError<{ response?: ApiResponse }>;
+    const errorResponse = axiosError?.response?.data?.response;
 
     if (errorResponse?.expiredAccessToken) {
-      const renewToken = getState().auth.apiAuth?.renewToken;
-      if (!renewToken) {
-        return {
-          statusCode: 401,
-          title: "غير مصرح",
-          message: "رمز التجديد مفقود. يرجى تسجيل الدخول مرة أخرى.",
-          expiredAccessToken: false,
-          expiredRenewToken: false,
-          accessUnauthorized: true,
-        };
-      }
+      const renewToken = state.auth.apiAuth?.renewToken;
+      if (!renewToken) throw createMissingTokenResponse("renew");
 
-      const renewResult = await dispatch(renewAccessThunk({ renewToken }));
+      const renewResult = await dispatch(
+        renewAccessThunk({ expiredAccessToken: accessToken, renewToken })
+      );
 
       if (renewAccessThunk.fulfilled.match(renewResult)) {
         accessToken = renewResult.payload.newAccessToken;
-        try {
-          if (!accessToken) {
-            return {
-              statusCode: 401,
-              title: "غير مصرح",
-              message: "رمز الوصول مفقود. يرجى تسجيل الدخول مرة أخرى.",
-              expiredAccessToken: false,
-              expiredRenewToken: false,
-              accessUnauthorized: true,
-            };
-          }
-          return await requestFn(accessToken);
-        } catch (retryError: any) {
-          const retryErrorResponse: ApiResponse | undefined =
-            retryError?.response?.data?.response;
 
-          return retryErrorResponse || createUnauthorizedResponse();
+        if (!accessToken) {
+          throw createMissingTokenResponse("access");
+        }
+
+        try {
+          return await requestFn(accessToken);
+        } catch (retryError: unknown) {
+          const retryAxiosError = retryError as AxiosError<{
+            response?: ApiResponse;
+          }>;
+          const retryErrorResponse = retryAxiosError?.response?.data?.response;
+
+          throw retryErrorResponse || createUnauthorizedResponse();
         }
       } else {
-        return {
+        throw {
           statusCode: 401,
           title: "انتهت الجلسة",
           message: "فشل تجديد الرمز. يرجى تسجيل الدخول مرة أخرى.",
           expiredAccessToken: false,
           expiredRenewToken: true,
           accessUnauthorized: true,
-        };
+        } as ApiResponse;
       }
     }
 
-    // Return errorResponse if exists or fallback generic
-    if (errorResponse) return errorResponse;
-
-    return createUnauthorizedResponse();
+    throw errorResponse || createUnauthorizedResponse();
   }
 }

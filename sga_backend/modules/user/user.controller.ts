@@ -146,11 +146,6 @@ const deleteUser = async (request: FastifyRequest, reply: FastifyReply) => {
   const { id } = request.query as { id: string }; // This is the ID of the user to be deleted
 
   try {
-    // Find the user to be deleted (not the current user)
-    const userToDelete = await request.server.prisma.user.findUnique({
-      where: { id: id, deletedAt: null },
-    });
-
     if (!userId) {
       throw new HttpErrorResponse(
         ErrorHttpStatusCode.BAD_REQUEST,
@@ -158,6 +153,11 @@ const deleteUser = async (request: FastifyRequest, reply: FastifyReply) => {
         errorResponse(language).errorMessage.INVALID_REQUEST
       );
     }
+
+    // Find the user to be deleted (not the current user)
+    const userToDelete = await request.server.prisma.user.findUnique({
+      where: { id: id, deletedAt: null },
+    });
 
     if (!userToDelete) {
       throw new HttpErrorResponse(

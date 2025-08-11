@@ -2,24 +2,27 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import api from "../../../core/services/api";
 import type { ApiResponse } from "../../models/apiResponse";
 import type { ApiAuth } from "../../models/apiAuth";
+import { authRequestHandler } from "../../../core/utils/apiUtil";
+import type { AppDispatch, RootState } from "../store";
 
 // ---------- Types ----------
-interface SignInPayload {
+type SignInPayload = {
   CIN: string;
   password: string;
-}
+};
 
-interface SignUpPayload {
+type SignUpPayload = {
   adminAccessCode: string;
   CIN: string;
   password: string;
   firstName: string;
   lastName: string;
-}
+};
 
-interface RenewPayload {
+type RenewPayload = {
+  expiredAccessToken: string;
   renewToken: string;
-}
+};
 
 // ---------- SIGN IN ----------
 export const signInThunk = createAsyncThunk<
@@ -69,23 +72,30 @@ export const signUpThunk = createAsyncThunk<
 
 // ---------- SIGN OUT ----------
 export const signOutThunk = createAsyncThunk<
-  { response: ApiResponse },
+  ApiResponse,
   void,
-  { rejectValue: ApiResponse }
+  { rejectValue: ApiResponse; dispatch: AppDispatch; state: RootState }
 >("auth/signOut", async (_, thunkAPI) => {
+  const { dispatch, getState, rejectWithValue } = thunkAPI;
   try {
-    const res = await api.post("/auth/sign-out");
-
-    return {
-      response: res.data.response,
-    };
-  } catch (err: any) {
-    const errorResponse: ApiResponse = err.response?.data?.response || {
-      statusCode: 500,
-      title: "Unknown Error",
-      message: err.message,
-    };
-    return thunkAPI.rejectWithValue(errorResponse);
+    const result = await authRequestHandler(
+      async (accessToken) => {
+        const res = await api.post(
+          "/auth/sign-out",
+          {},
+          {
+            headers: { authorization: accessToken },
+          }
+        );
+        return res.data.response;
+      },
+      dispatch,
+      getState()
+    );
+    return result;
+  } catch (error) {
+    const apiError = error as ApiResponse;
+    return rejectWithValue(apiError);
   }
 });
 
@@ -94,12 +104,15 @@ export const renewAccessThunk = createAsyncThunk<
   { newAccessToken: string; response: ApiResponse },
   RenewPayload,
   { rejectValue: ApiResponse }
->("auth/renewAccess", async (renewToken, thunkAPI) => {
+>("auth/access/renew", async ({ expiredAccessToken, renewToken }, thunkAPI) => {
   try {
-    const res = await api.post("/auth/renew", { renewToken });
+    const res = await api.post("/auth/access/renew", {
+      expiredAccessToken,
+      renewToken,
+    });
 
     return {
-      newAccessToken: res.data.auth.accessToken,
+      newAccessToken: res.data.auth.newAccessToken,
       response: res.data.response,
     };
   } catch (err: any) {

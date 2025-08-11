@@ -65,9 +65,11 @@ model AuditLog {
 
 model Session {
   id        String   @id @default(uuid())
-  userId    String   @unique
+  userId    String   
+  accessKeyPartial String @unique
   User      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
+  @@unique([userId, accessKeyPartial]) // Composite unique
 }
 
 enum Division {
@@ -98,7 +100,7 @@ enum AuditAction {
   visitorDeleted
   
   // Visit management
-  visitCreated
+  visitAdded
   visitUpdated
   visitDeleted
 }

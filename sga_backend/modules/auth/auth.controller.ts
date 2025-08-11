@@ -140,6 +140,7 @@ const signUp = async (
     await request.server.prisma.session.create({
       data: {
         userId: user.id,
+        accessKeyPartial: accessToken.slice(-8),
       },
     });
 
@@ -201,6 +202,26 @@ const signIn = async (
       );
     }
 
+    // Check if a session already exists
+    const existingSession = await request.server.prisma.session.findFirst({
+      where: { userId: user.id },
+    });
+
+    // If session exists, delete it and stop signing in
+    if (existingSession) {
+      await request.server.prisma.session.deleteMany({
+        where: { userId: user.id },
+      });
+
+      // Optionally, you can throw an error indicating session deletion
+      throw new HttpErrorResponse(
+        ErrorHttpStatusCode.BAD_REQUEST,
+        errorResponse(language).errorTitle.SESSION_EXISTS,
+        errorResponse(language).errorMessage.SESSION_EXISTS,
+        { sessionExpired: true }
+      );
+    }
+
     const tokenPayload = {
       userId: user.id,
       userRole: user.role,
@@ -214,18 +235,15 @@ const signIn = async (
       expiresIn: getJwtExpiryTime(renewTokenLifeSpan),
     });
 
-    await request.server.prisma.session.upsert({
-      where: {
+    // Create a new session
+    await request.server.prisma.session.create({
+      data: {
         userId: user.id,
-      },
-      update: {
-        userId: user.id,
-      },
-      create: {
-        userId: user.id,
+        accessKeyPartial: accessToken.slice(-8),
       },
     });
 
+    // Create an audit log for the sign-in action
     await request.server.prisma.auditLog.create({
       data: {
         userId: user.id,
@@ -264,7 +282,7 @@ const signOut = async (request: FastifyRequest, reply: FastifyReply) => {
       );
     }
 
-    const existingSession = await request.server.prisma.session.findUnique({
+    const existingSession = await request.server.prisma.session.findFirst({
       where: { userId: userId },
     });
 
@@ -276,15 +294,15 @@ const signOut = async (request: FastifyRequest, reply: FastifyReply) => {
       );
     }
 
+    await request.server.prisma.session.deleteMany({
+      where: { userId: userId },
+    });
+
     await request.server.prisma.auditLog.create({
       data: {
         userId: userId,
         action: AuditAction.signOut,
       },
-    });
-
-    await request.server.prisma.session.delete({
-      where: { userId: userId },
     });
 
     return reply.status(SuccessHttpStatusCode.OK).send({
@@ -302,6 +320,7 @@ const signOut = async (request: FastifyRequest, reply: FastifyReply) => {
 const renewAccess = async (
   request: FastifyRequest<{
     Body: {
+      expiredAccessToken: string;
       renewToken: string;
     };
   }>,
@@ -312,10 +331,10 @@ const renewAccess = async (
     "language",
     ResponseLanguage.ARABIC
   )!;
-  const { renewToken }: any = request.body;
+  const { renewToken, expiredAccessToken }: any = request.body;
 
   try {
-    if (!renewToken) {
+    if (!expiredAccessToken || !renewToken) {
       throw new HttpErrorResponse(
         ErrorHttpStatusCode.BAD_REQUEST,
         errorResponse(language).errorTitle.LACK_OF_CREDENTIALS,
@@ -324,9 +343,6 @@ const renewAccess = async (
     }
 
     if (!jwtSecretRenewToken) {
-      console.error(
-        "JWT secret renew token is not configured properly in the environment variables."
-      );
       throw new HttpErrorResponse(
         ErrorHttpStatusCode.INTERNAL_SERVER_ERROR,
         errorResponse(language).errorTitle.INTERNAL_SERVER_ERROR,
@@ -334,6 +350,7 @@ const renewAccess = async (
       );
     }
 
+    // Decode and verify the renew token
     let decodedResult: jwt.JwtPayload;
     try {
       decodedResult = jwt.verify(
@@ -342,6 +359,7 @@ const renewAccess = async (
       ) as jwt.JwtPayload;
     } catch (err) {
       if (err instanceof jwt.TokenExpiredError) {
+        // Handle expired token
         throw new HttpErrorResponse(
           ErrorHttpStatusCode.UNAUTHORIZED,
           errorResponse(language).errorTitle.RENEW_TOKEN_EXPIRED,
@@ -349,6 +367,18 @@ const renewAccess = async (
           { expiredRenewToken: true }
         );
       }
+
+      if (err instanceof jwt.JsonWebTokenError) {
+        // Handle invalid or malformed token
+        throw new HttpErrorResponse(
+          ErrorHttpStatusCode.UNAUTHORIZED,
+          errorResponse(language).errorTitle.INVALID_TOKEN,
+          errorResponse(language).errorMessage.INVALID_TOKEN,
+          { accessUnauthorized: true }
+        );
+      }
+
+      // Rethrow any other errors
       throw err;
     }
 
@@ -356,9 +386,6 @@ const renewAccess = async (
     const userRole = decodedResult.userRole;
 
     if (!jwtSecretToken) {
-      console.error(
-        "JWT secret tokens are not configured properly in the environment variables."
-      );
       throw new HttpErrorResponse(
         ErrorHttpStatusCode.INTERNAL_SERVER_ERROR,
         errorResponse(language).errorTitle.INTERNAL_SERVER_ERROR,
@@ -366,13 +393,30 @@ const renewAccess = async (
       );
     }
 
-    const tokenPayload = { userId: userId, userRole: userRole };
-    const finalAccessToken = jwt.sign(tokenPayload, jwtSecretToken, {
+    // Generate the new access token
+    const tokenPayload = { userId, userRole };
+    const newAccessToken = jwt.sign(tokenPayload, jwtSecretToken, {
       expiresIn: getJwtExpiryTime(accessTokenLifeSpan),
     });
 
+    try {
+      await request.server.prisma.session.update({
+        where: { accessKeyPartial: expiredAccessToken.slice(-8) },
+        data: {
+          accessKeyPartial: newAccessToken.slice(-8),
+        },
+      });
+    } catch (error) {
+      throw new HttpErrorResponse(
+        ErrorHttpStatusCode.INTERNAL_SERVER_ERROR,
+        errorResponse(language).errorTitle.INTERNAL_SERVER_ERROR,
+        errorResponse(language).errorMessage.INTERNAL_SERVER_ERROR,
+        { accessUnauthorized: true }
+      );
+    }
+
     return reply.status(SuccessHttpStatusCode.OK).send({
-      auth: { accessToken: finalAccessToken },
+      auth: { newAccessToken: newAccessToken },
     });
   } catch (error) {
     return handleError(error, reply, language);

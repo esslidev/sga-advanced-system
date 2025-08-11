@@ -24,6 +24,7 @@ export class HttpErrorResponse {
   public expiredAccessToken: boolean;
   public expiredRenewToken: boolean;
   public accessUnauthorized: boolean;
+  public sessionExpired: boolean;
 
   constructor(
     statusCode: HttpErrorStatusCode,
@@ -33,6 +34,7 @@ export class HttpErrorResponse {
       expiredAccessToken = false,
       expiredRenewToken = false,
       accessUnauthorized = false,
+      sessionExpired = false,
     } = {}
   ) {
     this.statusCode = statusCode;
@@ -41,5 +43,6 @@ export class HttpErrorResponse {
     this.expiredAccessToken = expiredAccessToken;
     this.expiredRenewToken = expiredRenewToken;
     this.accessUnauthorized = accessUnauthorized;
+    this.sessionExpired = sessionExpired;
   }
 }

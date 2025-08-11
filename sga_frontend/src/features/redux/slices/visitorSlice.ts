@@ -11,16 +11,16 @@ import type { ApiResponse } from "../../models/apiResponse";
 import type { ApiPagination } from "../../models/apiPagination";
 
 interface VisitorState {
+  visitor: Visitor | null;
   visitors: Visitor[];
-  selectedVisitor: Visitor | null;
   loading: boolean;
   response: ApiResponse | null;
   pagination: ApiPagination | null;
 }
 
 const initialState: VisitorState = {
+  visitor: null,
   visitors: [],
-  selectedVisitor: null,
   loading: false,
   response: null,
   pagination: null,
@@ -35,7 +35,7 @@ const visitorSlice = createSlice({
       state.pagination = null;
     },
     clearVisitor: (state) => {
-      state.selectedVisitor = null;
+      state.visitor = null;
     },
     clearResponse: (state) => {
       state.response = null;
@@ -48,9 +48,9 @@ const visitorSlice = createSlice({
     });
     builder.addCase(
       getVisitor.fulfilled,
-      (state, action: PayloadAction<Visitor>) => {
+      (state, action: PayloadAction<{ visitor: Visitor }>) => {
         state.loading = false;
-        state.selectedVisitor = action.payload;
+        state.visitor = action.payload.visitor;
       }
     );
     builder.addCase(getVisitor.rejected, (state, action) => {

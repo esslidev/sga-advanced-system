@@ -25,6 +25,9 @@ export enum FrErrorTitle {
   MISSING_PARAMETERS = "Paramètres manquants",
   MISSING_ADMIN_ACCESS_CODE = "Code d'accès administrateur manquant",
   INVALID_ADMIN_ACCESS_CODE = "Code d'accès administrateur invalide",
+  SESSION_EXPIRED = "Session expirée",
+  SESSION_NOT_FOUND = "Session introuvable",
+  SESSION_EXISTS = "La session existe déjà",
 
   // Visitor-related
   VISITOR_ALREADY_EXISTS = "Le visiteur existe déjà",
@@ -62,6 +65,9 @@ export enum FrErrorMessage {
   MISSING_PARAMETERS = "Des paramètres requis sont manquants dans la requête.",
   MISSING_ADMIN_ACCESS_CODE = "Le code d'accès administrateur est requis pour s'inscrire.",
   INVALID_ADMIN_ACCESS_CODE = "Le code d'accès administrateur fourni est invalide.",
+  SESSION_EXPIRED = "La session a expiré. Veuillez vous reconnecter.",
+  SESSION_NOT_FOUND = "La session est introuvable. Veuillez vous reconnecter.",
+  SESSION_EXISTS = "Une session existante a été trouvée. La session précédente a été supprimée.",
 
   // Visitor-related
   VISITOR_ALREADY_EXISTS = "Un visiteur avec ces informations existe déjà dans le système.",

@@ -25,6 +25,9 @@ export enum ArErrorTitle {
   MISSING_PARAMETERS = "المعطيات المفقودة",
   MISSING_ADMIN_ACCESS_CODE = "رمز الوصول الإداري مفقود",
   INVALID_ADMIN_ACCESS_CODE = "رمز الوصول الإداري غير صالح",
+  SESSION_EXPIRED = "انتهت صلاحية الجلسة",
+  SESSION_NOT_FOUND = "لم يتم العثور على الجلسة",
+  SESSION_EXISTS = "الجلسة موجودة بالفعل",
 
   // Visitor-related
   VISITOR_ALREADY_EXISTS = "الزائر موجود مسبقًا",
@@ -62,6 +65,9 @@ export enum ArErrorMessage {
   MISSING_PARAMETERS = "المعطيات المطلوبة مفقودة في الطلب.",
   MISSING_ADMIN_ACCESS_CODE = "رمز الوصول الإداري مطلوب للتسجيل.",
   INVALID_ADMIN_ACCESS_CODE = "رمز الوصول الإداري المقدم غير صالح.",
+  SESSION_EXPIRED = "انتهت صلاحية الجلسة. يرجى تسجيل الدخول مرة أخرى.",
+  SESSION_NOT_FOUND = "لم يتم العثور على الجلسة. يرجى تسجيل الدخول مرة أخرى.",
+  SESSION_EXISTS = "تم العثور على جلسة موجودة بالفعل. تم حذف الجلسة القديمة.",
 
   // Visitor-related
   VISITOR_ALREADY_EXISTS = "الزائر بمعلومات المقدمة موجود مسبقًا في النظام.",

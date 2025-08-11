@@ -1,5 +1,5 @@
 import { FastifyRequest, FastifyReply } from "fastify";
-import { Prisma } from "@prisma/client";
+import { AuditAction, Prisma } from "@prisma/client";
 import { ResponseLanguage } from "../../core/enums/responses/responseLanguage";
 import { HttpErrorResponse } from "../../core/resources/response/httpErrorResponse";
 import {
@@ -147,8 +147,18 @@ const addVisitor = async (
     "language",
     ResponseLanguage.ARABIC
   )!;
+  const { userId } = request.user;
+
   const { CIN, firstName, lastName } = request.body;
   try {
+    if (!userId) {
+      throw new HttpErrorResponse(
+        ErrorHttpStatusCode.BAD_REQUEST,
+        errorResponse(language).errorTitle.INVALID_REQUEST,
+        errorResponse(language).errorMessage.INVALID_REQUEST
+      );
+    }
+
     const existingVisitor = await request.server.prisma.visitor.findFirst({
       where: { CIN, deletedAt: { equals: null } },
     });
@@ -180,6 +190,13 @@ const addVisitor = async (
       data: { CIN, firstName, lastName },
     });
 
+    await request.server.prisma.auditLog.create({
+      data: {
+        userId: userId,
+        action: AuditAction.visitorCreated,
+      },
+    });
+
     return reply.status(SuccessHttpStatusCode.CREATED).send({
       response: {
         statusCode: SuccessHttpStatusCode.CREATED,
@@ -209,9 +226,17 @@ const updateVisitor = async (
     "language",
     ResponseLanguage.ARABIC
   )!;
+  const { userId } = request.user;
   const { id, CIN, firstName, lastName } = request.body;
 
   try {
+    if (!userId) {
+      throw new HttpErrorResponse(
+        ErrorHttpStatusCode.BAD_REQUEST,
+        errorResponse(language).errorTitle.INVALID_REQUEST,
+        errorResponse(language).errorMessage.INVALID_REQUEST
+      );
+    }
     const existingVisitor = await request.server.prisma.visitor.findFirst({
       where: { id, deletedAt: { equals: null } },
     });
@@ -230,19 +255,17 @@ const updateVisitor = async (
       ...(lastName && { lastName }),
     };
 
-    const updatedVisitor = await request.server.prisma.visitor.update({
+    await request.server.prisma.visitor.update({
       where: { id },
       data: updatedVisitorData,
     });
 
-    const responseVisitor = {
-      id: updatedVisitor.id,
-      CIN: updatedVisitor.CIN,
-      firstName: updatedVisitor.firstName,
-      lastName: updatedVisitor.lastName,
-      createdAt: updatedVisitor.createdAt.toISOString(),
-      updatedAt: updatedVisitor.updatedAt.toISOString(),
-    };
+    await request.server.prisma.auditLog.create({
+      data: {
+        userId: userId,
+        action: AuditAction.visitorUpdated,
+      },
+    });
 
     return reply.status(SuccessHttpStatusCode.OK).send({
       response: {
@@ -270,8 +293,17 @@ const deleteVisitor = async (
     "language",
     ResponseLanguage.ARABIC
   )!;
+  const { userId } = request.user;
+
   const { id } = request.query;
   try {
+    if (!userId) {
+      throw new HttpErrorResponse(
+        ErrorHttpStatusCode.BAD_REQUEST,
+        errorResponse(language).errorTitle.INVALID_REQUEST,
+        errorResponse(language).errorMessage.INVALID_REQUEST
+      );
+    }
     const visitor = await request.server.prisma.visitor.findUnique({
       where: { id },
     });
@@ -287,6 +319,13 @@ const deleteVisitor = async (
     await request.server.prisma.visitor.update({
       where: { id },
       data: { deletedAt: new Date() },
+    });
+
+    await request.server.prisma.auditLog.create({
+      data: {
+        userId: userId,
+        action: AuditAction.visitDeleted,
+      },
     });
 
     return reply.status(SuccessHttpStatusCode.OK).send({

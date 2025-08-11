@@ -1,5 +1,5 @@
 import { FastifyRequest, FastifyReply } from "fastify";
-import { Prisma, Division } from "@prisma/client";
+import { Prisma, Division, AuditAction } from "@prisma/client";
 import {
   ErrorHttpStatusCode,
   SuccessHttpStatusCode,
@@ -20,6 +20,7 @@ const getVisits = async (request: FastifyRequest, reply: FastifyReply) => {
     "language",
     ResponseLanguage.ARABIC
   )!;
+
   const {
     visitorId,
     limit = "10",
@@ -97,9 +98,19 @@ const addVisit = async (
     "language",
     ResponseLanguage.ARABIC
   )!;
+  const { userId } = request.user;
+
   const { visitDate, divisions, visitReason, visitor } = request.body;
 
   try {
+    if (!userId) {
+      throw new HttpErrorResponse(
+        ErrorHttpStatusCode.BAD_REQUEST,
+        errorResponse(language).errorTitle.INVALID_REQUEST,
+        errorResponse(language).errorMessage.INVALID_REQUEST
+      );
+    }
+
     const existingVisitor = await request.server.prisma.visitor.findUnique({
       where: { CIN: visitor.CIN },
     });
@@ -138,8 +149,6 @@ const addVisit = async (
       });
     }
 
-    request.log.info("divisions:", divisions);
-
     // Register the visit
     await request.server.prisma.visit.create({
       data: {
@@ -151,6 +160,13 @@ const addVisit = async (
             division,
           })),
         },
+      },
+    });
+
+    await request.server.prisma.auditLog.create({
+      data: {
+        userId: userId,
+        action: AuditAction.visitAdded,
       },
     });
 
@@ -185,8 +201,16 @@ const updateVisit = async (
     ResponseLanguage.ARABIC
   )!;
   const { id, visitorCIN, divisions, visitDate, visitReason } = request.body;
-
+  const { userId } = request.user;
   try {
+    if (!userId) {
+      throw new HttpErrorResponse(
+        ErrorHttpStatusCode.BAD_REQUEST,
+        errorResponse(language).errorTitle.INVALID_REQUEST,
+        errorResponse(language).errorMessage.INVALID_REQUEST
+      );
+    }
+
     // Check existing Visit
     const existingVisit = await request.server.prisma.visit.findUnique({
       where: { id },
@@ -235,6 +259,13 @@ const updateVisit = async (
       }
     });
 
+    await request.server.prisma.auditLog.create({
+      data: {
+        userId: userId,
+        action: AuditAction.visitUpdated,
+      },
+    });
+
     return reply.status(SuccessHttpStatusCode.OK).send({
       response: {
         statusCode: SuccessHttpStatusCode.OK,
@@ -261,8 +292,18 @@ const deleteVisit = async (
     "language",
     ResponseLanguage.ARABIC
   )!;
+
+  const { userId } = request.user;
   const { id } = request.query;
   try {
+    if (!userId) {
+      throw new HttpErrorResponse(
+        ErrorHttpStatusCode.BAD_REQUEST,
+        errorResponse(language).errorTitle.INVALID_REQUEST,
+        errorResponse(language).errorMessage.INVALID_REQUEST
+      );
+    }
+
     const visit = await request.server.prisma.visit.findUnique({
       where: { id },
     });
@@ -278,6 +319,13 @@ const deleteVisit = async (
     await request.server.prisma.visit.update({
       where: { id },
       data: { deletedAt: new Date() },
+    });
+
+    await request.server.prisma.auditLog.create({
+      data: {
+        userId: userId,
+        action: AuditAction.visitDeleted,
+      },
     });
 
     return reply.status(SuccessHttpStatusCode.OK).send({

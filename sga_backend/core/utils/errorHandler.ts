@@ -19,6 +19,8 @@ const handleError = (
         message: error.responseMessage,
         expiredAccessToken: error.expiredAccessToken,
         expiredRenewToken: error.expiredRenewToken,
+        accessUnauthorized: error.accessUnauthorized,
+        sessionExpired: error.sessionExpired,
       },
     });
   } else {

@@ -6,7 +6,7 @@ import type { ApiPagination } from "../../models/apiPagination";
 import { authRequestHandler } from "../../../core/utils/apiUtil";
 import type { AppDispatch, RootState } from "../store";
 
-type GetVisitsQuery = {
+type GetVisitsPayload = {
   visitorId: string;
   limit?: number;
   page?: number;
@@ -15,87 +15,68 @@ type GetVisitsQuery = {
 // GET many visits
 export const getVisits = createAsyncThunk<
   { data: Visit[]; pagination: ApiPagination },
-  GetVisitsQuery | undefined,
+  GetVisitsPayload | undefined,
   { rejectValue: ApiResponse; dispatch: AppDispatch; state: RootState }
 >("visit/getVisits", async (params, thunkAPI) => {
+  const { dispatch, getState, rejectWithValue } = thunkAPI;
   try {
-    // Use the authRequestHandler to wrap the API call
-    const data = await authRequestHandler(
+    const result = await authRequestHandler(
       async (accessToken) => {
         const queryParams = new URLSearchParams();
+
         if (params) {
           if (params.visitorId)
             queryParams.append("visitorId", params.visitorId);
           if (params.limit) queryParams.append("limit", String(params.limit));
           if (params.page) queryParams.append("page", String(params.page));
         }
-        const query = queryParams.toString();
 
-        // Pass the accessToken in headers
+        const query = queryParams.toString();
         const res = await api.get(
-          `/visit/get-visits${query ? "?" + query : ""}`,
+          `/visit/get-visits${query ? `?${query}` : ""}`,
           {
-            headers: { Authorization: `Bearer ${accessToken}` },
+            headers: { authorization: accessToken },
           }
         );
-        return res.data;
+
+        return res.data as { data: Visit[]; pagination: ApiPagination };
       },
-      thunkAPI.dispatch,
-      thunkAPI.getState
+      dispatch,
+      getState()
     );
-    return data;
-  } catch (err: any) {
-    const errorResponse: ApiResponse = err.response?.data || {
-      statusCode: 500,
-      title: "",
-      message: err.message,
-    };
-    return thunkAPI.rejectWithValue(errorResponse);
+    return result;
+  } catch (error) {
+    const apiError = error as ApiResponse;
+    return rejectWithValue(apiError);
   }
 });
-
-/*// GET many visits
-export const getVisits = createAsyncThunk<
-  { data: Visit[]; pagination: ApiPagination },
-  GetVisitsQuery | undefined,
-  { rejectValue: ApiResponse }
->("visit/getVisits", async (params, thunkAPI) => {
-  try {
-    const queryParams = new URLSearchParams();
-    if (params) {
-      queryParams.append("visitorId", params.visitorId);
-      if (params.limit) queryParams.append("limit", String(params.limit));
-      if (params.page) queryParams.append("page", String(params.page));
-    }
-    const query = queryParams.toString();
-    const res = await api.get(`/visit/get-visits${query ? "?" + query : ""}`);
-    return res.data;
-  } catch (err: any) {
-    const errorResponse: ApiResponse = err.response?.data || {
-      statusCode: 500,
-      title: "",
-      message: err.message,
-    };
-    return thunkAPI.rejectWithValue(errorResponse);
-  }
-});*/
 
 // ADD new visit
 export const addVisit = createAsyncThunk<
   ApiResponse,
   Partial<Visit>,
-  { rejectValue: ApiResponse }
+  { rejectValue: ApiResponse; dispatch: AppDispatch; state: RootState }
 >("visit/addVisit", async (newVisit, thunkAPI) => {
+  const { dispatch, getState, rejectWithValue } = thunkAPI;
   try {
-    const res = await api.post("/visit/add-visit", newVisit);
-    return res.data;
+    const result = await authRequestHandler(
+      async (accessToken) => {
+        const res = await api.post("/visit/add-visit", newVisit, {
+          headers: { authorization: accessToken },
+        });
+        return res.data;
+      },
+      dispatch,
+      getState()
+    );
+    return result;
   } catch (err: any) {
     const errorResponse: ApiResponse = err.response?.data || {
       statusCode: 500,
       title: "",
       message: err.message,
     };
-    return thunkAPI.rejectWithValue(errorResponse);
+    return rejectWithValue(errorResponse);
   }
 });
 
@@ -103,18 +84,28 @@ export const addVisit = createAsyncThunk<
 export const updateVisit = createAsyncThunk<
   ApiResponse,
   Partial<Visit>,
-  { rejectValue: ApiResponse }
+  { rejectValue: ApiResponse; dispatch: AppDispatch; state: RootState }
 >("visit/updateVisit", async (updatedVisit, thunkAPI) => {
+  const { dispatch, getState, rejectWithValue } = thunkAPI;
   try {
-    const res = await api.put("/visit/update-visit", updatedVisit);
-    return res.data;
+    const result = await authRequestHandler(
+      async (accessToken) => {
+        const res = await api.put("/visit/update-visit", updatedVisit, {
+          headers: { authorization: accessToken },
+        });
+        return res.data;
+      },
+      dispatch,
+      getState()
+    );
+    return result;
   } catch (err: any) {
     const errorResponse: ApiResponse = err.response?.data || {
       statusCode: 500,
       title: "",
       message: err.message,
     };
-    return thunkAPI.rejectWithValue(errorResponse);
+    return rejectWithValue(errorResponse);
   }
 });
 
@@ -122,17 +113,27 @@ export const updateVisit = createAsyncThunk<
 export const deleteVisit = createAsyncThunk<
   ApiResponse,
   string,
-  { rejectValue: ApiResponse }
+  { rejectValue: ApiResponse; dispatch: AppDispatch; state: RootState }
 >("visit/deleteVisit", async (id, thunkAPI) => {
+  const { dispatch, getState, rejectWithValue } = thunkAPI;
   try {
-    const res = await api.delete(`/visit/delete-visit?id=${id}`);
-    return res.data;
+    const result = await authRequestHandler(
+      async (accessToken) => {
+        const res = await api.delete(`/visit/delete-visit?id=${id}`, {
+          headers: { authorization: accessToken },
+        });
+        return res.data;
+      },
+      dispatch,
+      getState()
+    );
+    return result;
   } catch (err: any) {
     const errorResponse: ApiResponse = err.response?.data || {
       statusCode: 500,
       title: "",
       message: err.message,
     };
-    return thunkAPI.rejectWithValue(errorResponse);
+    return rejectWithValue(errorResponse);
   }
 });

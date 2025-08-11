@@ -47,11 +47,12 @@ export async function authHook(request: FastifyRequest, reply: FastifyReply) {
   const language = getHeaderValue(
     request.headers,
     "language",
-    ResponseLanguage.ARABIC
+    "ar" // Defaulting to Arabic if no language header
   )!;
   const accessToken = request.headers["authorization"];
 
   try {
+    // Check if access token is present
     if (!accessToken) {
       throw new HttpErrorResponse(
         ErrorHttpStatusCode.UNAUTHORIZED,
@@ -61,6 +62,7 @@ export async function authHook(request: FastifyRequest, reply: FastifyReply) {
       );
     }
 
+    // Check if jwtSecretToken is available
     if (!jwtSecretToken) {
       throw new HttpErrorResponse(
         ErrorHttpStatusCode.INTERNAL_SERVER_ERROR,
@@ -70,6 +72,7 @@ export async function authHook(request: FastifyRequest, reply: FastifyReply) {
       );
     }
 
+    // Decode the JWT token
     let decoded: any;
     try {
       decoded = jwt.verify(accessToken, jwtSecretToken);
@@ -82,13 +85,49 @@ export async function authHook(request: FastifyRequest, reply: FastifyReply) {
           { expiredAccessToken: true }
         );
       }
-      throw err;
+
+      if (err instanceof jwt.JsonWebTokenError) {
+        throw new HttpErrorResponse(
+          ErrorHttpStatusCode.UNAUTHORIZED,
+          errorResponse(language).errorTitle.AUTHENTICATION_ERROR,
+          errorResponse(language).errorMessage.INVALID_TOKEN,
+          { accessUnauthorized: true }
+        );
+      }
+
+      // For any other unexpected JWT error
+      throw new HttpErrorResponse(
+        ErrorHttpStatusCode.INTERNAL_SERVER_ERROR,
+        errorResponse(language).errorTitle.INTERNAL_SERVER_ERROR,
+        errorResponse(language).errorMessage.INTERNAL_SERVER_ERROR,
+        { accessUnauthorized: true }
+      );
     }
 
+    // Check if the user exists in the session table (using Prisma)
+    const existingSession = await request.server.prisma.session.findUnique({
+      where: {
+        userId: decoded.userId,
+        accessKeyPartial: accessToken.slice(-8),
+      },
+    });
+
+    // If no session found, throw error
+    if (!existingSession) {
+      throw new HttpErrorResponse(
+        ErrorHttpStatusCode.UNAUTHORIZED,
+        errorResponse(language).errorTitle.SESSION_EXPIRED,
+        errorResponse(language).errorMessage.SESSION_NOT_FOUND,
+        { sessionExpired: true }
+      );
+    }
+
+    // If the session is valid, attach user info to request
     request.user = {
       userId: decoded.userId,
     };
   } catch (error) {
+    // Handle error (e.g. expired access token, missing session, etc.)
     return handleError(error, reply, language);
   }
 }

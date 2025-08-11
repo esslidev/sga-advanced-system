@@ -79,14 +79,15 @@ const authSlice = createSlice({
     });
     builder.addCase(
       signOutThunk.fulfilled,
-      (state, action: PayloadAction<{ response: ApiResponse }>) => {
+      (state, action: PayloadAction<ApiResponse>) => {
         state.loading = false;
         state.apiAuth = null;
-        state.response = action.payload.response;
+        state.response = action.payload;
       }
     );
     builder.addCase(signOutThunk.rejected, (state, action) => {
       state.loading = false;
+      state.apiAuth = null;
       state.response = action.payload ?? null;
     });
 
