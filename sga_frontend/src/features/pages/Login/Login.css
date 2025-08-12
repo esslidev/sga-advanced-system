@@ -1,9 +1,16 @@
-.loginPage {
+.page {
   min-width: 100vw;
   min-height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.side-image {
+  height: 100%;
+  background-image: url("../../../assets/images/smara-illustration.png");
+  background-size: cover;
+  background-position: center;
 }
 
 #loginContainer {
