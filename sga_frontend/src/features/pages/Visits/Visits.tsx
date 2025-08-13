@@ -17,7 +17,7 @@ import {
   type DivisionOption,
   type Visit,
 } from "../../models/visit";
-import CustomTextInput from "../../components/common/CustomTextInput/CustomTextInput";
+import CustomTextInput from "../../components/common/CustomTextField/CustomTextField";
 import AutoResizeTextarea from "../../components/common/CustomTextArea/AutoResizeTextarea";
 import Multiselect from "multiselect-react-dropdown";
 
