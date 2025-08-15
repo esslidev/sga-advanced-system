@@ -1,17 +1,19 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 import LoginPage from "./features/pages/Login/Login";
+import SignUpPage from "./features/pages/SignUp/SignUp";
 import VisitorsPage from "./features/pages/Visitors/Visitors";
-import NotFound from "./features/pages/NotFound/NotFound";
-import Footer from "./features/components/features/Footer/Footer";
-import Header from "./features/components/features/Header/Header";
-import StatsPage from "./features/pages/Stats/Stats";
-import VisitDataEntryPage from "./features/pages/VisitorDataEntry/VisitDataEntry";
 import VisitsPage from "./features/pages/Visits/Visits";
+import VisitDataEntryPage from "./features/pages/VisitorDataEntry/VisitDataEntry";
+import StatsPage from "./features/pages/Stats/Stats";
+import NotFound from "./features/pages/NotFound/NotFound";
+import Header from "./features/components/features/Header/Header";
+import Footer from "./features/components/features/Footer/Footer";
 import { useAuth } from "./features/hooks/useAuth";
 
 export const PagesRoutes = {
   basePage: "/accueil",
   loginPage: "/connexion",
+  signUpPage: "/inscription",
   visitorsPage: "/visiteurs",
   visitsPage: "/visiteurs/visites",
   visitDataEntryPage: "/saisie-donnees-visites",
@@ -36,6 +38,11 @@ const LoggedInLayout = () => {
         <Route path={PagesRoutes.visitorsPage} element={<VisitorsPage />} />
         <Route path={PagesRoutes.visitsPage} element={<VisitsPage />} />
         <Route path={PagesRoutes.statsPage} element={<StatsPage />} />
+        <Route
+          path="/"
+          element={<Navigate to={PagesRoutes.visitDataEntryPage} replace />}
+        />
+        <Route path="*" element={<NotFound />} />
       </Routes>
       <Footer />
     </div>
@@ -45,11 +52,12 @@ const LoggedInLayout = () => {
 const AppRoutes = () => {
   const { apiAuth } = useAuth();
 
-  // If user is not authenticated, block access to logged-in routes by redirecting to login
   if (!apiAuth?.accessToken) {
+    // Public routes
     return (
       <Routes>
         <Route path={PagesRoutes.loginPage} element={<LoginPage />} />
+        <Route path={PagesRoutes.signUpPage} element={<SignUpPage />} />
         <Route
           path="*"
           element={<Navigate to={PagesRoutes.loginPage} replace />}
@@ -58,21 +66,8 @@ const AppRoutes = () => {
     );
   }
 
-  // User is authenticated, render logged-in routes + public fallback
-  return (
-    <Routes>
-      <Route
-        path="/"
-        element={<Navigate to={PagesRoutes.visitDataEntryPage} replace />}
-      />
-      <Route path="/*" element={<LoggedInLayout />} />
-      <Route
-        path={PagesRoutes.loginPage}
-        element={<Navigate to={PagesRoutes.visitDataEntryPage} replace />}
-      />
-      <Route path="*" element={<NotFound />} />
-    </Routes>
-  );
+  // Protected routes
+  return <LoggedInLayout />;
 };
 
 export default AppRoutes;

@@ -1,3 +1,79 @@
-.customSelector {
-  width: 500px;
+.custom-selector {
+  position: relative;
+  min-width: 150px;
+}
+
+.selector-trigger {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: white;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.selector-trigger:hover {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.selector-trigger.open {
+  box-shadow: 0 0 0 3px #e7b98b;
+}
+
+.selector-text {
+  color: var(--text-color);
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.selector-arrow {
+  color: var(--third-text-color);
+  font-size: 12px;
+  transition: transform 0.2s ease;
+}
+
+.selector-arrow.rotated {
+  transform: rotate(180deg);
+}
+
+.selector-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border-radius: 6px;
+  margin-top: 4px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+  overflow: hidden;
+  animation: slideDown 0.15s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.selector-option {
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+  color: var(--primary-text-color);
+  font-size: 14px;
+}
+
+.selector-option.selected {
+  background-color: #f6f5f3;
+  color: var(--primary-color);
+  font-weight: 600;
 }

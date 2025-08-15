@@ -1,4 +1,5 @@
 import { combineReducers } from "redux";
+import systemPreferencesReducer from "./slices/systemPreferences";
 import authReducer from "./slices/authSlice";
 import visitorReducer from "./slices/visitorSlice";
 import visitReducer from "./slices/visitSlice";
@@ -19,10 +20,11 @@ import { configureStore } from "@reduxjs/toolkit";
 const persistConfig = {
   key: "root",
   storage,
-  whitelist: ["auth"],
+  whitelist: ["auth", "systemPreferences"],
 };
 
 const rootReducer = combineReducers({
+  systemPreferences: systemPreferencesReducer,
   auth: authReducer,
   visitor: visitorReducer,
   visit: visitReducer,

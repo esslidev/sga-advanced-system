@@ -17,7 +17,6 @@ import {
   type DivisionOption,
   type Visit,
 } from "../../models/visit";
-import CustomTextInput from "../../components/common/CustomTextField/CustomTextField";
 import AutoResizeTextarea from "../../components/common/CustomTextArea/AutoResizeTextarea";
 import Multiselect from "multiselect-react-dropdown";
 
@@ -142,10 +141,9 @@ const VisitsPage = () => {
           key="date-time-inputs"
           style={{ display: "flex", flexDirection: "column", gap: "8px" }}
         >
-          <CustomTextInput
+          <input
             name="تاريخ الزيارة"
             type="date"
-            isCentered
             value={formData.visitDate.toISOString().split("T")[0]}
             onChange={(e) => {
               const newDate = new Date(formData.visitDate);
@@ -154,10 +152,9 @@ const VisitsPage = () => {
               setFormData({ ...formData, visitDate: newDate });
             }}
           />
-          <CustomTextInput
+          <input
             name="ساعة الزيارة"
             type="time"
-            isCentered
             value={formData.visitDate.toTimeString().substring(0, 5)}
             onChange={(e) => {
               const newDate = new Date(formData.visitDate);

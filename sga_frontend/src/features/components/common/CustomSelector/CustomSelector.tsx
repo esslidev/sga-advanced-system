@@ -1,47 +1,79 @@
-import React from "react";
+import React, { useState, useRef, useEffect } from "react";
 import "./CustomSelector.css";
 
+interface Option {
+  value: string;
+  label: string;
+}
+
 interface CustomSelectorProps {
-  name: string;
+  options: Option[];
   value?: string;
-  options: { value: string; label: string }[];
-  onChange?: (e: React.ChangeEvent<HTMLSelectElement>) => void;
-  required?: boolean;
-  isCentered?: boolean;
+  onChange?: (value: string) => void;
   placeholder?: string;
 }
 
 const CustomSelector: React.FC<CustomSelectorProps> = ({
-  name,
-  value,
   options,
+  value,
   onChange,
-  required = true,
-  isCentered,
-  placeholder,
+  placeholder = "Select option",
 }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const selectorRef = useRef<HTMLDivElement>(null);
+
+  const selectedOption = options.find((option) => option.value === value);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        selectorRef.current &&
+        !selectorRef.current.contains(event.target as Node)
+      ) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleToggle = () => {
+    setIsOpen(!isOpen);
+  };
+
+  const handleSelect = (option: Option) => {
+    onChange?.(option.value);
+    setIsOpen(false);
+  };
+
   return (
-    <div className="customSelector">
-      <p>{name + " :"}</p>
-      <select
-        id={name}
-        name={name}
-        value={value || ""}
-        onChange={onChange}
-        required={required}
-        style={isCentered ? { textAlign: "center" } : {}}
+    <div className="custom-selector" ref={selectorRef}>
+      <div
+        className={`selector-trigger ${isOpen ? "open" : ""}`}
+        onClick={handleToggle}
       >
-        {placeholder && (
-          <option value="" disabled={required} hidden={!!value}>
-            {placeholder}
-          </option>
-        )}
-        {options.map((opt) => (
-          <option key={opt.value} value={opt.value}>
-            {opt.label}
-          </option>
-        ))}
-      </select>
+        <span className="selector-text">
+          {selectedOption ? selectedOption.label : placeholder}
+        </span>
+        <span className={`selector-arrow ${isOpen ? "rotated" : ""}`}>▼</span>
+      </div>
+
+      {isOpen && (
+        <div className="selector-dropdown">
+          {options.map((option) => (
+            <div
+              key={option.value}
+              className={`selector-option ${
+                value === option.value ? "selected" : ""
+              }`}
+              onClick={() => handleSelect(option)}
+            >
+              {option.label}
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

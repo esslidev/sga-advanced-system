@@ -16,16 +16,18 @@ body,
   margin: 0;
   padding: 0;
   font-family: "Noto Kufi Arabic", sans-serif;
-  background-color: #f9f9f9;
+  background-color: #f2f4f5;
   color: #222;
   line-height: 1.6;
 }
 
 /* Globalizing colors */
 :root {
-  --primary-color: #33b168;
+  --primary-color: #d47413;
   --danger-color: #ca4d3f;
-  --text-color: #333;
+  --text-color: #374151;
+  --secondary-text-color: #616161;
+  --third-text-color: #a0a0a0;
   --background-color: #f8f9fa;
 }
 
@@ -62,32 +64,46 @@ body,
 
 /* ===== Form Defaults ===== */
 input,
-button,
-select,
 textarea {
   font-family: inherit;
   font-size: 1rem;
   padding: 0.5rem;
-  border-radius: 4px;
-  border: 1px solid #ccc;
+  border-radius: unset;
+  border: unset;
   outline: none;
+  color: var(--text-color);
+  background-color: white;
 }
 
 select {
-  font-family: inherit;
+  padding: 0.5rem 1rem;
   font-size: 1rem;
-  padding: 0.5rem;
-  border-radius: 4px;
-  border: 1px solid #ccc;
-  color: #222;
-  width: 100%;
-  appearance: auto;
-  -webkit-appearance: menulist;
-  -moz-appearance: menulist;
+  border: unset;
+  border-radius: unset;
+  background-color: white;
+  appearance: unset;
+  outline: unset;
+  cursor: pointer;
+  transition: border 0.2s, box-shadow 0.2s;
+
+  /* custom arrow */
+  background-image: url("data:image/svg+xml;utf8,<svg fill='gray' height='20' viewBox='0 0 20 20' width='20' xmlns='http://www.w3.org/2000/svg'><polygon points='0,0 20,0 10,10'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 12px;
+  padding-right: 2.5rem; /* leave space for arrow */
 }
+
 select:focus {
-  border-color: var(--primary-color);
-  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+select option {
+  padding: 0.5rem;
+  color: var(--text-color);
+  background-color: white;
+  margin-top: 8px;
 }
 
 .custom-multiselect .multiselectContainer {
@@ -143,17 +159,17 @@ select:focus {
 }
 
 button {
-  cursor: pointer;
-  background-color: #f4f4f4;
-  color: #222;
-  border: none;
-  border-radius: 4px;
-  transition: background-color 0.2s ease;
-  font-weight: 700;
+  cursor: pointer !important;
+  background-color: var(--primary-color) !important;
+  color: white !important;
+  border: unset !important;
+  border-radius: 6px !important;
+  font-weight: 600 !important;
+  transition: background-color 0.5s ease !important;
 }
 
 button:hover {
-  background-color: #e7e7e7;
+  background-color: #ca6907 !important;
 }
 
 /* ===== Responsive Text ===== */

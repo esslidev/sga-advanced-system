@@ -1,90 +1,118 @@
 import "./Login.css";
-import CustomButton from "../../components/common/CustomButton/CustomButton";
 import { useState } from "react";
 import { useAuth } from "../../hooks/useAuth";
+import { Button } from "react-bootstrap";
 import {
-  CustomTextField,
-  CustomTextFieldIconPosition,
-} from "../../components/common/CustomTextField/CustomTextField";
-import { IdCard } from "lucide-react";
+  EyeIcon,
+  EyeSlashIcon,
+  IdentificationIcon,
+} from "@heroicons/react/24/outline";
+import CustomSelector from "../../components/common/CustomSelector/CustomSelector";
+import { useSystemPreferences } from "../../hooks/useSystemPreferences";
+import { Language } from "../../models/systemPreferences";
+import CustomTextInput from "../../components/common/TextInput/CustomTextInput";
+
+// PasswordInput with show/hide toggle
+const PasswordInput = ({
+  label,
+  value,
+  onChange,
+  onEnter,
+}: {
+  label: string;
+  value: string;
+  onChange: (val: string) => void;
+  onEnter?: () => void;
+}) => {
+  const [show, setShow] = useState(false);
+  return (
+    <CustomTextInput
+      label={label}
+      value={value}
+      onChange={onChange}
+      type={show ? "text" : "password"}
+      placeholder="●●●●●●●●"
+      onEnter={onEnter}
+      icon={
+        <span onClick={() => setShow(!show)} style={{ cursor: "pointer" }}>
+          {show ? <EyeSlashIcon /> : <EyeIcon />}
+        </span>
+      }
+    />
+  );
+};
 
 const LoginPage = () => {
+  const { language, changeLanguage } = useSystemPreferences();
   const { signIn, loading, response } = useAuth();
-
   const [CIN, setCIN] = useState("");
   const [password, setPassword] = useState("");
 
-  // Submit handler
   const handleLogin = () => {
     if (!CIN || !password) return;
     signIn({ CIN, password });
   };
 
   return (
-    <div className="container-fluid vh-100">
-      <div className="row h-100">
-        <div className="side-image col-md-5" />
-        <div className="login-container d-flex flex-column col-md-7">
+    <div className="container-fluid g-0 vh-100">
+      <div className="row g-0 h-100">
+        <div className="side-image d-none d-md-block col-md-6 col-lg-5" />
+        <div className="login-container d-flex flex-column col-12 col-md-6 col-lg-7">
           <div className="login-header d-flex justify-content-between">
-            <CustomButton
-              name={"تسجيل حساب جديد"}
-              isInsert
-              disabled={loading}
-              onClick={() => {}}
-            />
-            <CustomButton
-              name={"العربية"}
-              isInsert
-              disabled={loading}
-              onClick={() => {}}
+            <Button className="sign-up-button" onClick={() => {}}>
+              حساب جديد
+            </Button>
+            <CustomSelector
+              value={language == Language.french ? "french" : "arabic"}
+              options={[
+                { value: "french", label: "Français" },
+                { value: "arabic", label: "العربية" },
+              ]}
+              onChange={function (value: string) {
+                changeLanguage(
+                  value == "arabic" ? Language.arabic : Language.french
+                );
+              }}
             />
           </div>
-          <div className="login-form flex-fill d-flex flex-column align-items-center justify-content-center">
-            <div className="form-title">
-              <p className="title">تسجيل الدخول</p>
-              <p className="sub-title"></p>
-            </div>
-            <div className="form-inputs d-flex flex-column gap-4">
-              <div className="d-flex flex-column gap-2">
-                <label>رقم البطاقة الوطنية</label>
-                <CustomTextField
-                  icon={<IdCard />}
-                  iconColor=""
-                  hintText="أدخل رقم البطاقة الوطنية"
-                  keyboardType="text"
-                  value={CIN}
-                  onChange={(value) => setCIN(value)}
-                  borderRadius={8}
-                />
-              </div>
-              <div className="d-flex flex-column gap-2">
-                <label>كلمة السر</label>
-                <CustomTextField
-                  icon="lock"
-                  iconPosition={CustomTextFieldIconPosition.LEFT}
-                  hintText="أدخل كلمة السر هنا"
-                  keyboardType="password"
-                  obscureText={true}
-                  value={password}
-                  onChange={(value) => setPassword(value)}
-                  borderRadius={8}
-                />
-              </div>
-            </div>
-            {response && (
-              <p
-                className="error-response"
-                style={{ color: "red", marginTop: "1rem" }}
-              >
-                {response.message}
+
+          <div className="login-form flex-fill d-flex flex-column gap-4 justify-content-center">
+            <div className="form-title d-flex flex-column gap-2">
+              <h1 className="title">تسجيل الدخول</h1>
+              <p className="subtitle">
+                يرجى استخدام رقم البطاقة الوطنية وكلمة المرور لتسجيل الدخول
               </p>
+            </div>
+
+            <div className="form-inputs d-flex flex-column gap-4">
+              <CustomTextInput
+                label="رقم البطاقة الوطنية"
+                value={CIN}
+                onChange={(val) => setCIN(val.toUpperCase())}
+                placeholder="XX000000"
+                icon={<IdentificationIcon />}
+                onEnter={handleLogin}
+              />
+              <PasswordInput
+                label="كلمة السر"
+                value={password}
+                onChange={setPassword}
+                onEnter={handleLogin}
+              />
+            </div>
+
+            {response && response.statusCode >= 400 && (
+              <p className="error-response">{response.message}</p>
             )}
-            <CustomButton
-              name={loading ? "جاري الدخول..." : "تسجيل الدخول"}
-              isInsert
+
+            <Button
+              type="submit"
+              className="login-btn"
               disabled={loading}
               onClick={handleLogin}
-            />
+            >
+              {loading ? "جاري الدخول..." : "تسجيل الدخول"}
+            </Button>
           </div>
         </div>
       </div>

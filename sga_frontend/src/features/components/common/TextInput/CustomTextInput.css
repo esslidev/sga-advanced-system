@@ -1,0 +1,30 @@
+.form-input-container {
+  background-color: white;
+  height: 64px;
+  border-radius: 6px;
+  padding-left: 20px;
+  padding-right: 20px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.form-input-container label {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--third-text-color);
+  width: 300px;
+}
+
+.form-input-container input {
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: var(--text-color);
+}
+
+.form-input-container input::placeholder {
+  color: var(--third-text-color);
+}
+
+.form-input-icon {
+  width: 46px;
+  color: var(--third-text-color);
+}

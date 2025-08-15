@@ -12,7 +12,6 @@ import {
 import "./VisitDataEntry.css";
 import Multiselect from "multiselect-react-dropdown";
 import AutoResizeTextarea from "../../components/common/CustomTextArea/AutoResizeTextarea";
-import { CustomTextField } from "../../components/common/CustomTextField/CustomTextField";
 
 interface VisitFormData {
   CIN: string;
@@ -104,44 +103,48 @@ const VisitDataEntryPage = () => {
       <h1 className="title">تحصيل الزيارة</h1>
       <div className="divisions">
         <div className="division">
-          <CustomTextField
-            hintText="رقم البطاقة الوطنية"
-            keyboardType="text"
+          <input
+            placeholder="رقم البطاقة الوطنية"
+            type="text"
             value={formData.CIN}
-            onChange={(value) => setFormData({ ...formData, CIN: value })}
+            onChange={(e) => setFormData({ ...formData, CIN: e.target.value })}
           />
         </div>
         <div className="division">
-          <CustomTextField
-            hintText="الإسم الشخصي"
-            keyboardType="text"
+          <input
+            placeholder="الإسم الشخصي"
+            type="text"
             value={formData.firstName}
-            onChange={(value) => setFormData({ ...formData, firstName: value })}
+            onChange={(e) =>
+              setFormData({ ...formData, firstName: e.target.value })
+            }
           />
-          <CustomTextField
-            hintText="الإسم العائلي"
-            keyboardType="text"
+          <input
+            placeholder="الإسم العائلي"
+            type="text"
             value={formData.lastName}
-            onChange={(value) => setFormData({ ...formData, lastName: value })}
+            onChange={(e) =>
+              setFormData({ ...formData, lastName: e.target.value })
+            }
           />
-          <CustomTextField
-            hintText="تاريخ الزيارة"
-            keyboardType="date"
+          <input
+            placeholder="تاريخ الزيارة"
+            type="date"
             value={formData.visitDate.toISOString().split("T")[0]}
-            onChange={(value) => {
+            onChange={(e) => {
               const newDate = new Date(formData.visitDate);
-              const [year, month, day] = value.split("-").map(Number);
+              const [year, month, day] = e.target.value.split("-").map(Number);
               newDate.setFullYear(year, month - 1, day);
               setFormData({ ...formData, visitDate: newDate });
             }}
           />
-          <CustomTextField
-            hintText="ساعة الزيارة"
-            keyboardType="time"
+          <input
+            placeholder="ساعة الزيارة"
+            type="time"
             value={formData.visitDate.toTimeString().substring(0, 5)} // HH:mm
-            onChange={(value) => {
+            onChange={(e) => {
               const newDate = new Date(formData.visitDate);
-              const [hours, minutes] = value.split(":").map(Number);
+              const [hours, minutes] = e.target.value.split(":").map(Number);
               newDate.setHours(hours, minutes);
               setFormData({ ...formData, visitDate: newDate });
             }}
