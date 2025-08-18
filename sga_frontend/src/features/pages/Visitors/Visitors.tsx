@@ -11,7 +11,7 @@ import CustomPaginator from "../../components/common/CustomPaginator/CustomPagin
 import { AppUtil } from "../../../core/utils/appUtil";
 import debounce from "lodash.debounce";
 import { useNavigate } from "react-router-dom";
-import { PagesRoutes } from "../../../AppRoutes";
+import { PagesRoutes } from "../../AppRouter/AppRouter";
 
 const VisitorsPage = () => {
   const navigate = useNavigate();

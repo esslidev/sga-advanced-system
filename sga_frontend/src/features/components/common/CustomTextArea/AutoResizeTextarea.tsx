@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, CSSProperties } from "react";
+import React, { useState, useRef, useEffect, type CSSProperties } from "react";
 import "./AutoResizeTextarea.css";
 
 interface AutoResizeTextareaProps {

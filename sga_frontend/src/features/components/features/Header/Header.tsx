@@ -1,7 +1,7 @@
 import "./Header.css";
 import ProfileFilledIcon from "../../../../assets/vectors/profile-filled-icon";
 import { useNavigate } from "react-router-dom";
-import { PagesRoutes } from "../../../../AppRoutes";
+import { PagesRoutes } from "../../../AppRouter/AppRouter";
 import { useAuth } from "../../../hooks/useAuth";
 
 const Header = () => {

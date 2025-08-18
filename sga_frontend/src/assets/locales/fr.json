@@ -1,0 +1,56 @@
+{
+  "components": {
+    "features": {
+      "footer": {
+        "allRights": "Tous droits réservés © Ministère de l'Intérieur 2025 – Préfecture de Smara – DSIC"
+      }
+    }
+  },
+  "pages": {
+    "login": {
+      "newAccount": "Nouveau compte",
+      "title": "Connexion",
+      "subtitle": "Veuillez utiliser le numéro de la carte nationale et le mot de passe pour vous connecter",
+      "cin": "Numéro de la carte nationale",
+      "password": "Mot de passe",
+      "submit": "Se connecter",
+      "submitLoading": "Connexion en cours..."
+    },
+    "signUp": {
+      "errorResponses": {
+        "passwordUnmatched": "Les mots de passe ne correspondent pas"
+      },
+      "login": "Connexion",
+      "title": "Créer un compte",
+      "subtitle": "Cette page est réservée au service des systèmes d'information et de communication",
+      "adminAccessCode": "Code d'accès administratif",
+      "adminAccessCodePlaceholder": "Saisir le code administratif",
+      "cin": "Numéro de la carte nationale",
+      "firstName": "Prénom",
+      "firstNamePlaceholder": "Saisir le prénom",
+      "lastName": "Nom",
+      "lastNamePlaceholder": "Saisir le nom",
+      "password": "Mot de passe",
+      "passwordConfirm": "Confirmer le mot de passe",
+      "submit": "Créer un compte",
+      "submitLoading": "Création du compte en cours..."
+    },
+    "visitDataEntry": {
+      "title": "Saisie de la visite",
+      "subtitle": "Veuillez entrer les données de la visite avec précision conformément aux instructions en vigueur",
+      "cin": "Numéro de la carte nationale",
+      "firstName": "Prénom",
+      "firstNamePlaceholder": "Entrez le prénom",
+      "lastName": "Nom de famille",
+      "lastNamePlaceholder": "Entrez le nom de famille",
+      "visitDate": "Date de la visite",
+      "visitTime": "Heure de la visite",
+      "departementPlaceholder": "Choisissez le service",
+      "unavailableDepartementPlaceholder": "Aucune option disponible",
+      "visitReasonPlaceholder": "Entrez ici le motif de la visite",
+      "submit": "Soumettre",
+      "submitLoading": "Enregistrement en cours",
+      "cancel": "Annuler l'enregistrement"
+    }
+  }
+}

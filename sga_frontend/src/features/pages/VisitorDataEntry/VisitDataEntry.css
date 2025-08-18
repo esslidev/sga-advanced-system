@@ -1,15 +1,93 @@
-.divisions {
-  display: flex;
-  flex-direction: column;
-  gap: 25px;
+.form-container {
+  width: 80%;
 }
 
-.division {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 25px;
+.form-container .title {
+  font-size: 2.4rem;
+  font-weight: 700;
 }
 
-.division button {
-  margin: 25px auto;
+.form-container .subtitle {
+  font-size: 1rem;
+  color: var(--secondary-text-color);
+}
+
+.form-inputs .input {
+  padding: 0 24px;
+}
+
+/* multi select */
+.multiSelectContainer {
+  text-align: unset !important;
+}
+
+.custom-multiselect .multiselectContainer {
+  background-color: white;
+}
+
+.multiSelectContainer input {
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.chip {
+  border-radius: 6px !important;
+  gap: 4px !important;
+  background: var(--primary-color) !important;
+}
+
+.chip .closeIcon {
+  margin: 0 !important;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.custom-multiselect .search-wrapper {
+  border: none;
+  outline: none;
+  padding: 0;
+}
+
+.custom-multiselect .searchBox {
+  background-color: white !important;
+  height: 64px;
+  border: unset;
+  width: 100%;
+  border-radius: 6px;
+  padding-left: 20px;
+  padding-right: 20px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.custom-multiselect .optionContainer {
+  background-color: white;
+}
+
+.custom-multiselect .option {
+  background-color: white;
+  color: black;
+}
+
+.custom-multiselect .option:hover {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.custom-multiselect .option.selected {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+/* -------------------------------------------- */
+
+.visit-form-btn {
+  background: var(--primary-color) !important;
+  color: white !important;
+  font-size: 1.1rem !important;
+  padding: 15px 30px !important;
+  font-weight: 600 !important;
+  border-radius: 6px !important;
+  border: none !important;
+  cursor: pointer !important;
+  transition: background 0.2s ease !important;
 }

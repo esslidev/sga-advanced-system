@@ -45,7 +45,7 @@ const start = async () => {
     // Rate Limiting Middleware (DDoS Protection)
     await fastify.register(rateLimit, {
       global: true,
-      max: 100, // max requests
+      max: 20, // max requests
       timeWindow: "1 minute", // per time window
       // allowList: ["127.0.0.1"], // optional: allow local dev IP
       ban: 2, // temporary ban after exceeding limit

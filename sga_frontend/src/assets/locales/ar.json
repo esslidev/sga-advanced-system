@@ -1,0 +1,54 @@
+{
+  "components": {
+    "features": {
+      "footer": {
+        "allRights": "جميع الحقوق محفوظة © وزارة الداخلية 2025 – عمالة السمارة – DSIC"
+      }
+    }
+  },
+  "pages": {
+    "login": {
+      "newAccount": "حساب جديد",
+      "title": "تسجيل الدخول",
+      "subtitle": "يرجى استخدام رقم البطاقة الوطنية وكلمة المرور لتسجيل الدخول",
+      "cin": "رقم البطاقة الوطنية",
+      "password": "كلمة السر",
+      "submit": "تسجيل الدخول",
+      "submitLoading": "جاري الدخول..."
+    },
+    "signUp": {
+      "errorResponses": { "passwordUnmatched": "كلمتا السر غير متطابقتين" },
+      "login": "تسجيل الدخول",
+      "title": "إنشاء حساب",
+      "subtitle": "هذه الصفحة خاصة بمصلحة نظم المعلوميات والإتصال",
+      "adminAccessCode": "رمز الدخول الإداري",
+      "adminAccessCodePlaceholder": "أدخل الرمز الإداري",
+      "cin": "رقم البطاقة الوطنية",
+      "firstName": "الاسم",
+      "firstNamePlaceholder": "أدخل الاسم",
+      "lastName": "النسب",
+      "lastNamePlaceholder": "أدخل النسب",
+      "password": "كلمة السر",
+      "passwordConfirm": "تأكيد كلمة السر",
+      "submit": "إنشاء حساب",
+      "submitLoading": "جاري الدخول..."
+    },
+    "visitDataEntry": {
+      "title": "تحصيل الزيارة",
+      "subtitle": "الرجاء إدخال البيانات الخاصة بالزيارة بدقة وفق التعليمات المعمول بها",
+      "cin": "رقم البطاقة الوطنية",
+      "firstName": "الاسم",
+      "firstNamePlaceholder": "أدخل الاسم",
+      "lastName": "النسب",
+      "lastNamePlaceholder": "أدخل النسب",
+      "visitDate": "تاريخ الزيارة",
+      "visitTime": "ساعة الزيارة",
+      "departementPlaceholder": "إختر المصلحة",
+      "unavailableDepartementPlaceholder": "لا توجد خيارات متاحة",
+      "visitReasonPlaceholder": "أدخل سبب الزيارة هنا",
+      "submit": "تسجيل",
+      "submitLoading": "جاري التسجيل",
+      "cancel": "إلغاء التسجيل"
+    }
+  }
+}

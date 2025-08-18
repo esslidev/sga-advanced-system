@@ -12,8 +12,10 @@ import { useSystemPreferences } from "../../hooks/useSystemPreferences";
 import { Language } from "../../models/systemPreferences";
 import CustomTextInput from "../../components/common/TextInput/CustomTextInput";
 import { useNavigate } from "react-router-dom";
-import { PagesRoutes } from "../../../AppRoutes";
+import { PagesRoutes } from "../../AppRouter/AppRouter";
 import { signInThunk } from "../../redux/thunks/authThunks";
+import { t } from "../../../core/utils/translator";
+import Footer from "../../components/features/Footer/Footer";
 
 // PasswordInput with show/hide toggle
 const PasswordInput = ({
@@ -53,7 +55,7 @@ const LoginPage = () => {
   const [password, setPassword] = useState("");
 
   const handleLogin = async () => {
-    if (!CIN || !password) return;
+    if (!CIN.trim() || !password.trim()) return;
     const resultAction = await signIn({ CIN, password });
     if (signInThunk.fulfilled.match(resultAction)) {
       navigate(PagesRoutes.visitDataEntryPage, { replace: true });
@@ -63,7 +65,7 @@ const LoginPage = () => {
     <div className="container-fluid g-0 vh-100">
       <div className="row g-0 h-100">
         <div className="side-image d-none d-md-block col-md-6 col-lg-5" />
-        <div className="login-container d-flex flex-column col-12 col-md-6 col-lg-7 h-100 overflow-auto">
+        <div className="login-container d-flex flex-column col-12 col-md-6 col-lg-7">
           <div className="login-header d-flex justify-content-between">
             <Button
               className="sign-up-button"
@@ -71,7 +73,7 @@ const LoginPage = () => {
                 navigate(PagesRoutes.signUpPage);
               }}
             >
-              حساب جديد
+              {t("pages.login.newAccount", language)}
             </Button>
             <CustomSelector
               value={language == Language.french ? "french" : "arabic"}
@@ -89,24 +91,22 @@ const LoginPage = () => {
 
           <div className="login-form flex-fill d-flex flex-column gap-4 justify-content-center overflow-auto">
             <div className="form-title d-flex flex-column gap-2">
-              <h1 className="title">تسجيل الدخول</h1>
-              <p className="subtitle">
-                يرجى استخدام رقم البطاقة الوطنية وكلمة المرور لتسجيل الدخول
-              </p>
+              <h1 className="title">{t("pages.login.title", language)}</h1>
+              <p className="subtitle">{t("pages.login.subtitle", language)}</p>
             </div>
 
             <div className="form-inputs d-flex flex-column gap-4">
               <CustomTextInput
-                label="رقم البطاقة الوطنية"
-                value={CIN}
+                label={t("pages.login.cin", language)}
+                value={CIN.trim()}
                 onChange={(val) => setCIN(val.toUpperCase())}
                 placeholder="XX000000"
                 icon={<IdentificationIcon />}
                 onEnter={handleLogin}
               />
               <PasswordInput
-                label="كلمة السر"
-                value={password}
+                label={t("pages.login.password", language)}
+                value={password.trim()}
                 onChange={setPassword}
                 onEnter={handleLogin}
               />
@@ -122,9 +122,12 @@ const LoginPage = () => {
               disabled={loading}
               onClick={handleLogin}
             >
-              {loading ? "جاري الدخول..." : "تسجيل الدخول"}
+              {loading
+                ? t("pages.login.submitLoading", language)
+                : t("pages.login.submit", language)}
             </Button>
           </div>
+          <Footer />
         </div>
       </div>
     </div>

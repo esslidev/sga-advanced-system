@@ -1,0 +1,87 @@
+.side-image {
+  height: 100%;
+  background-image: url("../../../assets/images/smara-illustration.png");
+  background-size: cover;
+  background-position: center;
+}
+
+.login-container {
+  padding: 60px !important;
+  gap: 45px;
+  background-image: url("../../../assets/vectors/zellije-tile.svg");
+  background-repeat: repeat;
+  background-size: 120px 120px;
+}
+
+.sign-up-button {
+  font-size: 0.8rem !important;
+  padding-left: 16px !important;
+  padding-right: 16px !important;
+}
+
+.login-form {
+  width: 550px;
+  margin: 0 auto;
+}
+
+.login-form .title {
+  font-size: 2.4rem;
+  font-weight: 700;
+}
+
+.login-form .subtitle {
+  font-size: 1rem;
+  color: var(--secondary-text-color);
+}
+
+.error-response {
+  display: inline-block;
+  word-wrap: break-word;
+  max-width: 100%;
+  color: red;
+  background-color: #ffe5e5;
+  border: 1px solid red;
+  font-size: 14px;
+  border-radius: 4px;
+  padding: 0.5rem 1rem;
+  text-align: center;
+}
+
+.login-btn {
+  background: var(--primary-color) !important;
+  color: white !important;
+  height: 64px !important;
+  font-size: 1.3rem !important;
+  font-weight: 600 !important;
+  border-radius: 6px !important;
+  border: none !important;
+  cursor: pointer !important;
+  transition: background 0.2s ease !important;
+  margin-top: 32px;
+}
+
+@media (max-width: 1135px) {
+  .login-form {
+    width: 350px;
+  }
+}
+@media (max-width: 880px) {
+  .login-form {
+    width: 280px;
+  }
+}
+
+@media (max-width: 765px) {
+  .login-form {
+    width: 400px;
+  }
+}
+
+@media (max-width: 530px) {
+  .login-container {
+    padding: 30px !important;
+  }
+  .login-form {
+    width: 300px;
+  }
+}

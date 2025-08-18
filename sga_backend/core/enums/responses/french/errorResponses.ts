@@ -61,7 +61,7 @@ export enum FrErrorMessage {
   INVALID_TOKEN = "Le jeton fourni est invalide. Veuillez en fournir un valide.",
   ALREADY_VERIFIED = "Ce compte a déjà été vérifié.",
   EMAIL_NOT_VERIFIED = "L'adresse e-mail n'est pas vérifiée. Veuillez la confirmer avant de continuer.",
-  DATA_ALREADY_EXISTS = "Les données existent déjà. Veuillez fournir des données différentes.",
+  DATA_ALREADY_EXISTS = "Cet utilisateur existe déjà. Veuillez utiliser un autre compte ou vous connecter.",
   MISSING_PARAMETERS = "Des paramètres requis sont manquants dans la requête.",
   MISSING_ADMIN_ACCESS_CODE = "Le code d'accès administrateur est requis pour s'inscrire.",
   INVALID_ADMIN_ACCESS_CODE = "Le code d'accès administrateur fourni est invalide.",

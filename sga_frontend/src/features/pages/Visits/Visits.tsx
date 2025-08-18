@@ -9,7 +9,7 @@ import CustomTable, {
 } from "../../components/common/CustomDataGrid/CustomTable";
 
 import CustomPaginator from "../../components/common/CustomPaginator/CustomPaginator";
-import { PagesRoutes } from "../../../AppRoutes";
+import { PagesRoutes } from "../../AppRouter/AppRouter";
 import { AppUtil } from "../../../core/utils/appUtil";
 import {
   Division,

@@ -7,6 +7,10 @@
 
 .login-container {
   padding: 60px !important;
+  gap: 45px;
+  background-image: url("../../../assets/vectors/zellije-tile.svg");
+  background-repeat: repeat;
+  background-size: 120px 120px;
 }
 
 .sign-up-button {

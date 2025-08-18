@@ -16,7 +16,7 @@ body,
   margin: 0;
   padding: 0;
   font-family: "Noto Kufi Arabic", sans-serif;
-  background-color: #f2f4f5;
+  background-color: var(--background-color);
   color: #222;
   line-height: 1.6;
 }
@@ -28,7 +28,28 @@ body,
   --text-color: #374151;
   --secondary-text-color: #616161;
   --third-text-color: #a0a0a0;
-  --background-color: #f8f9fa;
+  --background-color: #eef2f7;
+}
+
+/* Hide default date/time picker icon in most browsers */
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="time"]::-webkit-calendar-picker-indicator {
+  display: none;
+  -webkit-appearance: none;
+}
+
+input[type="date"]::-moz-calendar-picker-indicator,
+input[type="time"]::-moz-calendar-picker-indicator {
+  display: none;
+  -moz-appearance: none;
+}
+
+/* For IE/Edge (if needed) */
+input[type="date"]::-ms-clear,
+input[type="date"]::-ms-expand,
+input[type="time"]::-ms-clear,
+input[type="time"]::-ms-expand {
+  display: none;
 }
 
 /* ===== Layout Helpers ===== */
@@ -104,58 +125,6 @@ select option {
   color: var(--text-color);
   background-color: white;
   margin-top: 8px;
-}
-
-.custom-multiselect .multiselectContainer {
-  background-color: white;
-  width: 500px;
-  border: 1px solid #ccc;
-}
-
-.chip .closeIcon {
-  margin: 0 !important;
-  font-size: 16px;
-  cursor: pointer;
-}
-
-.custom-multiselect .search-wrapper {
-  text-align: right;
-  border: none;
-  outline: none;
-  padding: 0;
-}
-
-.custom-multiselect .searchBox {
-  background-color: white !important;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  width: 100%;
-  text-align: right;
-  padding: 10px 16px;
-}
-
-.custom-multiselect .optionContainer {
-  background-color: white !important;
-  text-align: right;
-}
-
-.custom-multiselect .optionContainer {
-  background-color: white;
-}
-
-.custom-multiselect .option {
-  background-color: white;
-  color: black;
-}
-
-.custom-multiselect .option:hover {
-  background-color: var(--primary-color);
-  color: white;
-}
-
-.custom-multiselect .option.selected {
-  background-color: var(--primary-color);
-  color: white;
 }
 
 button {

@@ -1,15 +1,15 @@
-import { Navigate, Route, Routes, useNavigate } from "react-router-dom";
-import LoginPage from "./features/pages/Login/Login";
-import SignUpPage from "./features/pages/SignUp/SignUp";
-import VisitorsPage from "./features/pages/Visitors/Visitors";
-import VisitsPage from "./features/pages/Visits/Visits";
-import VisitDataEntryPage from "./features/pages/VisitorDataEntry/VisitDataEntry";
-import StatsPage from "./features/pages/Stats/Stats";
-import NotFound from "./features/pages/NotFound/NotFound";
-import Header from "./features/components/features/Header/Header";
-import Footer from "./features/components/features/Footer/Footer";
-import { useAuth } from "./features/hooks/useAuth";
-import { useEffect } from "react";
+import "./AppRouter.css";
+import { Navigate, Route, Routes } from "react-router-dom";
+import LoginPage from "../pages/Login/Login";
+import SignUpPage from "../pages/SignUp/SignUp";
+import VisitorsPage from "../pages/Visitors/Visitors";
+import VisitsPage from "../pages/Visits/Visits";
+import VisitDataEntryPage from "../pages/VisitorDataEntry/VisitDataEntry";
+import StatsPage from "../pages/Stats/Stats";
+import NotFound from "../pages/NotFound/NotFound";
+import Header from "../components/features/Header/Header";
+import Footer from "../components/features/Footer/Footer";
+import { useAuth } from "../hooks/useAuth";
 
 export const PagesRoutes = {
   basePage: "/accueil",
@@ -24,6 +24,7 @@ export const PagesRoutes = {
 const LoggedInLayout = () => {
   return (
     <div
+      className="logged-in-layout"
       style={{
         minHeight: "100vh",
         display: "flex",

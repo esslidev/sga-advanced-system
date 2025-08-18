@@ -1,7 +1,6 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import CustomButton from "../../components/common/CustomButton/CustomButton";
 import { useVisit } from "../../hooks/useVisit";
-import { HttpStatusCode } from "axios";
 import {
   Division,
   divisionOptions,
@@ -12,218 +11,225 @@ import {
 import "./VisitDataEntry.css";
 import Multiselect from "multiselect-react-dropdown";
 import AutoResizeTextarea from "../../components/common/CustomTextArea/AutoResizeTextarea";
-
-interface VisitFormData {
-  CIN: string;
-  firstName: string;
-  lastName: string;
-  visitDate: Date;
-  divisions: Division[];
-  visitReason: string;
-}
+import { t } from "../../../core/utils/translator";
+import { useSystemPreferences } from "../../hooks/useSystemPreferences";
+import CustomTextInput from "../../components/common/TextInput/CustomTextInput";
+import { IdentificationIcon } from "@heroicons/react/24/outline";
+import { Calendar, Clock, UserCircle } from "lucide-react";
+import { Button } from "react-bootstrap";
 
 const VisitDataEntryPage = () => {
-  const { createVisit } = useVisit();
+  const { language } = useSystemPreferences();
+  const { createVisit, loading, response } = useVisit();
 
   const multiselectRef = useRef<Multiselect>(null);
-  const [formData, setFormData] = useState<VisitFormData>({
-    CIN: "",
-    firstName: "",
-    lastName: "",
-    visitDate: new Date(),
-    divisions: [],
-    visitReason: "",
-  });
+  const [CIN, setCIN] = useState<string>("");
+  const [firstName, setFirstName] = useState<string>("");
+  const [lastName, setLastName] = useState<string>("");
+  const [visitDate, setVisitDate] = useState<Date>(new Date());
+  const [divisions, setDivisions] = useState<Division[]>([]);
+  const [visitReason, setVisitReason] = useState<string>("");
 
-  const handleSubmit = async () => {
-    // Basic validation
-    if (
-      !formData.CIN?.trim() ||
-      !formData.firstName?.trim() ||
-      !formData.lastName?.trim() ||
-      !formData.visitReason?.trim() ||
-      formData.divisions.length === 0 ||
-      formData.visitDate.toString() === "Invalid Date"
-    ) {
-      alert("الرجاء ملء جميع الحقول المطلوبة.");
-      return;
-    }
-
-    try {
-      const visitPayload: Partial<Visit> & {
-        visitor: { CIN: string; firstName: string; lastName: string };
-      } = {
-        visitor: {
-          CIN: formData.CIN.trim(),
-          firstName: formData.firstName.trim(),
-          lastName: formData.lastName.trim(),
-        },
-        visitDate: formData.visitDate,
-        divisions: formData.divisions,
-        visitReason: formData.visitReason.trim(),
-      };
-
-      console.log("Submitting visit data:", visitPayload);
-
-      const visitActionResult = await createVisit(visitPayload);
-      const visitResult = visitActionResult.payload;
-
-      if (
-        ![HttpStatusCode.Ok, HttpStatusCode.Created].includes(
-          visitResult?.statusCode || 0
-        )
-      ) {
-        alert(visitResult?.message || "حدث خطأ أثناء تسجيل الزيارة");
-        return;
-      }
-
+  useEffect(() => {
+    if (response && response.statusCode >= 200 && response.statusCode < 300) {
       alert("تم تسجيل الزيارة بنجاح!");
-
       // Reset form
-      setFormData({
-        CIN: "",
-        firstName: "",
-        lastName: "",
-        visitDate: new Date(),
-        divisions: [],
-        visitReason: "",
-      });
+      setCIN("");
+      setFirstName("");
+      setLastName("");
+      setVisitDate(new Date());
+      setDivisions([]);
+      setVisitReason("");
 
-      // reset multiselect UI
       if (multiselectRef.current) {
         multiselectRef.current.resetSelectedValues();
       }
-    } catch (error: any) {
-      alert("حدث خطأ: " + (error.message || error));
     }
+  }, [response]);
+
+  const handleSubmit = async () => {
+    if (
+      !CIN.trim() ||
+      !firstName?.trim() ||
+      !lastName?.trim() ||
+      !visitReason?.trim() ||
+      divisions.length === 0 ||
+      visitDate.toString() === "Invalid Date"
+    ) {
+      return;
+    }
+
+    const visitPayload: Partial<Visit> & {
+      visitor: { CIN: string; firstName: string; lastName: string };
+    } = {
+      visitor: { CIN, firstName, lastName },
+      visitDate,
+      divisions,
+      visitReason,
+    };
+
+    await createVisit(visitPayload);
   };
 
   return (
-    <div className="page visitorDataEntryPage">
-      <h1 className="title">تحصيل الزيارة</h1>
-      <div className="divisions">
-        <div className="division">
-          <input
-            placeholder="رقم البطاقة الوطنية"
-            type="text"
-            value={formData.CIN}
-            onChange={(e) => setFormData({ ...formData, CIN: e.target.value })}
-          />
+    <div className="visit-data-entry-container container-fluid d-flex flex-column justify-content-center align-items-center g-0 vh-100">
+      <div className="form-container d-flex flex-column gap-4">
+        <div className="form-title d-flex flex-column gap-2">
+          <h1 className="title">{t("pages.visitDataEntry.title", language)}</h1>
+          <p className="subtitle">
+            {t("pages.visitDataEntry.subtitle", language)}
+          </p>
         </div>
-        <div className="division">
-          <input
-            placeholder="الإسم الشخصي"
-            type="text"
-            value={formData.firstName}
-            onChange={(e) =>
-              setFormData({ ...formData, firstName: e.target.value })
-            }
-          />
-          <input
-            placeholder="الإسم العائلي"
-            type="text"
-            value={formData.lastName}
-            onChange={(e) =>
-              setFormData({ ...formData, lastName: e.target.value })
-            }
-          />
-          <input
-            placeholder="تاريخ الزيارة"
-            type="date"
-            value={formData.visitDate.toISOString().split("T")[0]}
-            onChange={(e) => {
-              const newDate = new Date(formData.visitDate);
-              const [year, month, day] = e.target.value.split("-").map(Number);
-              newDate.setFullYear(year, month - 1, day);
-              setFormData({ ...formData, visitDate: newDate });
-            }}
-          />
-          <input
-            placeholder="ساعة الزيارة"
-            type="time"
-            value={formData.visitDate.toTimeString().substring(0, 5)} // HH:mm
-            onChange={(e) => {
-              const newDate = new Date(formData.visitDate);
-              const [hours, minutes] = e.target.value.split(":").map(Number);
-              newDate.setHours(hours, minutes);
-              setFormData({ ...formData, visitDate: newDate });
-            }}
-          />
-          {
-            <div>
-              <p>الأقسام:</p>
-              <Multiselect
-                ref={multiselectRef}
-                className="custom-multiselect"
-                options={divisionOptions.map((option) => ({
-                  name: option.label,
-                  value: option.value,
-                }))}
-                displayValue="name"
-                placeholder="اختر القسم"
-                emptyRecordMsg="لا توجد خيارات متاحة"
-                onSelect={(selected: DivisionOption[]) => {
-                  setFormData({
-                    ...formData,
-                    divisions: selected.map((s) => s.value as Division), // if you use enum Division
-                  });
-                }}
-                onRemove={(selected: DivisionOption[]) => {
-                  setFormData({
-                    ...formData,
-                    divisions: selected.map((s) => s.value as Division),
-                  });
-                }}
-                isObject={true}
-                style={{
-                  chips: {
-                    gap: "4px",
-                    borderRadius: "4px",
-                    background: "var(--primary-color)",
-                  },
-                  multiselectContainer: {
-                    width: "500px",
-                  },
-                }}
-              />
-            </div>
-          }
-          <div>
-            <p className="font-semibold mb-2">سبب الزيارة :</p>
+
+        <div className="form-inputs row g-4">
+          {/* CIN */}
+          <div className="col-12 col-md-6">
+            <CustomTextInput
+              className="input"
+              label={t("pages.visitDataEntry.cin", language)}
+              value={CIN.trim()}
+              onChange={(val) => setCIN(val.toUpperCase())}
+              placeholder="XX000000"
+              icon={<IdentificationIcon />}
+              onEnter={handleSubmit}
+            />
+          </div>
+
+          {/* First Name */}
+          <div className="col-12 col-md-6">
+            <CustomTextInput
+              className="input"
+              label={t("pages.visitDataEntry.firstName", language)}
+              value={firstName}
+              onChange={setFirstName}
+              placeholder={t(
+                "pages.visitDataEntry.firstNamePlaceholder",
+                language
+              )}
+              icon={<UserCircle />}
+            />
+          </div>
+
+          {/* Last Name */}
+          <div className="col-12 col-md-6">
+            <CustomTextInput
+              className="input"
+              label={t("pages.visitDataEntry.lastName", language)}
+              value={lastName}
+              onChange={setLastName}
+              placeholder={t(
+                "pages.visitDataEntry.lastNamePlaceholder",
+                language
+              )}
+              icon={<UserCircle />}
+            />
+          </div>
+
+          {/* Visit Date */}
+          <div className="col-12 col-md-6">
+            <CustomTextInput
+              className="input"
+              label={t("pages.visitDataEntry.visitDate", language)}
+              type="date"
+              value={visitDate.toISOString().split("T")[0]}
+              onChange={(value) => {
+                const newDate = new Date(visitDate);
+                const [year, month, day] = value.split("-").map(Number);
+                newDate.setFullYear(year, month - 1, day);
+                setVisitDate(newDate);
+              }}
+              icon={<Calendar />}
+            />
+          </div>
+
+          {/* Visit Time */}
+          <div className="col-12 col-md-6">
+            <CustomTextInput
+              className="input"
+              label={t("pages.visitDataEntry.visitTime", language)}
+              type="time"
+              value={visitDate.toTimeString().substring(0, 5)}
+              onChange={(value) => {
+                const newDate = new Date(visitDate);
+                const [hours, minutes] = value.split(":").map(Number);
+                newDate.setHours(hours, minutes);
+                setVisitDate(newDate);
+              }}
+              icon={<Clock />}
+            />
+          </div>
+
+          {/* Division */}
+          <div className="col-12 col-md-6">
+            <Multiselect
+              ref={multiselectRef}
+              className="custom-multiselect"
+              options={divisionOptions.map((option) => ({
+                name: option.label,
+                value: option.value,
+              }))}
+              displayValue="name"
+              placeholder={t(
+                "pages.visitDataEntry.departementPlaceholder",
+                language
+              )}
+              emptyRecordMsg={t(
+                "pages.visitDataEntry.unavailableDepartementPlaceholder",
+                language
+              )}
+              onSelect={(selected: DivisionOption[]) =>
+                setDivisions(selected.map((s) => s.value as Division))
+              }
+              onRemove={(selected: DivisionOption[]) =>
+                setDivisions(selected.map((s) => s.value as Division))
+              }
+              isObject={true}
+            />
+          </div>
+
+          {/* Visit Reason */}
+          <div className="col-12 col-md-6">
             <AutoResizeTextarea
               name="سبب الزيارة"
               placeholder="أدخل سبب الزيارة هنا"
-              style={{ width: "500px" }}
-              value={formData.visitReason}
-              onChange={(e) =>
-                setFormData({ ...formData, visitReason: e.target.value })
-              }
+              style={{ width: "100%" }}
+              value={visitReason}
+              onChange={(e) => setVisitReason(e.target.value)}
               minRows={4}
               maxRows={8}
             />
           </div>
         </div>
-        <div className="division buttonDivision">
-          <CustomButton name="التسجيل" isInsert={true} onClick={handleSubmit} />
-          <CustomButton
-            name="الإلغاء"
+        {response && response.statusCode >= 400 && (
+          <p className="error-response">{response.message}</p>
+        )}
+        <div className="divisions mt-4 d-flex gap-3">
+          <Button
+            type="submit"
+            className="visit-form-btn"
+            disabled={loading}
+            onClick={handleSubmit}
+          >
+            {loading
+              ? t("pages.visitDataEntry.submitLoading", language)
+              : t("pages.visitDataEntry.submit", language)}
+          </Button>
+          <Button
+            className="visit-form-btn"
+            disabled={loading}
             onClick={() => {
-              // Reset form
-              setFormData({
-                CIN: "",
-                firstName: "",
-                lastName: "",
-                visitDate: new Date(),
-                divisions: [],
-                visitReason: "",
-              });
-
-              // reset multiselect UI
-              if (multiselectRef.current) {
+              setCIN("");
+              setFirstName("");
+              setLastName("");
+              setVisitDate(new Date());
+              setDivisions([]);
+              setVisitReason("");
+              if (multiselectRef.current)
                 multiselectRef.current.resetSelectedValues();
-              }
             }}
-          />
+          >
+            {t("pages.visitDataEntry.cancel", language)}
+          </Button>
         </div>
       </div>
     </div>

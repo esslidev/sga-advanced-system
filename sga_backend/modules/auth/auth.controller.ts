@@ -72,8 +72,8 @@ const signUp = async (
     if (!CIN || !isCINValid(CIN)) {
       throw new HttpErrorResponse(
         ErrorHttpStatusCode.BAD_REQUEST,
-        errorResponse(language).errorTitle.INVALID_EMAIL,
-        errorResponse(language).errorMessage.INVALID_EMAIL
+        errorResponse(language).errorTitle.INVALID_CIN,
+        errorResponse(language).errorMessage.INVALID_CIN
       );
     }
 

@@ -12,8 +12,11 @@ import { useSystemPreferences } from "../../hooks/useSystemPreferences";
 import { Language } from "../../models/systemPreferences";
 import CustomTextInput from "../../components/common/TextInput/CustomTextInput";
 import { useNavigate } from "react-router-dom";
-import { PagesRoutes } from "../../../AppRoutes";
+import { PagesRoutes } from "../../AppRouter/AppRouter";
 import { BadgeCheck, UserCircle } from "lucide-react";
+import { signUpThunk } from "../../redux/thunks/authThunks";
+import { t } from "../../../core/utils/translator";
+import Footer from "../../components/features/Footer/Footer";
 
 // PasswordInput with show/hide toggle
 const PasswordInput = ({
@@ -56,15 +59,32 @@ const SignUpPage = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
-  const handleSignUp = () => {
-    if (!CIN || !password || !confirmPassword) return;
+  const handleSignUp = async () => {
+    if (
+      !adminAccessCode.trim() ||
+      !CIN.trim() ||
+      !firstName.trim() ||
+      !lastName.trim() ||
+      !password.trim() ||
+      !confirmPassword.trim()
+    )
+      return;
 
     if (password !== confirmPassword) {
-      alert("كلمتا السر غير متطابقتين");
+      alert(t("pages.signUp.errorResponses.passwordUnmatched", language));
       return;
     }
 
-    signUp({ CIN, password, firstName, lastName, adminAccessCode });
+    const resultAction = await signUp({
+      CIN,
+      password,
+      firstName,
+      lastName,
+      adminAccessCode,
+    });
+    if (signUpThunk.fulfilled.match(resultAction)) {
+      navigate(PagesRoutes.visitDataEntryPage, { replace: true });
+    }
   };
 
   return (
@@ -79,7 +99,7 @@ const SignUpPage = () => {
                 navigate(PagesRoutes.loginPage);
               }}
             >
-              تسجيل الدخول
+              {t("pages.signUp.login", language)}
             </Button>
             <CustomSelector
               value={language === Language.french ? "french" : "arabic"}
@@ -97,49 +117,50 @@ const SignUpPage = () => {
 
           <div className="login-form flex-fill d-flex flex-column gap-4 justify-content-center">
             <div className="form-title d-flex flex-column gap-2">
-              <h1 className="title">إنشاء حساب</h1>
-              <p className="subtitle">
-                هذه الصفحة خاصة بمصلحة نظم المعلوميات والإتصال
-              </p>
+              <h1 className="title">{t("pages.signUp.title", language)}</h1>
+              <p className="subtitle">{t("pages.signUp.subtitle", language)}</p>
             </div>
             <div className="form-inputs d-flex flex-column gap-4">
               <CustomTextInput
-                label="رمز الدخول الإداري"
-                value={adminAccessCode}
+                label={t("pages.signUp.adminAccessCode", language)}
+                value={adminAccessCode.trim()}
                 onChange={setAdminAccessCode}
-                placeholder="أدخل الرمز الإداري"
+                placeholder={t(
+                  "pages.signUp.adminAccessCodePlaceholder",
+                  language
+                )}
                 icon={<BadgeCheck />}
               />
               <CustomTextInput
-                label="رقم البطاقة الوطنية"
-                value={CIN}
+                label={t("pages.signUp.cin", language)}
+                value={CIN.trim()}
                 onChange={(val) => setCIN(val.toUpperCase())}
                 placeholder="XX000000"
                 icon={<IdentificationIcon />}
                 onEnter={handleSignUp}
               />
               <CustomTextInput
-                label="الاسم"
+                label={t("pages.signUp.firstName", language)}
                 value={firstName}
                 onChange={setFirstName}
-                placeholder="أدخل الاسم"
+                placeholder={t("pages.signUp.firstNamePlaceholder", language)}
                 icon={<UserCircle />}
               />
               <CustomTextInput
-                label="النسب"
+                label={t("pages.signUp.lastName", language)}
                 value={lastName}
                 onChange={setLastName}
-                placeholder="أدخل النسب"
+                placeholder={t("pages.signUp.lastNamePlaceholder", language)}
                 icon={<UserCircle />}
               />
               <PasswordInput
-                label="كلمة السر"
+                label={t("pages.signUp.password", language)}
                 value={password}
                 onChange={setPassword}
                 onEnter={handleSignUp}
               />
               <PasswordInput
-                label="تأكيد كلمة السر"
+                label={t("pages.signUp.passwordConfirm", language)}
                 value={confirmPassword}
                 onChange={setConfirmPassword}
                 onEnter={handleSignUp}
@@ -156,9 +177,12 @@ const SignUpPage = () => {
               disabled={loading}
               onClick={handleSignUp}
             >
-              {loading ? "جاري التسجيل..." : "إنشاء حساب"}
+              {loading
+                ? t("pages.signUp.submitLoading", language)
+                : t("pages.signUp.submit", language)}
             </Button>
           </div>
+          <Footer />
         </div>
       </div>
     </div>

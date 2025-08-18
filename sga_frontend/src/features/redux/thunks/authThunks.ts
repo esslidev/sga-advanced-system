@@ -28,10 +28,13 @@ type RenewPayload = {
 export const signInThunk = createAsyncThunk<
   { response: ApiResponse; auth: ApiAuth },
   SignInPayload,
-  { rejectValue: ApiResponse }
+  { rejectValue: ApiResponse; state: RootState }
 >("auth/signIn", async (payload, thunkAPI) => {
+  const { getState, rejectWithValue } = thunkAPI;
   try {
-    const res = await api.post("/auth/sign-in", payload);
+    const res = await api.post("/auth/sign-in", payload, {
+      headers: { language: getState().systemPreferences.language },
+    });
 
     return {
       response: res.data.response,
@@ -43,7 +46,7 @@ export const signInThunk = createAsyncThunk<
       title: "Unknown Error",
       message: err.message,
     };
-    return thunkAPI.rejectWithValue(errorResponse);
+    return rejectWithValue(errorResponse);
   }
 });
 
@@ -51,10 +54,13 @@ export const signInThunk = createAsyncThunk<
 export const signUpThunk = createAsyncThunk<
   { response: ApiResponse; auth: ApiAuth },
   SignUpPayload,
-  { rejectValue: ApiResponse }
+  { rejectValue: ApiResponse; state: RootState }
 >("auth/signUp", async (payload, thunkAPI) => {
+  const { getState, rejectWithValue } = thunkAPI;
   try {
-    const res = await api.post("/auth/sign-up", payload);
+    const res = await api.post("/auth/sign-up", payload, {
+      headers: { language: getState().systemPreferences.language },
+    });
 
     return {
       response: res.data.response,
@@ -66,7 +72,7 @@ export const signUpThunk = createAsyncThunk<
       title: "Unknown Error",
       message: err.message,
     };
-    return thunkAPI.rejectWithValue(errorResponse);
+    return rejectWithValue(errorResponse);
   }
 });
 
@@ -84,7 +90,10 @@ export const signOutThunk = createAsyncThunk<
           "/auth/sign-out",
           {},
           {
-            headers: { authorization: accessToken },
+            headers: {
+              authorization: accessToken,
+              language: getState().systemPreferences.language,
+            },
           }
         );
         return res.data.response;
@@ -103,13 +112,20 @@ export const signOutThunk = createAsyncThunk<
 export const renewAccessThunk = createAsyncThunk<
   { newAccessToken: string; response: ApiResponse },
   RenewPayload,
-  { rejectValue: ApiResponse }
+  { rejectValue: ApiResponse; state: RootState }
 >("auth/access/renew", async ({ expiredAccessToken, renewToken }, thunkAPI) => {
+  const { getState, rejectWithValue } = thunkAPI;
   try {
-    const res = await api.post("/auth/access/renew", {
-      expiredAccessToken,
-      renewToken,
-    });
+    const res = await api.post(
+      "/auth/access/renew",
+      {
+        expiredAccessToken,
+        renewToken,
+      },
+      {
+        headers: { language: getState().systemPreferences.language },
+      }
+    );
 
     return {
       newAccessToken: res.data.auth.newAccessToken,
@@ -121,6 +137,6 @@ export const renewAccessThunk = createAsyncThunk<
       title: "Unknown Error",
       message: err.message,
     };
-    return thunkAPI.rejectWithValue(errorResponse);
+    return rejectWithValue(errorResponse);
   }
 });
