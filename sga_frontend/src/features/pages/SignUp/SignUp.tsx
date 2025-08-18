@@ -11,6 +11,9 @@ import CustomSelector from "../../components/common/CustomSelector/CustomSelecto
 import { useSystemPreferences } from "../../hooks/useSystemPreferences";
 import { Language } from "../../models/systemPreferences";
 import CustomTextInput from "../../components/common/TextInput/CustomTextInput";
+import { useNavigate } from "react-router-dom";
+import { PagesRoutes } from "../../../AppRoutes";
+import { BadgeCheck, UserCircle } from "lucide-react";
 
 // PasswordInput with show/hide toggle
 const PasswordInput = ({
@@ -43,6 +46,7 @@ const PasswordInput = ({
 };
 
 const SignUpPage = () => {
+  const navigate = useNavigate();
   const { language, changeLanguage } = useSystemPreferences();
   const { signUp, loading, response } = useAuth();
   const [adminAccessCode, setAdminAccessCode] = useState("");
@@ -67,9 +71,16 @@ const SignUpPage = () => {
     <div className="container-fluid g-0 vh-100">
       <div className="row g-0 h-100">
         <div className="side-image d-none d-md-block col-md-6 col-lg-5" />
-        <div className="login-container d-flex flex-column col-12 col-md-6 col-lg-7">
-          <div className="login-header d-flex justify-content-between align-items-center">
-            <h2>حساب جديد</h2>
+        <div className="login-container d-flex flex-column col-12 col-md-6 col-lg-7 h-100 overflow-auto">
+          <div className="login-header d-flex justify-content-between">
+            <Button
+              className="sign-up-button"
+              onClick={() => {
+                navigate(PagesRoutes.loginPage);
+              }}
+            >
+              تسجيل الدخول
+            </Button>
             <CustomSelector
               value={language === Language.french ? "french" : "arabic"}
               options={[
@@ -85,18 +96,19 @@ const SignUpPage = () => {
           </div>
 
           <div className="login-form flex-fill d-flex flex-column gap-4 justify-content-center">
+            <div className="form-title d-flex flex-column gap-2">
+              <h1 className="title">إنشاء حساب</h1>
+              <p className="subtitle">
+                هذه الصفحة خاصة بمصلحة نظم المعلوميات والإتصال
+              </p>
+            </div>
             <div className="form-inputs d-flex flex-column gap-4">
               <CustomTextInput
-                label="الاسم"
-                value={firstName}
-                onChange={setFirstName}
-                placeholder="أدخل الاسم"
-              />
-              <CustomTextInput
-                label="النسب"
-                value={lastName}
-                onChange={setLastName}
-                placeholder="أدخل النسب"
+                label="رمز الدخول الإداري"
+                value={adminAccessCode}
+                onChange={setAdminAccessCode}
+                placeholder="أدخل الرمز الإداري"
+                icon={<BadgeCheck />}
               />
               <CustomTextInput
                 label="رقم البطاقة الوطنية"
@@ -105,6 +117,20 @@ const SignUpPage = () => {
                 placeholder="XX000000"
                 icon={<IdentificationIcon />}
                 onEnter={handleSignUp}
+              />
+              <CustomTextInput
+                label="الاسم"
+                value={firstName}
+                onChange={setFirstName}
+                placeholder="أدخل الاسم"
+                icon={<UserCircle />}
+              />
+              <CustomTextInput
+                label="النسب"
+                value={lastName}
+                onChange={setLastName}
+                placeholder="أدخل النسب"
+                icon={<UserCircle />}
               />
               <PasswordInput
                 label="كلمة السر"
@@ -117,12 +143,6 @@ const SignUpPage = () => {
                 value={confirmPassword}
                 onChange={setConfirmPassword}
                 onEnter={handleSignUp}
-              />
-              <CustomTextInput
-                label="كود الدخول الإداري (اختياري)"
-                value={adminAccessCode}
-                onChange={setAdminAccessCode}
-                placeholder="أدخل الكود إذا كان لديك"
               />
             </div>
 

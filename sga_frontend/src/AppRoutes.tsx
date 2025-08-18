@@ -1,4 +1,4 @@
-import { Navigate, Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes, useNavigate } from "react-router-dom";
 import LoginPage from "./features/pages/Login/Login";
 import SignUpPage from "./features/pages/SignUp/SignUp";
 import VisitorsPage from "./features/pages/Visitors/Visitors";
@@ -9,6 +9,7 @@ import NotFound from "./features/pages/NotFound/NotFound";
 import Header from "./features/components/features/Header/Header";
 import Footer from "./features/components/features/Footer/Footer";
 import { useAuth } from "./features/hooks/useAuth";
+import { useEffect } from "react";
 
 export const PagesRoutes = {
   basePage: "/accueil",

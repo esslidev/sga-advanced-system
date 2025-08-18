@@ -6,10 +6,10 @@ import rateLimit from "@fastify/rate-limit";
 import prisma from "./prisma/client";
 import visitorRouter from "./modules/visitor/visitor.router";
 import visitRouter from "./modules/visit/visit.router";
-import authRoutes from "./modules/auth/auth.routes";
+import authRoutes from "./modules/auth/auth.router";
 import userRouter from "./modules/user/user.router";
 import { integrationAuthHook } from "./hooks/authHook";
-import logsRouter from "./modules/logs/logs.routes";
+import logsRouter from "./modules/logs/logs.router";
 
 const fastify = Fastify({
   logger: {

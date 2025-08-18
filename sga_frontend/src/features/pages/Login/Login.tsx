@@ -11,6 +11,9 @@ import CustomSelector from "../../components/common/CustomSelector/CustomSelecto
 import { useSystemPreferences } from "../../hooks/useSystemPreferences";
 import { Language } from "../../models/systemPreferences";
 import CustomTextInput from "../../components/common/TextInput/CustomTextInput";
+import { useNavigate } from "react-router-dom";
+import { PagesRoutes } from "../../../AppRoutes";
+import { signInThunk } from "../../redux/thunks/authThunks";
 
 // PasswordInput with show/hide toggle
 const PasswordInput = ({
@@ -43,23 +46,31 @@ const PasswordInput = ({
 };
 
 const LoginPage = () => {
+  const navigate = useNavigate();
   const { language, changeLanguage } = useSystemPreferences();
   const { signIn, loading, response } = useAuth();
   const [CIN, setCIN] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     if (!CIN || !password) return;
-    signIn({ CIN, password });
+    const resultAction = await signIn({ CIN, password });
+    if (signInThunk.fulfilled.match(resultAction)) {
+      navigate(PagesRoutes.visitDataEntryPage, { replace: true });
+    }
   };
-
   return (
     <div className="container-fluid g-0 vh-100">
       <div className="row g-0 h-100">
         <div className="side-image d-none d-md-block col-md-6 col-lg-5" />
-        <div className="login-container d-flex flex-column col-12 col-md-6 col-lg-7">
+        <div className="login-container d-flex flex-column col-12 col-md-6 col-lg-7 h-100 overflow-auto">
           <div className="login-header d-flex justify-content-between">
-            <Button className="sign-up-button" onClick={() => {}}>
+            <Button
+              className="sign-up-button"
+              onClick={() => {
+                navigate(PagesRoutes.signUpPage);
+              }}
+            >
               حساب جديد
             </Button>
             <CustomSelector
@@ -76,7 +87,7 @@ const LoginPage = () => {
             />
           </div>
 
-          <div className="login-form flex-fill d-flex flex-column gap-4 justify-content-center">
+          <div className="login-form flex-fill d-flex flex-column gap-4 justify-content-center overflow-auto">
             <div className="form-title d-flex flex-column gap-2">
               <h1 className="title">تسجيل الدخول</h1>
               <p className="subtitle">
