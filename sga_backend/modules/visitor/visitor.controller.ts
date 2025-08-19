@@ -16,7 +16,7 @@ import { getHeaderValue } from "../../core/utils/headerValueGetter";
 // GET Visitor
 const getVisitor = async (
   request: FastifyRequest<{
-    Querystring: { id: string };
+    Querystring: { id?: string; CIN?: string };
   }>,
   reply: FastifyReply
 ) => {
@@ -25,10 +25,23 @@ const getVisitor = async (
     "language",
     ResponseLanguage.ARABIC
   )!;
-  const { id } = request.query;
+  const { id, CIN } = request.query;
+
   try {
+    if (!id && !CIN) {
+      throw new HttpErrorResponse(
+        ErrorHttpStatusCode.BAD_REQUEST,
+        errorResponse(language).errorTitle.INVALID_REQUEST,
+        errorResponse(language).errorMessage.INVALID_REQUEST
+      );
+    }
+
     const visitor = await request.server.prisma.visitor.findFirst({
-      where: { id, deletedAt: { equals: null } },
+      where: {
+        deletedAt: null,
+        ...(id ? { id } : {}),
+        ...(CIN ? { CIN } : {}),
+      },
     });
 
     if (!visitor) {

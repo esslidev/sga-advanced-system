@@ -18,14 +18,17 @@ type GetVisitorsPayload = {
 // GET visitor
 export const getVisitor = createAsyncThunk<
   { visitor: Visitor },
-  string,
+  { id?: string; CIN?: string }, // <-- accept id or CIN
   { rejectValue: ApiResponse; dispatch: AppDispatch; state: RootState }
->("visitor/getVisitor", async (id, thunkAPI) => {
+>("visitor/getVisitor", async (params, thunkAPI) => {
   const { dispatch, getState, rejectWithValue } = thunkAPI;
+  const { id, CIN } = params;
+
   try {
     const result = await authRequestHandler(
       async (accessToken) => {
-        const res = await api.get(`/visitor/get-visitor/${id}`, {
+        const res = await api.get(`/visitor/get-visitor`, {
+          params: { id, CIN }, // <-- send as query params
           headers: { authorization: accessToken },
         });
         return { visitor: res.data.data };

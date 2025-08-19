@@ -17,9 +17,7 @@ export const useVisitor = () => {
   const dispatch = useAppDispatch();
 
   const visitors = useAppSelector((state) => state.visitor.visitors);
-  const selectedVisitor = useAppSelector(
-    (state) => state.visitor.selectedVisitor
-  );
+  const visitor = useAppSelector((state) => state.visitor.visitor);
   const loading = useAppSelector((state) => state.visitor.loading);
   const response = useAppSelector((state) => state.visitor.response);
   const pagination = useAppSelector((state) => state.visitor.pagination);
@@ -30,7 +28,9 @@ export const useVisitor = () => {
     limit?: number;
     page?: number;
   }) => dispatch(getVisitors(params));
-  const fetchVisitor = (id: string) => dispatch(getVisitor(id));
+  const fetchVisitor = ({ id, CIN }: { id?: string; CIN?: string }) => {
+    return dispatch(getVisitor({ id, CIN }));
+  };
   const createVisitor = (data: Partial<Visitor>) => dispatch(addVisitor(data));
   const modifyVisitor = (data: Partial<Visitor>) =>
     dispatch(updateVisitor(data));
@@ -42,7 +42,7 @@ export const useVisitor = () => {
 
   return {
     visitors,
-    selectedVisitor,
+    visitor,
     loading,
     response,
     pagination,

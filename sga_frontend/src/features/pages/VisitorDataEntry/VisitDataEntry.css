@@ -1,5 +1,5 @@
 .form-container {
-  width: 80%;
+  width: 70%;
 }
 
 .form-container .title {
@@ -90,4 +90,17 @@
   border: none !important;
   cursor: pointer !important;
   transition: background 0.2s ease !important;
+}
+
+.visitor-found {
+  display: inline-block;
+  word-wrap: break-word;
+  max-width: 100%;
+  color: green;
+  background-color: #dbecdb;
+  border: 1px solid green;
+  font-size: 14px;
+  border-radius: 4px;
+  padding: 0.5rem 1rem;
+  text-align: center;
 }

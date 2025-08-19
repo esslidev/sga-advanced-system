@@ -56,6 +56,7 @@ const visitorSlice = createSlice({
     builder.addCase(getVisitor.rejected, (state, action) => {
       state.loading = false;
       state.response = action.payload ?? null;
+      state.visitor = null;
     });
 
     // GET MANY

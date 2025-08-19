@@ -1,5 +1,4 @@
-import { useEffect, useRef, useState } from "react";
-import CustomButton from "../../components/common/CustomButton/CustomButton";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useVisit } from "../../hooks/useVisit";
 import {
   Division,
@@ -17,10 +16,23 @@ import CustomTextInput from "../../components/common/TextInput/CustomTextInput";
 import { IdentificationIcon } from "@heroicons/react/24/outline";
 import { Calendar, Clock, UserCircle } from "lucide-react";
 import { Button } from "react-bootstrap";
+import { useVisitor } from "../../hooks/useVisitor";
+import debounce from "lodash.debounce";
 
 const VisitDataEntryPage = () => {
   const { language } = useSystemPreferences();
-  const { createVisit, loading, response } = useVisit();
+  const {
+    createVisit,
+    loading: visitLoading,
+    response: visitResponse,
+  } = useVisit();
+
+  const {
+    visitor,
+    fetchVisitor,
+    loading: visitorLoading,
+    response: visitorResponse,
+  } = useVisitor();
 
   const multiselectRef = useRef<Multiselect>(null);
   const [CIN, setCIN] = useState<string>("");
@@ -30,28 +42,46 @@ const VisitDataEntryPage = () => {
   const [divisions, setDivisions] = useState<Division[]>([]);
   const [visitReason, setVisitReason] = useState<string>("");
 
+  // Reset form after successful submission
   useEffect(() => {
-    if (response && response.statusCode >= 200 && response.statusCode < 300) {
+    if (
+      visitResponse &&
+      visitResponse.statusCode >= 200 &&
+      visitResponse.statusCode < 300
+    ) {
       alert("تم تسجيل الزيارة بنجاح!");
-      // Reset form
       setCIN("");
       setFirstName("");
       setLastName("");
       setVisitDate(new Date());
       setDivisions([]);
       setVisitReason("");
-
       if (multiselectRef.current) {
         multiselectRef.current.resetSelectedValues();
       }
     }
-  }, [response]);
+  }, [visitResponse]);
+
+  // Debounced visitor search
+  const debouncedSearch = useCallback(
+    debounce((value: string) => {
+      fetchVisitor({ CIN: value });
+    }, 500),
+    []
+  );
+
+  const handleCheckVisitor = (value: string) => {
+    debouncedSearch(value);
+  };
 
   const handleSubmit = async () => {
+    const effectiveFirstName = visitor ? visitor.firstName : firstName;
+    const effectiveLastName = visitor ? visitor.lastName : lastName;
+
     if (
       !CIN.trim() ||
-      !firstName?.trim() ||
-      !lastName?.trim() ||
+      !effectiveFirstName?.trim() ||
+      !effectiveLastName?.trim() ||
       !visitReason?.trim() ||
       divisions.length === 0 ||
       visitDate.toString() === "Invalid Date"
@@ -62,7 +92,11 @@ const VisitDataEntryPage = () => {
     const visitPayload: Partial<Visit> & {
       visitor: { CIN: string; firstName: string; lastName: string };
     } = {
-      visitor: { CIN, firstName, lastName },
+      visitor: {
+        CIN,
+        firstName: effectiveFirstName,
+        lastName: effectiveLastName,
+      },
       visitDate,
       divisions,
       visitReason,
@@ -83,16 +117,24 @@ const VisitDataEntryPage = () => {
 
         <div className="form-inputs row g-4">
           {/* CIN */}
-          <div className="col-12 col-md-6">
+          <div className="col-12 col-md-12 d-flex flex-column gap-3">
             <CustomTextInput
               className="input"
               label={t("pages.visitDataEntry.cin", language)}
               value={CIN.trim()}
-              onChange={(val) => setCIN(val.toUpperCase())}
+              onChange={(value) => {
+                setCIN(value.toUpperCase());
+                handleCheckVisitor(value);
+              }}
               placeholder="XX000000"
               icon={<IdentificationIcon />}
               onEnter={handleSubmit}
             />
+            {visitor && (
+              <p className="visitor-found">
+                {t("pages.visitDataEntry.visitorFound", language)}
+              </p>
+            )}
           </div>
 
           {/* First Name */}
@@ -100,7 +142,7 @@ const VisitDataEntryPage = () => {
             <CustomTextInput
               className="input"
               label={t("pages.visitDataEntry.firstName", language)}
-              value={firstName}
+              value={visitor ? visitor.firstName : firstName}
               onChange={setFirstName}
               placeholder={t(
                 "pages.visitDataEntry.firstNamePlaceholder",
@@ -115,7 +157,7 @@ const VisitDataEntryPage = () => {
             <CustomTextInput
               className="input"
               label={t("pages.visitDataEntry.lastName", language)}
-              value={lastName}
+              value={visitor ? visitor.lastName : lastName}
               onChange={setLastName}
               placeholder={t(
                 "pages.visitDataEntry.lastNamePlaceholder",
@@ -195,28 +237,30 @@ const VisitDataEntryPage = () => {
               style={{ width: "100%" }}
               value={visitReason}
               onChange={(e) => setVisitReason(e.target.value)}
-              minRows={4}
-              maxRows={8}
+              minRows={6}
+              maxRows={10}
             />
           </div>
         </div>
-        {response && response.statusCode >= 400 && (
-          <p className="error-response">{response.message}</p>
+
+        {visitResponse && visitResponse.statusCode >= 400 && (
+          <p className="error-response">{visitResponse.message}</p>
         )}
+
         <div className="divisions mt-4 d-flex gap-3">
           <Button
             type="submit"
             className="visit-form-btn"
-            disabled={loading}
+            disabled={visitLoading}
             onClick={handleSubmit}
           >
-            {loading
+            {visitLoading
               ? t("pages.visitDataEntry.submitLoading", language)
               : t("pages.visitDataEntry.submit", language)}
           </Button>
           <Button
             className="visit-form-btn"
-            disabled={loading}
+            disabled={visitLoading}
             onClick={() => {
               setCIN("");
               setFirstName("");

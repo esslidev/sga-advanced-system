@@ -1,10 +1,8 @@
 .header {
   display: flex;
   flex-direction: column;
-  background-color: white;
   padding: 24px 120px;
   gap: 14px;
-  box-shadow: 2px 2px 11px rgba(0, 0, 0, 0.1);
 }
 
 .topBar {

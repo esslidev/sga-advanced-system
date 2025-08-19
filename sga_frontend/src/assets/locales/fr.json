@@ -39,6 +39,7 @@
       "title": "Saisie de la visite",
       "subtitle": "Veuillez entrer les données de la visite avec précision conformément aux instructions en vigueur",
       "cin": "Numéro de la carte nationale",
+      "visitorFound": "Le visiteur a été trouvé dans le système",
       "firstName": "Prénom",
       "firstNamePlaceholder": "Entrez le prénom",
       "lastName": "Nom de famille",
@@ -50,7 +51,7 @@
       "visitReasonPlaceholder": "Entrez ici le motif de la visite",
       "submit": "Soumettre",
       "submitLoading": "Enregistrement en cours",
-      "cancel": "Annuler l'enregistrement"
+      "cancel": "Annuler"
     }
   }
 }
