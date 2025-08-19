@@ -92,6 +92,11 @@
   transition: background 0.2s ease !important;
 }
 
+.cancel {
+  background: #dde4ec !important;
+  color: var(--text-color) !important;
+}
+
 .visitor-found {
   display: inline-block;
   word-wrap: break-word;

@@ -1,6 +1,14 @@
 {
   "components": {
     "features": {
+      "header": {
+        "navs": {
+          "dataEntry": "Saisie des visites",
+          "tracking": "Suivi des saisies",
+          "analytics": "Analytique"
+        },
+        "signout": "Déconnexion"
+      },
       "footer": {
         "allRights": "Tous droits réservés © Ministère de l'Intérieur 2025 – Préfecture de Smara – DSIC"
       }

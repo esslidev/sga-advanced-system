@@ -18,7 +18,7 @@ export const PagesRoutes = {
   visitorsPage: "/visiteurs",
   visitsPage: "/visiteurs/visites",
   visitDataEntryPage: "/saisie-donnees-visites",
-  statsPage: "/statistiques-visiteurs",
+  analyticsPage: "/analytique-visiteurs",
 };
 
 const LoggedInLayout = () => {
@@ -39,7 +39,7 @@ const LoggedInLayout = () => {
         />
         <Route path={PagesRoutes.visitorsPage} element={<VisitorsPage />} />
         <Route path={PagesRoutes.visitsPage} element={<VisitsPage />} />
-        <Route path={PagesRoutes.statsPage} element={<StatsPage />} />
+        <Route path={PagesRoutes.analyticsPage} element={<StatsPage />} />
         <Route
           path="/"
           element={<Navigate to={PagesRoutes.visitDataEntryPage} replace />}

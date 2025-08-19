@@ -39,7 +39,7 @@ export const getVisits = createAsyncThunk<
           }
         );
 
-        return res.data as { data: Visit[]; pagination: ApiPagination };
+        return res.data;
       },
       dispatch,
       getState()
@@ -64,7 +64,7 @@ export const addVisit = createAsyncThunk<
         const res = await api.post("/visit/add-visit", newVisit, {
           headers: { authorization: accessToken },
         });
-        return res.data;
+        return res.data.response;
       },
       dispatch,
       getState()
@@ -93,7 +93,7 @@ export const updateVisit = createAsyncThunk<
         const res = await api.put("/visit/update-visit", updatedVisit, {
           headers: { authorization: accessToken },
         });
-        return res.data;
+        return res.data.response;
       },
       dispatch,
       getState()
@@ -122,7 +122,7 @@ export const deleteVisit = createAsyncThunk<
         const res = await api.delete(`/visit/delete-visit?id=${id}`, {
           headers: { authorization: accessToken },
         });
-        return res.data;
+        return res.data.response;
       },
       dispatch,
       getState()

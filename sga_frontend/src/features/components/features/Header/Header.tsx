@@ -1,61 +1,63 @@
 import "./Header.css";
-import ProfileFilledIcon from "../../../../assets/vectors/profile-filled-icon";
 import { useNavigate } from "react-router-dom";
 import { PagesRoutes } from "../../../AppRouter/AppRouter";
 import { useAuth } from "../../../hooks/useAuth";
+import { signOutThunk } from "../../../redux/thunks/authThunks";
+import moroccoSymbol from "../../../../assets/images/morocco-symbol.png";
+import { useSystemPreferences } from "../../../hooks/useSystemPreferences";
+import { t } from "../../../../core/utils/translator";
+import ProfileFilledIcon from "../../../../assets/vectors/profile-filled-icon";
 
 const Header = () => {
   const navigate = useNavigate();
-  const { apiAuth, signOut } = useAuth();
+  const { language } = useSystemPreferences();
+  const { signOut } = useAuth();
 
-  const fullName = "الإسم الكامل";
-  const profileImage = null;
+  const handleLogout = async () => {
+    signOut();
 
-  const handleLogout = () => {
-    signOut(); // Clear auth state
-    navigate(PagesRoutes.loginPage); // Redirect to login
+    const resultAction = await signOut();
+    if (signOutThunk.fulfilled.match(resultAction)) {
+      navigate(PagesRoutes.loginPage, { replace: true });
+    }
   };
 
   return (
-    <div className="header">
-      <div className="topBar">
-        <div className="profile">
-          {profileImage ? (
-            <img className="profileImage" src={profileImage} alt="profile" />
-          ) : (
-            <div className="profileImage">
-              <ProfileFilledIcon fillColor="#717070" />
-            </div>
-          )}
-          <p id="fullName">{fullName}</p>
+    <div className="header container-fluid d-flex align-items-center justify-content-between shadow-sm py-3">
+      <div className="d-flex gap-3 align-items-center justify-content-center">
+        <div className="profileImage">
+          <ProfileFilledIcon fillColor="#717070" />
         </div>
-
-        <button id="logout" title="خروج" onClick={handleLogout}>
-          خروج
-        </button>
+        <p className="full-name">علي سالم السويح</p>
       </div>
 
-      <div className="navBar">
+      {/* Center: Morocco Symbol Logo */}
+      <div className="position-absolute start-50 translate-middle-x">
+        <img className="symbol-img" src={moroccoSymbol} alt="Logo" />
+      </div>
+
+      {/* Right: Navigation Links */}
+      <div className="header-nav d-flex flex-row gap-3">
         <button
-          className="navButton"
-          title="تحصيل الزيارة"
+          className="nav-btn"
           onClick={() => navigate(PagesRoutes.visitDataEntryPage)}
         >
-          تحصيل الزيارة
+          {t("components.features.header.navs.dataEntry", language)}
         </button>
         <button
-          className="navButton"
-          title="تتبع التحصيل"
+          className="nav-btn"
           onClick={() => navigate(PagesRoutes.visitorsPage)}
         >
-          تتبع التحصيل
+          {t("components.features.header.navs.tracking", language)}{" "}
         </button>
         <button
-          className="navButton"
-          title="الإحصائيات"
-          onClick={() => navigate(PagesRoutes.statsPage)}
+          className="nav-btn"
+          onClick={() => navigate(PagesRoutes.analyticsPage)}
         >
-          الإحصائيات
+          {t("components.features.header.navs.analytics", language)}
+        </button>
+        <button className="signout-btn" onClick={handleLogout}>
+          {t("components.features.header.signout", language)}
         </button>
       </div>
     </div>

@@ -1,20 +1,12 @@
 .header {
-  display: flex;
-  flex-direction: column;
-  padding: 24px 120px;
-  gap: 14px;
+  width: 100%;
+  min-height: 180px;
+  background-color: white;
+  padding: 0 6% !important;
 }
 
-.topBar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.profile {
-  display: flex;
-  gap: 10px;
-  align-items: center;
+.symbol-img {
+  width: 120px;
 }
 
 .profileImage {
@@ -27,30 +19,44 @@
   align-items: center;
   padding: 10px;
 }
-#fullName {
+
+.full-name {
   font-size: 16px;
   font-weight: 500;
-}
-
-#logout {
-  padding: 4px 24px;
-  font-size: 14px;
-  font-weight: 500;
-  border-radius: 50px;
-  background-color: #e74b4b;
-  color: white;
-}
-
-#logout:hover {
-  background-color: #d0393a;
-  color: white;
-}
-
-.navBar {
+  margin: 0;
+  line-height: 1;
   display: flex;
-  gap: 20px;
+  align-items: center;
 }
 
-.navButton {
-  padding: 10px 40px;
+.nav-btn {
+  padding: 8px 12px !important;
+  font-size: 16px !important;
+  font-weight: 600 !important;
+  border-radius: 4px !important;
+  background-color: transparent !important;
+  color: var(--text-color) !important;
+  transition: all 0.3s ease !important;
+}
+
+.nav-btn:hover {
+  background-color: transparent !important;
+  color: var(--primary-color) !important;
+}
+
+.signout-btn {
+  padding: 4px 24px !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  border-radius: 4px !important;
+  border: 2px solid red !important;
+  background-color: transparent !important;
+  color: #e74b4b !important;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.signout-btn:hover {
+  background-color: red !important;
+  color: white !important;
 }

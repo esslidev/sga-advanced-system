@@ -1,6 +1,14 @@
 {
   "components": {
     "features": {
+      "header": {
+        "navs": {
+          "dataEntry": "تحصيل الزيارة",
+          "tracking": "تتبع التحصيل",
+          "analytics": "البيانات"
+        },
+        "signout": "تسجيل الخروج"
+      },
       "footer": {
         "allRights": "جميع الحقوق محفوظة © وزارة الداخلية 2025 – عمالة السمارة – DSIC"
       }

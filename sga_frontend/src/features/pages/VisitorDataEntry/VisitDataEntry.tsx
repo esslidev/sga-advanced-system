@@ -12,7 +12,7 @@ import Multiselect from "multiselect-react-dropdown";
 import AutoResizeTextarea from "../../components/common/CustomTextArea/AutoResizeTextarea";
 import { t } from "../../../core/utils/translator";
 import { useSystemPreferences } from "../../hooks/useSystemPreferences";
-import CustomTextInput from "../../components/common/TextInput/CustomTextInput";
+import CustomTextInput from "../../components/common/CustomTextInput/CustomTextInput";
 import { IdentificationIcon } from "@heroicons/react/24/outline";
 import { Calendar, Clock, UserCircle } from "lucide-react";
 import { Button } from "react-bootstrap";
@@ -233,7 +233,10 @@ const VisitDataEntryPage = () => {
           <div className="col-12 col-md-6">
             <AutoResizeTextarea
               name="سبب الزيارة"
-              placeholder="أدخل سبب الزيارة هنا"
+              placeholder={t(
+                "pages.visitDataEntry.visitReasonPlaceholder",
+                language
+              )}
               style={{ width: "100%" }}
               value={visitReason}
               onChange={(e) => setVisitReason(e.target.value)}
@@ -259,7 +262,7 @@ const VisitDataEntryPage = () => {
               : t("pages.visitDataEntry.submit", language)}
           </Button>
           <Button
-            className="visit-form-btn"
+            className="visit-form-btn cancel"
             disabled={visitLoading}
             onClick={() => {
               setCIN("");

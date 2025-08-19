@@ -10,7 +10,7 @@ import {
 import CustomSelector from "../../components/common/CustomSelector/CustomSelector";
 import { useSystemPreferences } from "../../hooks/useSystemPreferences";
 import { Language } from "../../models/systemPreferences";
-import CustomTextInput from "../../components/common/TextInput/CustomTextInput";
+import CustomTextInput from "../../components/common/CustomTextInput/CustomTextInput";
 import { useNavigate } from "react-router-dom";
 import { PagesRoutes } from "../../AppRouter/AppRouter";
 import { BadgeCheck, UserCircle } from "lucide-react";
